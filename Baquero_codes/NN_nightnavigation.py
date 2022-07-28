@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Aug  3 23:03:12 2021
 
 @author: andres
+@author: Felipe-Tommaselli
 """
 
 import os
