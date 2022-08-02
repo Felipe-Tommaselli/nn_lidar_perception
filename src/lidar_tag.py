@@ -14,14 +14,20 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
 NavigationToolbar2Tk)
 
-# path = '/home/andres/Documents/learning_lidar/Data_2021/problem_rosbag/ts_2021_10_14_13h35m40s'
+# move from root (\src) to \assets\tags
+os.chdir('..') 
 path = os.getcwd() + '\\assets\\tags'
+
+# getting file paths right
 label_file_name = os.path.join(path,'Label_Data.csv')
-lidar_file_name = 'Lidar_Data.csv'
+lidar_file_name = os.path.join(path, 'Lidar_Data.csv')
+
+# open lidar file and lidar data
 lidar_file = open(lidar_file_name,'r')
 lidar_data = lidar_file.readlines()
 Final_label_data = []
-print(os.path.exists(label_file_name))
+
+
 Fc = 0
 if os.path.exists(label_file_name) == 0:
     label_file = open(label_file_name,'w', encoding="utf-8")
@@ -34,17 +40,15 @@ else:
     label_file = open(label_file_name,'r', encoding="utf-8")
     label_data = label_file.readlines()
     label_file.close()
-    print(label_data)
-    label_len = len(label_data)
-    print(label_len)
+    # print('label> ', label_data)
+    label_len = len(label_data) # label_len = 1
     step = label_len - 1
     #for t in range(1,label_len):
         #Final_label_data.append(label_data[t])
     for t in range(1,len(lidar_data)):
         if t < label_len:
-            #Final_label_data.append(label_data[t])
             Final_label_data.append((label_data[t])[:len(label_data[t])])
-            print((label_data[t])[:len(label_data[t])])
+            print('?> ', (label_data[t])[:len(label_data[t])])
         else:
             Final_label_data.append('')
 
@@ -143,7 +147,6 @@ def PlotFunction(i):
     x_lidar = []
     y_lidar = []
     global canvas
-    print(len(lidar))
     for j in range(0,len(lidar)):
         #print(j)
         if (j==0):
@@ -207,16 +210,16 @@ def on_pick(event):
         points_x[n_p] = x1
         points_y[n_p] = y1
         n_p = n_p +1
-        print ('X='+str(x1)) # Print X point
-        print ('Y='+str(y1))# Print Y point
-        print('Pointsx: ', points_x)
-        print('Pointsy: ', points_y)
+        print (f'X= {x1:.2f}') # Print X point
+        print (f'Y={y1:.2f}')# Print Y point
+        print(f'Pointsx: ' + f', '.join(f'{p:.2f}' for p in points_x))
+        print(f'Pointsy: ' + f', '.join(f'{p:.2f}' for p in points_y))
         ax.plot(x1,y1,'k*')
         canvas = FigureCanvasTkAgg(fig, master = root)  
         canvas.draw()
         canvas.get_tk_widget().place(x=50,y=50)
         fig.canvas.mpl_connect('pick_event', on_pick)
-        print(points)
+        # print(points)
         
     else:
         print("IT IS NOT POSSIBLE TO SAVE MORE THAN 4 POINTS")
