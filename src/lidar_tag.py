@@ -9,6 +9,8 @@ import os
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set_theme(style="whitegrid")
 import tkinter
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
@@ -168,6 +170,9 @@ def PlotFunction(i):
   
     # plotting the graph
     ax.plot(x_lidar,y_lidar,'.', color='g',picker=3)
+    #! TESTE COM SEABORN
+    sns.scatterplot(x=x_lidar, y=y_lidar, color='r')
+    plt.show()
     ax.set_title('Step: ' + str(i))
     ax.set_xlim([-1, 1])
     ax.set_ylim([0, 3])
