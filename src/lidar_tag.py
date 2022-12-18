@@ -20,44 +20,59 @@ NavigationToolbar2Tk)
 os.chdir('..') 
 path = os.getcwd() + '\\assets\\tags'
 
+
 # getting file paths right
 label_file_name = os.path.join(path,'Label_Data.csv')
 lidar_file_name = os.path.join(path, 'Lidar_Data.csv')
 
+#! LIDAR DATA
 # open lidar file and lidar data
 lidar_file = open(lidar_file_name,'r')
 lidar_data = lidar_file.readlines()
 Final_label_data = []
 
-
+a = []
 Fc = 0
+#! LABEL DATA
+# if label file does not exist, create it
 if os.path.exists(label_file_name) == 0:
-    label_file = open(label_file_name,'w', encoding="utf-8")
+    label_file = open(label_file_name,'w', encoding="utf-8") # write = create
     print('No File')
     Fc = 1
     step = 0
+    # cover all lidar data with empty labels
     for t in range(0,len(lidar_data)-1):
+        # add empty label to label data
         Final_label_data.append('')
 else:
-    label_file = open(label_file_name,'r', encoding="utf-8")
-    label_data = label_file.readlines()
-    label_file.close()
+    # open label file and label data
+    label_file = open(label_file_name,'r', encoding="utf-8") # read
+    label_data = label_file.readlines() # store label data
+    label_file.close() # clos efile
+
     # print('label> ', label_data)
-    label_len = len(label_data) # label_len = 1
+    
+    # get label data length
+    label_len = len(label_data) # init: label_len = 1
     step = label_len - 1
-    #for t in range(1,label_len):
-        #Final_label_data.append(label_data[t])
+    # cover lidar_data 
     for t in range(1,len(lidar_data)):
+        # if label data is not empty
         if t < label_len:
-            Final_label_data.append((label_data[t])[:len(label_data[t])])
-            print('?> ', (label_data[t])[:len(label_data[t])])
+            # labelt = last element (list) in the label_data 
+            labelt = (label_data[t])[:len(label_data[t])]
+            # add label to label data
+            Final_label_data.append(labelt)
+            print('?> ', labelt)
         else:
             Final_label_data.append('')
+
 
 x_lidar = []
 y_lidar = []
 min_angle = np.deg2rad(-45)
 max_angle = np.deg2rad(225)
+# angle is a list of 1081 values from -45 to 225
 angle = np.linspace(min_angle, max_angle, 1081, endpoint = False)
 
 max_step = len(lidar_data)
@@ -67,6 +82,7 @@ points_x = [0, 0, 0, 0]
 points_y = [0, 0, 0, 0]
 n_p = 0
 
+#! TKINTER
 def NextFunction():
     print('NEXT STEP')
     global step

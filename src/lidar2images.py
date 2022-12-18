@@ -1,5 +1,27 @@
 # -*- coding: utf-8 -*-
 """
+lidar2images.py is a script that converts lidar data to images.
+
+With the lidar data obtained from the syncro_data.csv file, witch contains data from the TerraSentia lidar, this script convert 
+the data to images and save them in the images folder. The image format is basically a plot of the lidar data in a 2D space.
+
+The script is divided in 3 parts:
+    1. Data processing
+    2. Data visualization
+    3. Data saving
+
+The data processing part is divided in 3 functions:
+    1. limitLidar: This function limits the lidar data to a maximum value of 5 meters.
+    2. polar2xy: This function converts the polar coordinates of the lidar data to cartesian coordinates.
+    3. plot_lines: This function plots the lidar data in a 2D space.
+
+The data visualization part is divided in 2 functions:
+    1. plot_lines: This function plots the lidar data in a 2D space.
+
+The data saving part only contains the function of saving the images.
+
+The script is executed by running the following command in the terminal:
+> python lidar2images.py
 
 
 @author: andres
@@ -11,12 +33,17 @@ import math
 import numpy as np
 import os
 
+# move from root (\src) to \assets\tags
+os.chdir('..') 
+path = os.getcwd() + '\\datasets\\'
+data_file_name = os.path.join(path,'syncro_data_validation.csv')
+
 #filedata = open('/home/andres/Documents/learning_lidar/syncro_data.csv',"r")
-filedata = open('syncro_data_validation.csv',"r")
 #finalData = open('/home/andres/Documents/learning_lidar/filter_syncro_data_validation.csv',"w")
 #finalData = open('/home/andres/Documents/learning_lidar/filter_syncro_data.csv',"w")
 #finalData = open('/home/andres/Documents/learning_lidar/filter_syncro_data_norm.csv',"w")
 #finalData = open('/home/andres/Documents/learning_lidar/filter_syncro_data_validation_norm.csv',"w")
+filedata = open(data_file_name,"r")
 data = filedata.readlines()
 
 def limitLidar(readings):
@@ -50,10 +77,6 @@ def plot_lines(xl,yl,t):
     # name = '/home/andres/Documents/learning_lidar/images_approach/images/image'+str(t)
     #plt.savefig(name)
     plt.savefig(os.getcwd() + '\\assets\\images' + '\\image' + str(t))
-    
-
-
-
 
 
 for step in range(0,len(data)):
