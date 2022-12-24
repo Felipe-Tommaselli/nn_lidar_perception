@@ -29,68 +29,79 @@ The script is executed by running the following command in the terminal:
 """
 
 import matplotlib.pyplot as plt
-import math
+import numpy as np 
 import numpy as np
 import os
 
 class lidar2images:
+    """ Class convert the lidar data to images with each step of the lidar data (angle and distance) been converted to a point in a 2D space. """
+    
+    def __init__(self) -> None:
+        """ Constructor of the class. """
+        while True:
+            try: 
+                self.data = self.getData()
+                break
+            except Exception as e:
+                print("Error: ", e)
+                print("Please, check the path to the file and try again")
+                break
 
-    def __init__(self):
-        self.data = self.getData()
-
-
-    def getData(self):
+    def getData(self) -> list:
+        """ This function gets the data from the "syncro_data.csv" or the "filter_syncro_data_valitation" file. """
         # move from root (\src) to \assets\tags
         os.chdir('..') 
         path = os.getcwd() + '\\datasets\\'
-        s = 'syncro_data_validation.csv'
-        # s = filter_syncro_data_validation.csv
-        data_file_name = os.path.join(path, s)
+        filename = 'syncro_data_validation.csv'
+        # filename = filter_syncro_data_validation.csv
+        data_file_name = os.path.join(path, filename) # merge path and filename
 
+        # open file and read all data
         filedata = open(data_file_name,"r")
         data = filedata.readlines()
         filedata.close()
-        return data
+        return data # returns file data
 
     def limitLidar(self, readings):
-        final_readings= []
-        for t in range(0,len(readings)):
-                final_readings.append(int(readings[t])/1000)
-        #print(readings)
-        return final_readings #, maxval
+        """ This function normalizes data and limits the lidar data to a maximum value of 5 meters. """
+        readings = readings[7:1088] # limit data 
+        final_readings = [int(r)/1000 for r in readings if int(r)/1000 < 5] # normalizing the data
+        return final_readings
 
     def polar2xy(self, lidar):
-            x_lidar = []
-            y_lidar = []
-            min_angle = np.deg2rad(-45)
-            max_angle = np.deg2rad(225)
-            angle = np.linspace(min_angle, max_angle, 1081, endpoint = False)
-            for i in range(0, len(lidar)):
-                x_lidar.append(lidar[i]*math.cos(angle[i]))
-                y_lidar.append(lidar[i]*math.sin(angle[i]))
-                
-            return x_lidar, y_lidar
+        """ This function converts the polar coordinates of the lidar data to cartesian coordinates."""
+        min_angle = np.deg2rad(-45)
+        max_angle = np.deg2rad(225) # lidar range
+        angle = np.linspace(min_angle, max_angle, 1081, endpoint = False)
 
-    def plot_lines(self, xl,yl,t):
-        LW=0.8
-        plt.cla()
+        # convert polar to cartesian:
+        # x = r * cos(theta)
+        # y = r * sin(theta)
+        # where r is the distance from the lidar (x in lidar)
+        # and angle is the step between the angles measure in each distance (angle(lidar.index(x))
+        x_lidar = [x*np.cos(angle[lidar.index(x)]) for x in lidar]
+        y_lidar = [y*np.sin(angle[lidar.index(y)]) for y in lidar]
+
+        return x_lidar, y_lidar
+
+    def plot_lines(self, xl, yl, t):
+        """ This function plots the lidar data in a 2D space. """
+        LW=0.8 # distance for the plot (region avaiable for navigation) 
+        plt.cla() 
         plt.plot(xl,yl,'g.')
         plt.xlim(-LW,LW)
         plt.ylim(-1,5)
         plt.axis('off')
         plt.pause(0.1)
-        print(t)
-        # name = '/home/andres/Documents/learning_lidar/images_approach/images/image'+str(t)
-        #plt.savefig(name)
+        print(f'[{t}]')
         plt.savefig(os.getcwd() + '\\assets\\images' + '\\image' + str(t))
 
 if __name__ == '__main__':
     l2i = lidar2images()
     for step in range(0,len(l2i.data)):
-        lidar = ((l2i.data[step]).split(","))[7:1088]
-        #print(lidar)
-        lidar_readings = limitLidar(lidar)
-        #print(lidar_readings)
-        x,y = polar2xy(lidar_readings) 
-        #print(x)
-        plot_lines(x,y,step)
+        readings = ((l2i.data[step]).split(","))
+        lidar_readings = l2i.limitLidar(readings)
+        print('lidar readings:', lidar_readings[:4])
+        x,y = l2i.polar2xy(lidar_readings) 
+        print('x:', x[:4])
+        l2i.plot_lines(x,y,step)
