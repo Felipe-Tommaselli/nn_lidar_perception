@@ -36,28 +36,36 @@ import numpy as np
 import os
 
 global filename 
-filename = "syncro_data_validation.csv"
+filename = "syncro_data_validation.csv" # default file name
 ''' There are other options:
-Dataset:
+folder = Dataset:
     "filter_syncro_data_validation.csv"
     "filter_syncro_data_norm.csv"
-Tags:
+folder = Tags:
     "Label_Data.csv"
     "Lidar_Data.csv" '''
+folder = "Datasets"
 
 class lidar2images:
     """ Class convert the lidar data to images with each step of the lidar data (angle and distance) been converted to a point in a 2D space. """
     
-    def __init__(self, filename: str) -> None:
+    def __init__(self, filename: str, folder: str) -> None:
         """ Constructor of the class. """
-        self.data = lidar2images.getData(name=filename)
+        while True:
+            try:
+                self.data = lidar2images.getData(name=filename, folder=folder)
+                break
+            except Exception as e:
+                print("Error: ", e)
+                print("File not found, please try again")
+                filename = input("Please enter the file name: ")
 
     @staticmethod
-    def getData(name) -> list:
+    def getData(name: str, folder: str) -> list:
         """ This function gets the data from the "syncro_data.csv" or the "filter_syncro_data_valitation" file. """
         # move from root (\src) to \assets\tags
         os.chdir('..') 
-        path = os.getcwd() + '\\datasets\\'
+        path = os.getcwd() + '\\' + str(folder) + '\\'
         data_file_name = os.path.join(path, name) # merge path and filename
 
         # open file and read all data if possible
@@ -107,7 +115,7 @@ class lidar2images:
         plt.savefig(os.getcwd() + '\\assets\\images' + '\\image' + str(t))
 
 if __name__ == '__main__':
-    l2i = lidar2images(filename=filename)
+    l2i = lidar2images(filename=filename, folder=folder)
     print('L2I OG')
     for step in range(0,len(l2i.data)):
         # split data (each line) in a lista with all the values
