@@ -35,6 +35,16 @@ import numpy as np
 import numpy as np
 import os
 
+global filename 
+filename = "syncro_data_validation.csv"
+''' There are other options:
+Dataset:
+    "filter_syncro_data_validation.csv"
+    "filter_syncro_data_norm.csv"
+Tags:
+    "Label_Data.csv"
+    "Lidar_Data.csv" '''
+
 class lidar2images:
     """ Class convert the lidar data to images with each step of the lidar data (angle and distance) been converted to a point in a 2D space. """
     
@@ -54,8 +64,6 @@ class lidar2images:
         # move from root (\src) to \assets\tags
         os.chdir('..') 
         path = os.getcwd() + '\\datasets\\'
-        filename = 'syncro_data_validation.csv'
-        # filename = filter_syncro_data_validation.csv
         data_file_name = os.path.join(path, filename) # merge path and filename
 
         # open file and read all data
@@ -64,13 +72,13 @@ class lidar2images:
         filedata.close()
         return data # returns file data
 
-    def filterData(self, readings):
+    def filterData(self, readings) -> list:
         """ This function normalizes data and limits the lidar data to a maximum value of 5 meters. """
         readings = readings[7:1088] # limit data 
         final_readings = [int(r)/1000 for r in readings if int(r)/1000 < 5] # normalizing the data
         return final_readings
 
-    def polar2xy(self, lidar):
+    def polar2xy(self, lidar) -> list:
         """ This function converts the polar coordinates of the lidar data to cartesian coordinates."""
         min_angle = np.deg2rad(-45)
         max_angle = np.deg2rad(225) # lidar range
@@ -86,7 +94,7 @@ class lidar2images:
 
         return x_lidar, y_lidar
 
-    def plot_lines(self, xl: list, yl: list, t: int):
+    def plot_lines(self, xl: list, yl: list, t: int) -> None:
         """ This function plots the lidar data in a 2D space. """
         LW=0.8 # distance for the plot (region avaiable for navigation) 
         plt.cla() 
@@ -100,6 +108,7 @@ class lidar2images:
 
 if __name__ == '__main__':
     l2i = lidar2images()
+    print('L2I OG')
     for step in range(0,len(l2i.data)):
         # split data (each line) in a lista with all the values
         readings = l2i.data[step].split(",")
