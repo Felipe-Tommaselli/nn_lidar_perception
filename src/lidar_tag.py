@@ -16,6 +16,13 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
 NavigationToolbar2Tk)
 
+import lidar2images as l2i
+
+class lidar_tag():
+
+    def __init__(self):
+        
+
 # move from root (\src) to \assets\tags
 os.chdir('..') 
 path = os.getcwd() + '\\assets\\tags'
