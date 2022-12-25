@@ -16,28 +16,31 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
 NavigationToolbar2Tk)
 
-import lidar2images as l2i
+from lidar2images import *
 
-class lidar_tag():
+class lidar_tag:
 
     def __init__(self):
-        label_data = l2i.getData(filename='Label_Data.csv', folder='assets//Tags')
-        lidar_data = l2i.getData(filename='Lidar_Data.csv')
+        # raw_lidar_data == lidar_data
+        lidar_data = lidar2images.getData(name='Lidar_Data.csv', folder='assets\\Tags')
+        # raw_lidar_data != lidar_data, it requires a treatment
+        raw_label_data = lidar2images.getData(name='Label_Data.csv', folder='assets\\Tags')
 
-# move from root (\src) to \assets\tags
-os.chdir('..') 
-path = os.getcwd() + '\\assets\\tags'
+        label_data = []
+        if len(label_data) <= 1: 
+            # full of empty labels
+            label_data = ['' for i in range(len(lidar_data))]
+        else:
+            #label_data = [(label_data[t])[:len(label_data[t])] if t < len(label_data) - 1 else '' for t in range(1,len(lidar_data))]
+            for t in range(1,len(lidar_data)):
+                label_data[t] = (raw_label_data[t])[:len(raw_label_data[t])] if t < len(raw_label_data) - 1 else ''
+        print('Data is ok to be tagged')  if len(label_data) == len(lidar_data) else print('Data is not ok to be tagged')
 
 
-# getting file paths right
-label_file_name = os.path.join(path,'Label_Data.csv')
-lidar_file_name = os.path.join(path, 'Lidar_Data.csv')
+if __name__ == '__main__':
+    lidar_tag()
 
-#! LIDAR DATA
-# open lidar file and lidar data
-lidar_file = open(lidar_file_name,'r')
-lidar_data = lidar_file.readlines()
-Final_label_data = []
+'''
 
 a = []
 Fc = 0
@@ -284,8 +287,7 @@ InputStep.place(x=300, y = 745)
 root.mainloop()
 
 
-
-
+'''
 '''
 for i in range(1, len(lidar_data)):
     lidar = ((lidar_data[i]).split(','))[1:]

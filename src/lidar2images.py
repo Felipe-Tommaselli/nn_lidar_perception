@@ -44,7 +44,7 @@ folder = Dataset:
 folder = Tags:
     "Label_Data.csv"
     "Lidar_Data.csv" '''
-folder = "Datasets"
+folder = "datasets"
 
 class lidar2images:
     """ Class convert the lidar data to images with each step of the lidar data (angle and distance) been converted to a point in a 2D space. """
@@ -64,16 +64,18 @@ class lidar2images:
     def getData(name: str, folder: str) -> list:
         """ This function gets the data from the "syncro_data.csv" or the "filter_syncro_data_valitation" file. """
         # move from root (\src) to \assets\tags
-        os.chdir('..') 
+        if os.getcwd().split('\\')[-1] == 'src':
+            os.chdir('..') 
         path = os.getcwd() + '\\' + str(folder) + '\\'
         data_file_name = os.path.join(path, name) # merge path and filename
 
         # open file and read all data if possible
-        print("Opening file: ", data_file_name)
+        print("Opening file: ", data_file_name, end=' ')
         if os.path.exists(data_file_name):
             filedata = open(data_file_name,"r")
+            print('[SUCESS]')
         else:
-            print("File not found, we are going to create a new one")
+            print("[ERROR]\nFile not found, we are going to create a new one")
             filedata = open(path,"w+")
 
         data = filedata.readlines()
@@ -86,7 +88,8 @@ class lidar2images:
         final_readings = [int(r)/1000 for r in readings if int(r)/1000 < 5] # normalizing the data
         return final_readings
 
-    def polar2xy(self, lidar) -> list:
+    @staticmethod
+    def polar2xy(lidar) -> list:
         """ This function converts the polar coordinates of the lidar data to cartesian coordinates."""
         min_angle = np.deg2rad(-45)
         max_angle = np.deg2rad(225) # lidar range
