@@ -21,7 +21,7 @@ import lidar2images as l2i
 class lidar_tag():
 
     def __init__(self):
-        
+        label_data = l2i.getData()
 
 # move from root (\src) to \assets\tags
 os.chdir('..') 
