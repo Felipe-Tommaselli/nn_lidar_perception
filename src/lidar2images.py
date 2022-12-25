@@ -63,7 +63,7 @@ class lidar2images:
     @staticmethod
     def getData(name: str, folder: str) -> list:
         """ This function gets the data from the "syncro_data.csv" or the "filter_syncro_data_valitation" file. """
-        # move from root (\src) to \assets\tags
+        # move from root (\src) to \assets\tags or \datasets
         if os.getcwd().split('\\')[-1] == 'src':
             os.chdir('..') 
         path = os.getcwd() + '\\' + str(folder) + '\\'
