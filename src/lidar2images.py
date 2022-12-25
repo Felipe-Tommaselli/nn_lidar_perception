@@ -62,7 +62,7 @@ class lidar2images:
         filedata.close()
         return data # returns file data
 
-    def limitLidar(self, readings):
+    def filterData(self, readings):
         """ This function normalizes data and limits the lidar data to a maximum value of 5 meters. """
         readings = readings[7:1088] # limit data 
         final_readings = [int(r)/1000 for r in readings if int(r)/1000 < 5] # normalizing the data
@@ -84,7 +84,7 @@ class lidar2images:
 
         return x_lidar, y_lidar
 
-    def plot_lines(self, xl, yl, t):
+    def plot_lines(self, xl: list, yl: list, t: int):
         """ This function plots the lidar data in a 2D space. """
         LW=0.8 # distance for the plot (region avaiable for navigation) 
         plt.cla() 
@@ -99,9 +99,11 @@ class lidar2images:
 if __name__ == '__main__':
     l2i = lidar2images()
     for step in range(0,len(l2i.data)):
-        readings = ((l2i.data[step]).split(","))
-        lidar_readings = l2i.limitLidar(readings)
-        print('lidar readings:', lidar_readings[:4])
-        x,y = l2i.polar2xy(lidar_readings) 
-        print('x:', x[:4])
-        l2i.plot_lines(x,y,step)
+        # split data (each line) in a lista with all the values
+        readings = l2i.data[step].split(",")
+        # filter data
+        lidar_readings = l2i.filterData(readings=readings)
+        # convert polar to cartesian
+        x,y = l2i.polar2xy(lidar=lidar_readings) 
+        # plot image
+        l2i.plot_lines(xl=x, yl=y, t=step)
