@@ -1,2 +1,4 @@
-# DATASET
+# DATASETs
 *.csv
+# Images
+assets/images/*.png
