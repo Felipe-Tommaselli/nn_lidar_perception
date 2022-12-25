@@ -1,4 +1,4 @@
 # DATASETs
 *.csv
 # Images
-assets/images/*.png
+*.png
