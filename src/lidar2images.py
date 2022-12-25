@@ -6,19 +6,21 @@ With the lidar data obtained from the syncro_data.csv file, witch contains data 
 the data to images and save them in the images folder. The image format is basically a plot of the lidar data in a 2D space.
 
 The script is divided in 3 parts:
-    1. Data processing
-    2. Data visualization
-    3. Data saving
+    1. Data acquisition
+    2. Data processing
+    3. Data visualization
+
+The data acquisition part is divided in 1 function:
+    1. getData: This function gets the data from the "syncro_data.csv" or the "filter_syncro_data_valitation" file.
 
 The data processing part is divided in 3 functions:
-    1. limitLidar: This function limits the lidar data to a maximum value of 5 meters.
+    1. filterData: This function limits the lidar data to a maximum value of 5 meters.
     2. polar2xy: This function converts the polar coordinates of the lidar data to cartesian coordinates.
     3. plot_lines: This function plots the lidar data in a 2D space.
 
 The data visualization part is divided in 2 functions:
     1. plot_lines: This function plots the lidar data in a 2D space.
-
-The data saving part only contains the function of saving the images.
+    2. save_image: This function saves the image in the images folder.
 
 The script is executed by running the following command in the terminal:
 > python lidar2images.py
