@@ -48,26 +48,26 @@ Tags:
 class lidar2images:
     """ Class convert the lidar data to images with each step of the lidar data (angle and distance) been converted to a point in a 2D space. """
     
-    def __init__(self) -> None:
+    def __init__(self, filename: str) -> None:
         """ Constructor of the class. """
-        while True:
-            try: 
-                self.data = self.getData()
-                break
-            except Exception as e:
-                print("Error: ", e)
-                print("Please, check the path to the file and try again")
-                break
+        self.data = lidar2images.getData(name=filename)
 
-    def getData(self) -> list:
+    @staticmethod
+    def getData(name) -> list:
         """ This function gets the data from the "syncro_data.csv" or the "filter_syncro_data_valitation" file. """
         # move from root (\src) to \assets\tags
         os.chdir('..') 
         path = os.getcwd() + '\\datasets\\'
-        data_file_name = os.path.join(path, filename) # merge path and filename
+        data_file_name = os.path.join(path, name) # merge path and filename
 
-        # open file and read all data
-        filedata = open(data_file_name,"r")
+        # open file and read all data if possible
+        print("Opening file: ", data_file_name)
+        if os.path.exists(data_file_name):
+            filedata = open(data_file_name,"r")
+        else:
+            print("File not found, we are going to create a new one")
+            filedata = open(path,"w+")
+
         data = filedata.readlines()
         filedata.close()
         return data # returns file data
@@ -107,7 +107,7 @@ class lidar2images:
         plt.savefig(os.getcwd() + '\\assets\\images' + '\\image' + str(t))
 
 if __name__ == '__main__':
-    l2i = lidar2images()
+    l2i = lidar2images(filename=filename)
     print('L2I OG')
     for step in range(0,len(l2i.data)):
         # split data (each line) in a lista with all the values
