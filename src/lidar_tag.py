@@ -18,144 +18,105 @@ NavigationToolbar2Tk)
 
 from lidar2images import *
 
+
+
 class lidar_tag:
 
-    def __init__(self):
-        # raw_lidar_data == lidar_data
-        lidar_data = lidar2images.getData(name='Lidar_Data.csv', folder='assets\\Tags')
-        # raw_lidar_data != lidar_data, it requires a treatment
-        raw_label_data = lidar2images.getData(name='Label_Data.csv', folder='assets\\Tags')
+    def __init__(self, lidar_name:str, label_name:str, folder:str) -> None:
+        self.lidar_name = lidar_name
+        self.label_name = label_name
+        self.folder = folder
+        self.step = 0
+        self.min_step = 0
+        self.max_step = 0
+        self.points_x = [0, 0, 0, 0]
+        self.points_y = [0, 0, 0, 0]
+        self.points = []
 
+        # raw_lidar_data == lidar_data
+        self.lidar_data = lidar2images.getData(name=self.lidar_name, folder=self.folder)
+        # raw_lidar_data != lidar_data, it requires a treatment
+        raw_label_data = lidar2images.getData(name=self.label_name, folder=self.folder)
+        self.label_data = self.getLabel(raw=raw_label_data, data=self.lidar_data)
+
+    def getLabel(self, raw: list, data: list) -> list:
         label_data = []
         if len(label_data) <= 1: 
             # full of empty labels
-            label_data = ['' for i in range(len(lidar_data))]
+            label_data = ['' for i in range(len(data))]
         else:
-            #label_data = [(label_data[t])[:len(label_data[t])] if t < len(label_data) - 1 else '' for t in range(1,len(lidar_data))]
-            for t in range(1,len(lidar_data)):
-                label_data[t] = (raw_label_data[t])[:len(raw_label_data[t])] if t < len(raw_label_data) - 1 else ''
-        print('Data is ok to be tagged')  if len(label_data) == len(lidar_data) else print('Data is not ok to be tagged')
+            # fill the label_data with the labels if possible
+            for t in range(1,len(data)):
+                label_data[t] = (raw[t])[:len(raw[t])] if t < len(raw) - 1 else ''
+        print('Data is ok to be tagged')  if len(label_data) == len(data) else print('Data is not ok to be tagged')
+        return label_data
+
+    def NextFunction(self) -> None:
+        print('[NEXT STEP]')
+        self.step += 1
+        if (self.step < self.max_step):
+            PlotFunction(self.step)
+        else:
+            print('you reach the maximal step')
+
+    def PreviousFunction(self) -> None:
+        print('[PREVIOUS STEP]')
+        if (self.step <= self.min_step):
+            print('you reach the minimal step')
+        else:
+            self.step -= 1
+            PlotFunction(self.step)
+
+    def GoFunction(self) -> None:
+        INPUT = InputStep.get("1.0", "end-1c")
+        if(INPUT.isnumeric() == False):
+            print('It is empty or it is not a number')
+        elif (int(INPUT) < self.min_step):
+            print('The minimal step is 1')
+        elif (int(INPUT) > self.max_step):
+            print('The maximal step is '+ str(self.max_step))
+        else:
+            print('it is a number')
+            step = int(INPUT)
+            PlotFunction(self.step)
+
+    def CleanFunction(self) -> None:
+        self.points = []
+        self.points_x = [0, 0, 0, 0]
+        self.points_y = [0, 0, 0, 0]
+        PlotFunction(self.step)
+        self.label_data[self.step] = ''
+
+    def SaveFunction(self):
+        IL = 'L_x0'+','+'L_y0'+','+'L_x1'+','+'L_y1'+','+'L_x2'+','+'L_y2'+','+'L_x3'+','+'L_y3'
+        if  os.getcwd().split('\\')[-1] != 'IC_NN_Lidar':
+            os.chdir('..')
+        path = os.getcwd() + '\\' + str(self.folder) + '\\'
+        label_file_name = os.path.join(path, self.label_name) 
+
+        os.remove(label_file_name)
+        print('old file was deleted')
+        label_file = open(label_file_name,'w', encoding="utf-8")
+        print('new files was created')
+        self.label_data[0] = IL
+        for e in self.label_data:
+            if e != '':
+                label_file.writelines(e + '\n') 
+        print('File saved :)')
+
 
 
 if __name__ == '__main__':
-    lidar_tag()
-
-'''
+    lt = lidar_tag(lidar_name='Lidar_Data.csv', label_name='Label_Data.csv', folder='assets\\Tags')
+    lt.NextFunction()
+    lt.PreviousFunction()
+    lt.CleanFunction()
+    lt.SaveFunction()
 
 a = []
 Fc = 0
-#! LABEL DATA
-# if label file does not exist, create it
-if os.path.exists(label_file_name) == 0:
-    label_file = open(label_file_name,'w', encoding="utf-8") # write = create
-    print('No File')
-    Fc = 1
-    step = 0
-    # cover all lidar data with empty labels
-    for t in range(0,len(lidar_data)-1):
-        # add empty label to label data
-        Final_label_data.append('')
-else:
-    # open label file and label data
-    label_file = open(label_file_name,'r', encoding="utf-8") # read
-    label_data = label_file.readlines() # store label data
-    label_file.close() # clos efile
-
-    # print('label> ', label_data)
-    
-    # get label data length
-    label_len = len(label_data) # init: label_len = 1
-    step = label_len - 1
-    # cover lidar_data 
-    for t in range(1,len(lidar_data)):
-        # if label data is not empty
-        if t < label_len:
-            # labelt = last element (list) in the label_data 
-            labelt = (label_data[t])[:len(label_data[t])]
-            # add label to label data
-            Final_label_data.append(labelt)
-            print('?> ', labelt)
-        else:
-            Final_label_data.append('')
-
-
-x_lidar = []
-y_lidar = []
-min_angle = np.deg2rad(-45)
-max_angle = np.deg2rad(225)
-# angle is a list of 1081 values from -45 to 225
-angle = np.linspace(min_angle, max_angle, 1081, endpoint = False)
-
-max_step = len(lidar_data)
-min_step = 1
-points = []
-points_x = [0, 0, 0, 0]
-points_y = [0, 0, 0, 0]
-n_p = 0
-
+'''
 #! TKINTER
-def NextFunction():
-    print('NEXT STEP')
-    global step
-    global max_step
-    step = step+1
-    if (step<max_step):
-        PlotFunction(step)
-    else:
-        print('you reach the maximal step')
-
-def PreviousFunction():
-    print('PREVIOUS STEP')
-    global step
-    global max_step
-    if (step <= min_step):
-        print('you reach the minimal step')
-    else:
-        step = step-1
-        PlotFunction(step)
-
-def GoFunction():
-    INPUT = InputStep.get("1.0", "end-1c")
-    global min_step
-    global max_step
-    global step
-    if(INPUT.isnumeric() == False):
-        print('It is empty or it is not a number')
-    elif (int(INPUT) < min_step):
-        print('The minimal step is 1')
-    elif (int(INPUT) > max_step):
-        print('The maximal step is '+str(max_step))
-    else:
-        print('it is a number')
-        step = int(INPUT)
-        PlotFunction(step)
-
-def CleanFunction():
-    global points_x
-    global points_y
-    global points
-    global step, Final_label_data
-    points = []
-    points_x = [0, 0, 0, 0]
-    points_y = [0, 0, 0, 0]
-    PlotFunction(step)
-    Final_label_data[step] = ''
-
-def SaveFunction():
-    global Final_label_data
-    IL = 'L_x0'+','+'L_y0'+','+'L_x1'+','+'L_y1'+','+'L_x2'+','+'L_y2'+','+'L_x3'+','+'L_y3'
-    #if Fc == 0:
-    os.remove(label_file_name)
-    print('your file was deleted')
-    label_file = open(label_file_name,'w', encoding="utf-8")
-    print('your files was created')
-    Final_label_data[0] = IL
-    for k in range (0,len(Final_label_data)):
-        if Final_label_data[k] != '':
-            print(Final_label_data[k]+'\n')
-            label_file.writelines(Final_label_data[k]+'\n')
-    print('Your doc was saved')
-    
 
 
 fig = Figure(figsize = (5, 5), dpi = 130)
