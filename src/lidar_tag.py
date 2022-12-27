@@ -26,19 +26,19 @@ class lidar_tag:
         self.lidar_name = lidar_name
         self.label_name = label_name
         self.folder = folder
-        self.step = 0
-        self.min_step = 0
-        self.max_step = 0
-        self.points_x = [0, 0, 0, 0]
-        self.points_y = [0, 0, 0, 0]
-        self.points = []
-        self.n_p = 0
-
         # raw_lidar_data == lidar_data
         self.lidar_data = lidar2images.getData(name=self.lidar_name, folder=self.folder)
         # raw_lidar_data != lidar_data, it requires a treatment
         raw_label_data = lidar2images.getData(name=self.label_name, folder=self.folder)
         self.label_data = self.getLabel(raw=raw_label_data, data=self.lidar_data)
+
+        self.step = 0
+        self.min_step = 0
+        self.max_step = len(self.lidar_data)
+        self.points_x = [0, 0, 0, 0]
+        self.points_y = [0, 0, 0, 0]
+        self.points = []
+        self.n_p = 0
 
         self.fig = Figure(figsize = (5, 5), dpi = 130)
         self.ax = self.fig.add_subplot(111)
@@ -56,8 +56,10 @@ class lidar_tag:
         print('Data is ok to be tagged')  if len(label_data) == len(data) else print('Data is not ok to be tagged')
         return label_data
 
+    #* FUNCTIONS FOR THE GUI
     def NextFunction(self) -> None:
         print('[NEXT STEP]')
+        print('MAX STEP: ' + str(self.max_step))
         self.step += 1
         if (self.step < self.max_step):
             self.PlotFunction(self.step)
@@ -110,33 +112,17 @@ class lidar_tag:
         print('File saved :)')
 
     def PlotFunction(self, i):
-        # reset values
-        self.points_x = [0, 0, 0, 0]
-        self.points_y = [0, 0, 0, 0]
-        self.points = []
-        self.n_p = 0
+        print('Plotting the step: ' + str(i))
+
+        # split data (each line) in a lista with all the values
         lidar = ((self.lidar_data[i]).split(','))[1:]
-        x_lidar = []
-        y_lidar = []
-        
-        for j in range(0,len(lidar)):
-            if j==0:
-                x_lidar.append(float((lidar[j])[1:])*math.cos(angle[j]))
-                y_lidar.append(float((lidar[j])[1:])*math.sin(angle[j]))
-            elif j==len(lidar)-1:
-                x_lidar.append(float((lidar[j])[:len(lidar[j])-2])*math.cos(angle[j]))
-                y_lidar.append(float((lidar[j])[:len(lidar[j])-2])*math.sin(angle[j]))
-            else:
-                x_lidar.append(float(lidar[j])*math.cos(angle[j]))
-                y_lidar.append(float(lidar[j])*math.sin(angle[j]))
-        
-        #plt.plot(x_lidar,y_lidar)
-        # list of squares
-        #y = [i**2 for i in range(101)]
-    
+        # filter data
+        lidar_readings = lidar2images.filterData(readings=lidar)
+        # convert polar to cartesian
+        x_lidar,y_lidar = lidar2images.polar2xy(lidar=lidar_readings) 
+
         # adding the subplot
         self.ax.cla()
-    
         # plotting the graph
         self.ax.plot(x_lidar,y_lidar,'.', color='g',picker=3)
         #! TESTE COM SEABORN
@@ -147,12 +133,12 @@ class lidar_tag:
         self.ax.set_ylim([0, 3])
         # creating the Tkinter canvas
         # containing the Matplotlib figure
-        self.canvas = FigureCanvasTkAgg(fig, master = root)  
+        self.canvas = FigureCanvasTkAgg(self.fig, master = root)  
         self.canvas.draw()
     
         # placing the canvas on the Tkinter window
         self.canvas.get_tk_widget().place(x=50,y=50)
-        self.fig.canvas.mpl_connect('pick_event', on_pick)
+        self.fig.canvas.mpl_connect('pick_event', self.on_pick)
         # creating the Matplotlib toolbar
         #toolbar = NavigationToolbar2Tk(canvas, root)
         #toolbar.update()
@@ -171,7 +157,7 @@ class lidar_tag:
         BS  = tkinter.Button(self.root, text = 'Save', command = self.SaveFunction)
         return self.root, InputStep, BN, BP, BC, BCl, BS
 
-    def on_pick(event):
+    def on_pick(self, event):
         thisline = event.artist
         xdata = thisline.get_xdata()
         ydata = thisline.get_ydata()
@@ -189,10 +175,10 @@ class lidar_tag:
             print(f'Pointsx: ' + f', '.join(f'{p:.2f}' for p in self.points_x))
             print(f'Pointsy: ' + f', '.join(f'{p:.2f}' for p in self.points_y))
             self.ax.plot(x1,y1,'k*')
-            self.canvas = FigureCanvasTkAgg(fig, master = root)  
+            self.canvas = FigureCanvasTkAgg(self.fig, master = root)  
             self.canvas.draw()
             self.canvas.get_tk_widget().place(x=50,y=50)
-            self.fig.canvas.mpl_connect('pick_event', on_pick)
+            self.fig.canvas.mpl_connect('pick_event', self.on_pick)
             # print(points)
             
         else:
@@ -202,13 +188,13 @@ class lidar_tag:
             right_xpoints = self.points_x[2:4]
             right_ypoints = self.points_y[2:4]  
             data_s = f'{str(self.points_x[0])}, {str(self.points_y[0])},  {str(self.points_x[1])}, {str(self.points_y[1])}, {str(self.points_x[2])}, {str(self.points_y[2])}, {str(self.points_x[3])}, {str(self.points_y[3])}'
-            self.label_data[step] = data_s         
+            self.label_data[self.step] = data_s         
             self.ax.plot(left_xpoints,left_ypoints,'r', linewidth=2)
             self.ax.plot(right_xpoints,right_ypoints,'r',linewidth=2)
-            self.canvas = FigureCanvasTkAgg(fig, master = root)  
+            self.canvas = FigureCanvasTkAgg(self.fig, master = root)  
             self.canvas.draw()
             self.canvas.get_tk_widget().place(x=50,y=50)
-            self.fig.canvas.mpl_connect('pick_event', on_pick)            
+            self.fig.canvas.mpl_connect('pick_event', self.on_pick)            
 
 
 if __name__ == '__main__':

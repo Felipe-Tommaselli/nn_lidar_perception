@@ -82,10 +82,18 @@ class lidar2images:
         filedata.close()
         return data # returns file data
 
-    def filterData(self, readings) -> list:
+    @staticmethod
+    def filterData(readings) -> list:
         """ This function normalizes data and limits the lidar data to a maximum value of 5 meters. """
-        readings = readings[7:1088] # limit data 
-        final_readings = [int(r)/1000 for r in readings if int(r)/1000 < 5] # normalizing the data
+        #readings = [float(e) for e in readings[7:1088] if e != ''] # removing empty values
+        readings = list(map(lambda s: s.replace('\"', '').strip(), readings)) # remove \n and others
+        readings = list(map(float, readings[7:1088])) # convert to float
+        
+        # if mean of readings is higher than 10, the normalization is necessary
+        if float(np.mean(readings)) > 10.0:
+            final_readings = [float(r)/1000 for r in readings if float(r)/1000 < 5] # normalizing the data
+        else: 
+            final_readings = [float(r) for r in readings if float(r) < 5]
         return final_readings
 
     @staticmethod
@@ -105,7 +113,8 @@ class lidar2images:
 
         return x_lidar, y_lidar
 
-    def plot_lines(self, xl: list, yl: list, t: int) -> None:
+    @staticmethod
+    def plot_lines(xl: list, yl: list, t: int) -> None:
         """ This function plots the lidar data in a 2D space. """
         LW=0.8 # distance for the plot (region avaiable for navigation) 
         plt.cla() 
