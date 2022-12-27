@@ -48,6 +48,7 @@ class lidar_tag:
         self.ax = self.fig.add_subplot(111)
         self.canvas = None
 
+
     def getLabel(self, raw: list, data: list) -> list:
         label_data = []
         if len(label_data) <= 1: 
@@ -60,6 +61,7 @@ class lidar_tag:
         print('Data is ok to be tagged')  if len(label_data) == len(data) else print('Data is not ok to be tagged')
         return label_data
 
+
     #* FUNCTIONS FOR THE GUI
     def NextFunction(self) -> None:
         print('[NEXT STEP]: ' + str(self.step + 1) + ' of ' + str(self.max_step))
@@ -69,6 +71,7 @@ class lidar_tag:
         else:
             print('you reach the maximal step')
 
+
     def PreviousFunction(self) -> None:
         print('[PREVIOUS STEP]: ' + str(self.step - 1) + ' of ' + str(self.max_step))
         if (self.step <= self.min_step):
@@ -76,6 +79,7 @@ class lidar_tag:
         else:
             self.step -= 1
             self.PlotFunction(self.step)
+
 
     def GoFunction(self) -> None:
         INPUT = InputStep.get("1.0", "end-1c")
@@ -90,14 +94,16 @@ class lidar_tag:
             self.step = int(INPUT)
             self.PlotFunction(self.step)
 
+
     def CleanFunction(self) -> None:
-        print('CLEAN')
+        print('[CLEAN]')
         self.points = []
         self.points_x = [0, 0, 0, 0]
         self.points_y = [0, 0, 0, 0]
         self.n_p = 0
         self.PlotFunction(self.step)
         self.label_data[self.step] = ''
+
 
     def SaveFunction(self):
         IL = f'step, L_x0, L_y0, L_x1, L_y1, L_x2, L_y2, L_x3, L_y3'
@@ -115,6 +121,7 @@ class lidar_tag:
                 label_file.writelines(e + '\n') 
         print('File saved: ', label_file_path)
 
+
     def PlotFunction(self, i):
         self.n_p = 0
         # split data (each line) in a lista with all the values
@@ -127,20 +134,21 @@ class lidar_tag:
         # adding the subplot
         self.ax.cla()
         # plotting the graph
-        self.ax.plot(x_lidar,y_lidar,'.', color='g',picker=3)
+        self.ax.plot(x_lidar,y_lidar,'.', color='#40b255',picker=3)
         #! TESTE COM SEABORN
         # sns.scatterplot(x=x_lidar, y=y_lidar, color='r')
         #plt.show()
         self.ax.set_title('Step: ' + str(i))
         self.ax.set_xlim([-1, 1])
         self.ax.set_ylim([0, 3])
-        # creating the Tkinter canvas
-        # containing the Matplotlib figure
-        self.canvas = FigureCanvasTkAgg(self.fig, master = root)  
+
+        # creating the Tkinter canvas containing the Matplotlib figure
+        self.canvas = FigureCanvasTkAgg(self.fig, master = self.root)
         self.canvas.draw()
     
         # placing the canvas on the Tkinter window
         self.canvas.get_tk_widget().place(x=50,y=50)
+
         self.fig.canvas.mpl_connect('pick_event', self.on_pick)
         # creating the Matplotlib toolbar
         # toolbar = NavigationToolbar2Tk(self.canvas, root)
@@ -149,26 +157,6 @@ class lidar_tag:
         # placing the toolbar on the Tkinter window
         self.canvas.get_tk_widget().place(x=40,y=40)
 
-    def createWindow(self):
-        self.root = ctk.CTk()
-        self.root.geometry('740x800')
-        self.root.title('Lidar Labeling Tool')
-        ctk.set_appearance_mode("light")
-        ctk
-        
-        # style = ttk.Style()
-        # style.theme_use('alt')
-        # print(style.theme_use())
-        
-        # configure and customise all custom tkinter buttons with configure
-
-        InputStep = ctk.CTkTextbox(self.root, height = 2, width = 10)
-        BN  = ctk.CTkButton(self.root, text = 'Next', command = self.NextFunction)
-        BP  = ctk.CTkButton(self.root, text = 'Previous', command = self.PreviousFunction)
-        BC  = ctk.CTkButton(self.root, text = 'Go', command = self.GoFunction)
-        BCl = ctk.CTkButton(self.root, text = 'Clean', command = self.CleanFunction)
-        BS  = ctk.CTkButton(self.root, text = 'Save', command = self.SaveFunction)
-        return self.root, InputStep, BN, BP, BC, BCl, BS
 
     def on_pick(self, event):
         thisline = event.artist
@@ -208,47 +196,37 @@ class lidar_tag:
             self.fig.canvas.mpl_connect('pick_event', self.on_pick)            
 
 
+    def createWindow(self):
+        self.root = ctk.CTk()
+        self.root.geometry('740x800')
+        self.root.title('Lidar Labeling Tool')
+        ctk.set_appearance_mode("dark")
+        
+        # configure and customise all custom tkinter buttons with configure
+
+        Bprev  = ctk.CTkButton(self.root, text = 'Previous', command = self.PreviousFunction,
+                            width = 100, height=35, fg_color='#349b47', font=('Arial', 14, 'bold'))
+        Bnext  = ctk.CTkButton(self.root, text = 'Next', command = self.NextFunction, 
+                            width = 100, height=35, fg_color='#349b47', font=('Arial', 14, 'bold'))
+
+        InputStep = ctk.CTkTextbox(self.root, height = 4, width = 57, font=('Arial', 14))
+        Bgo  = ctk.CTkButton(self.root, text = 'Go', command = self.GoFunction,
+                            width = 70, height=35, fg_color='#349b47', font=('Arial', 14, 'bold'))
+        Bcln = ctk.CTkButton(self.root, text = 'Clean', command = self.CleanFunction,
+                            width = 100, height=35, fg_color='#349b47', font=('Arial', 14, 'bold'))
+        Bsave  = ctk.CTkButton(self.root, text = 'Save', command = self.SaveFunction,
+                            width = 100, height=35, fg_color='#349b47', font=('Arial', 14, 'bold'))
+        return self.root, InputStep, Bnext, Bprev, Bgo, Bcln, Bsave
+
+
 if __name__ == '__main__':
     lt = lidar_tag(lidar_name='Lidar_Data.csv', label_name='Label_Data.csv', folder='assets\\Tags')
-    root, InputStep, BN, BP, BC, BCl, BS = lt.createWindow()
+    root, InputStep, Bnext, Bprev, Bgo, Bcln, Bsave = lt.createWindow()
 
-    BN.place(x=200, y = 750)
-    BP.place(x=100, y = 750)
-    BC.place(x=400, y = 750)
-    BCl.place(x=600, y = 750)
-    BS.place(x=500, y = 750)
-    InputStep.place(x=300, y = 745)
+    Bprev.place(x=74, y = 740)
+    Bnext.place(x=177, y = 740)
+    InputStep.place(x=307, y = 741)
+    Bgo.place(x=367, y = 740)
+    Bsave.place(x=464, y = 740)
+    Bcln.place(x=567, y = 740)
     root.mainloop()
-
-
-'''
-#! TKINTER
-
-#cid = fig.canvas.mpl_connect('pick_event', on_pick)
-
-for i in range(1, len(lidar_data)):
-    lidar = ((lidar_data[i]).split(','))[1:]
-    x_lidar = []
-    y_lidar = []
-    print(len(lidar))
-    for j in range(0,len(lidar)):
-        #print(j)
-        if (j==0):
-            x_lidar.append(float((lidar[j])[1:])*math.cos(angle[j]))
-            y_lidar.append(float((lidar[j])[1:])*math.sin(angle[j]))
-        elif (j==len(lidar)-1):
-            x_lidar.append(float((lidar[j])[:len(lidar[j])-2])*math.cos(angle[j]))
-            y_lidar.append(float((lidar[j])[:len(lidar[j])-2])*math.sin(angle[j]))
-        else:
-            x_lidar.append(float(lidar[j])*math.cos(angle[j]))
-            y_lidar.append(float(lidar[j])*math.sin(angle[j]))
-    
-    plt.plot(x_lidar,y_lidar)
-    plt.pause(0.001)
-
-'''
-
-
-
-
-
