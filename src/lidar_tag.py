@@ -152,12 +152,16 @@ class lidar_tag:
     def createWindow(self):
         self.root = ctk.CTk()
         self.root.geometry('740x800')
+        self.root.title('Lidar Labeling Tool')
         ctk.set_appearance_mode("light")
+        ctk
+        
         # style = ttk.Style()
         # style.theme_use('alt')
         # print(style.theme_use())
-        self.root.title('Lidar Labeling Tool')
         
+        # configure and customise all custom tkinter buttons with configure
+
         InputStep = ctk.CTkTextbox(self.root, height = 2, width = 10)
         BN  = ctk.CTkButton(self.root, text = 'Next', command = self.NextFunction)
         BP  = ctk.CTkButton(self.root, text = 'Previous', command = self.PreviousFunction)
