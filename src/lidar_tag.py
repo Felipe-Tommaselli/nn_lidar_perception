@@ -58,8 +58,7 @@ class lidar_tag:
 
     #* FUNCTIONS FOR THE GUI
     def NextFunction(self) -> None:
-        print('[NEXT STEP]')
-        print('MAX STEP: ' + str(self.max_step))
+        print('[NEXT STEP]: ' + str(self.step + 1) + ' of ' + str(self.max_step))
         self.step += 1
         if (self.step < self.max_step):
             self.PlotFunction(self.step)
@@ -67,7 +66,7 @@ class lidar_tag:
             print('you reach the maximal step')
 
     def PreviousFunction(self) -> None:
-        print('[PREVIOUS STEP]')
+        print('[PREVIOUS STEP]: ' + str(self.step - 1) + ' of ' + str(self.max_step))
         if (self.step <= self.min_step):
             print('you reach the minimal step')
         else:
@@ -77,43 +76,43 @@ class lidar_tag:
     def GoFunction(self) -> None:
         INPUT = InputStep.get("1.0", "end-1c")
         if(INPUT.isnumeric() == False):
-            print('It is empty or it is not a number')
+            print('[ERROR] It is empty or it is not a number')
         elif (int(INPUT) < self.min_step):
-            print('The minimal step is 1')
+            print('[ERROR] The minimal step is 1')
         elif (int(INPUT) > self.max_step):
-            print('The maximal step is '+ str(self.max_step))
+            print('[ERROR] The maximal step is '+ str(self.max_step))
         else:
-            print('it is a number')
-            step = int(INPUT)
+            print(f'[GO TO STEP]: {INPUT} of {self.max_step}')
+            self.step = int(INPUT)
             self.PlotFunction(self.step)
 
     def CleanFunction(self) -> None:
+        print('CLEAN')
         self.points = []
         self.points_x = [0, 0, 0, 0]
         self.points_y = [0, 0, 0, 0]
-        self.label_data[self.step] = ''
+        self.n_p = 0
         self.PlotFunction(self.step)
+        self.label_data[self.step] = ''
 
     def SaveFunction(self):
-        IL = 'L_x0'+','+'L_y0'+','+'L_x1'+','+'L_y1'+','+'L_x2'+','+'L_y2'+','+'L_x3'+','+'L_y3'
+        IL = f'step, L_x0, L_y0, L_x1, L_y1, L_x2, L_y2, L_x3, L_y3'
         if  os.getcwd().split('\\')[-1] != 'IC_NN_Lidar':
             os.chdir('..')
         path = os.getcwd() + '\\' + str(self.folder) + '\\'
-        label_file_name = os.path.join(path, self.label_name) 
+        label_file_path = os.path.join(path, self.label_name) 
 
-        os.remove(label_file_name)
-        print('old file was deleted')
-        label_file = open(label_file_name,'w', encoding="utf-8")
-        print('new files was created')
+        os.remove(label_file_path)
+        label_file = open(label_file_path,'w', encoding="utf-8")
         self.label_data[0] = IL
+
         for e in self.label_data:
             if e != '':
                 label_file.writelines(e + '\n') 
-        print('File saved :)')
+        print('File saved: ', label_file_path)
 
     def PlotFunction(self, i):
-        print('Plotting the step: ' + str(i))
-
+        self.n_p = 0
         # split data (each line) in a lista with all the values
         lidar = ((self.lidar_data[i]).split(','))[1:]
         # filter data
@@ -126,8 +125,8 @@ class lidar_tag:
         # plotting the graph
         self.ax.plot(x_lidar,y_lidar,'.', color='g',picker=3)
         #! TESTE COM SEABORN
-        sns.scatterplot(x=x_lidar, y=y_lidar, color='r')
-        plt.show()
+        # sns.scatterplot(x=x_lidar, y=y_lidar, color='r')
+        #plt.show()
         self.ax.set_title('Step: ' + str(i))
         self.ax.set_xlim([-1, 1])
         self.ax.set_ylim([0, 3])
@@ -170,24 +169,22 @@ class lidar_tag:
             self.points_x[self.n_p] = x1
             self.points_y[self.n_p] = y1
             self.n_p += 1
-            print (f'X= {x1:.2f}') # Print X point
-            print (f'Y={y1:.2f}')# Print Y point
-            print(f'Pointsx: ' + f', '.join(f'{p:.2f}' for p in self.points_x))
-            print(f'Pointsy: ' + f', '.join(f'{p:.2f}' for p in self.points_y))
+            # print (f'X= {x1:.2f}') # Print X point
+            # print (f'Y={y1:.2f}')# Print Y point
+            # print(f'Pointsx: ' + f', '.join(f'{p:.2f}' for p in self.points_x))
+            # print(f'Pointsy: ' + f', '.join(f'{p:.2f}' for p in self.points_y))
             self.ax.plot(x1,y1,'k*')
             self.canvas = FigureCanvasTkAgg(self.fig, master = root)  
             self.canvas.draw()
             self.canvas.get_tk_widget().place(x=50,y=50)
             self.fig.canvas.mpl_connect('pick_event', self.on_pick)
-            # print(points)
-            
         else:
-            print("IT IS NOT POSSIBLE TO SAVE MORE THAN 4 POINTS")
+            print('Lines are already drawn!') if self.n_p == 4 else print("IT IS NOT POSSIBLE TO SAVE MORE THAN 4 POINTS")
             left_xpoints = self.points_x[0:2]
             left_ypoints = self.points_y[0:2]
             right_xpoints = self.points_x[2:4]
             right_ypoints = self.points_y[2:4]  
-            data_s = f'{str(self.points_x[0])}, {str(self.points_y[0])},  {str(self.points_x[1])}, {str(self.points_y[1])}, {str(self.points_x[2])}, {str(self.points_y[2])}, {str(self.points_x[3])}, {str(self.points_y[3])}'
+            data_s = f'{str(self.step)}, {str(self.points_x[0])}, {str(self.points_y[0])},  {str(self.points_x[1])}, {str(self.points_y[1])}, {str(self.points_x[2])}, {str(self.points_y[2])}, {str(self.points_x[3])}, {str(self.points_y[3])}'
             self.label_data[self.step] = data_s         
             self.ax.plot(left_xpoints,left_ypoints,'r', linewidth=2)
             self.ax.plot(right_xpoints,right_ypoints,'r',linewidth=2)
