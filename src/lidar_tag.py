@@ -134,13 +134,15 @@ class lidar_tag:
         # adding the subplot
         self.ax.cla()
         # plotting the graph
-        self.ax.plot(x_lidar,y_lidar,'.', color='#40b255',picker=3)
+
+        self.ax.scatter(x=x_lidar,y=y_lidar, marker='.', s=60, c='#40b255',picker=3)
         #! TESTE COM SEABORN
         # sns.scatterplot(x=x_lidar, y=y_lidar, color='r')
         #plt.show()
         self.ax.set_title('Step: ' + str(i))
-        self.ax.set_xlim([-1, 1])
-        self.ax.set_ylim([0, 3])
+        self.ax.set_xlim([-1.0, 1.2])
+        self.ax.set_ylim([-0.25, 3])
+        self.ax.grid(False)
 
         # creating the Tkinter canvas containing the Matplotlib figure
         self.canvas = FigureCanvasTkAgg(self.fig, master = self.root)
