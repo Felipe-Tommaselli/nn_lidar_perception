@@ -11,8 +11,12 @@ import math
 import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set_theme(style="whitegrid")
+
 import tkinter
+import tkinter.ttk as ttk
 from matplotlib.figure import Figure
+import customtkinter as ctk
+
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
 NavigationToolbar2Tk)
 
@@ -139,21 +143,27 @@ class lidar_tag:
         self.canvas.get_tk_widget().place(x=50,y=50)
         self.fig.canvas.mpl_connect('pick_event', self.on_pick)
         # creating the Matplotlib toolbar
-        #toolbar = NavigationToolbar2Tk(canvas, root)
-        #toolbar.update()
+        # toolbar = NavigationToolbar2Tk(self.canvas, root)
+        # toolbar.update()
     
         # placing the toolbar on the Tkinter window
-        #canvas.get_tk_widget().place(x=40,y=40)
+        self.canvas.get_tk_widget().place(x=40,y=40)
 
     def createWindow(self):
-        self.root = tkinter.Tk()
-        self.root.geometry('800x800')
-        InputStep = tkinter.Text(self.root, height = 2, width = 10)
-        BN  = tkinter.Button(self.root, text = 'Next', command = self.NextFunction)
-        BP  = tkinter.Button(self.root, text = 'Previous', command = self.PreviousFunction)
-        BC  = tkinter.Button(self.root, text = 'Go', command = self.GoFunction)
-        BCl = tkinter.Button(self.root, text = 'Clean', command = self.CleanFunction)
-        BS  = tkinter.Button(self.root, text = 'Save', command = self.SaveFunction)
+        self.root = ctk.CTk()
+        self.root.geometry('740x800')
+        ctk.set_appearance_mode("light")
+        # style = ttk.Style()
+        # style.theme_use('alt')
+        # print(style.theme_use())
+        self.root.title('Lidar Labeling Tool')
+        
+        InputStep = ctk.CTkTextbox(self.root, height = 2, width = 10)
+        BN  = ctk.CTkButton(self.root, text = 'Next', command = self.NextFunction)
+        BP  = ctk.CTkButton(self.root, text = 'Previous', command = self.PreviousFunction)
+        BC  = ctk.CTkButton(self.root, text = 'Go', command = self.GoFunction)
+        BCl = ctk.CTkButton(self.root, text = 'Clean', command = self.CleanFunction)
+        BS  = ctk.CTkButton(self.root, text = 'Save', command = self.SaveFunction)
         return self.root, InputStep, BN, BP, BC, BCl, BS
 
     def on_pick(self, event):
