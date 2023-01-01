@@ -169,6 +169,10 @@ def ValidFunction(nc, batch_size):
     return Val_loss, Val_heading_lossL1 #, Val_ratio_lossL1
     
 if __name__ == '__main__':
+    # check if cuda is available
+    print(torch.cuda.is_available())
+
+    
     #batch_size = 4
     epoch_number = 100
     mean_train = []
