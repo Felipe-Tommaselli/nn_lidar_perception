@@ -1,5 +1,16 @@
 # -*- coding: utf-8 -*-
 """
+lidar_tag.py is a script that make avaiable the UI to tags the lidar data for the Neural Network. This script is responsable for converting the 
+data to images and make manually labeling with de UI developed possible.
+
+The script was planned around the UI platform for image labeling, the UI was developed with the tkinter library with the wrapper customtkinter. 
+The UI is divided in 3 parts:
+    1. The canvas where the images are plotted.
+    2. The buttons to navigate through the images.
+    3. The entry to point the label on the image.
+
+The script is executed by running the following command in the terminal:
+> python lidar_tag.py
 
 @author: andres
 @author: Felipe-Tommaselli
@@ -22,10 +33,11 @@ NavigationToolbar2Tk)
 
 from lidar2images import *
 
-
+global POINT_WIDTH
+POINT_WIDTH = 60
 
 class lidar_tag:
-
+    """ Class that make avaiable the UI to tags the lidar data for the Neural Network. """
     def __init__(self, lidar_name:str, label_name:str, folder:str) -> None:
         self.lidar_name = lidar_name
         self.label_name = label_name
@@ -50,6 +62,7 @@ class lidar_tag:
 
 
     def getLabel(self, raw: list, data: list) -> list:
+        """ Function that get the labels from the raw data and fill the label_data with the labels if possible. """
         label_data = []
         if len(label_data) <= 1: 
             # full of empty labels
@@ -64,6 +77,7 @@ class lidar_tag:
 
     #* FUNCTIONS FOR THE GUI
     def NextFunction(self) -> None:
+        """ Function that change to next image for classification on click of the button "Next". """
         print('[NEXT STEP]: ' + str(self.step + 1) + ' of ' + str(self.max_step))
         self.step += 1
         if (self.step < self.max_step):
@@ -73,6 +87,7 @@ class lidar_tag:
 
 
     def PreviousFunction(self) -> None:
+        """ Function that change to previous image for classification on click of the button "Previous". """
         print('[PREVIOUS STEP]: ' + str(self.step - 1) + ' of ' + str(self.max_step))
         if (self.step <= self.min_step):
             print('you reach the minimal step')
@@ -82,6 +97,7 @@ class lidar_tag:
 
 
     def GoFunction(self) -> None:
+        """ Function that change to the desired image for classification on click of the button "Go". """
         INPUT = InputStep.get("1.0", "end-1c")
         if(INPUT.isnumeric() == False):
             print('[ERROR] It is empty or it is not a number')
@@ -96,6 +112,7 @@ class lidar_tag:
 
 
     def CleanFunction(self) -> None:
+        """ Function that clean the points on click of the button "Clean". """
         print('[CLEAN]')
         self.points = []
         self.points_x = [0, 0, 0, 0]
@@ -106,6 +123,7 @@ class lidar_tag:
 
 
     def SaveFunction(self):
+        """ Function that save the points on click of the button "Save". """
         IL = f'step, L_x0, L_y0, L_x1, L_y1, L_x2, L_y2, L_x3, L_y3'
         if  os.getcwd().split('\\')[-1] != 'IC_NN_Lidar':
             os.chdir('..')
@@ -123,6 +141,7 @@ class lidar_tag:
 
 
     def PlotFunction(self, i):
+        """ Function that plot the image that is going to be classified."""
         self.n_p = 0
         # split data (each line) in a lista with all the values
         lidar = ((self.lidar_data[i]).split(','))[1:]
@@ -135,10 +154,14 @@ class lidar_tag:
         self.ax.cla()
         # plotting the graph
 
-        self.ax.scatter(x=x_lidar,y=y_lidar, marker='.', s=60, c='#40b255',picker=3)
+        
         #! TESTE COM SEABORN
         # sns.scatterplot(x=x_lidar, y=y_lidar, color='r')
         #plt.show()
+
+        self.ax.scatter(x=x_lidar,y=y_lidar, marker='.', s=POINT_WIDTH, c='#40b255',picker=3)
+        self.ax.get_xaxis().set_visible(False)
+        self.ax.get_yaxis().set_visible(False)
         self.ax.set_title('Step: ' + str(i))
         self.ax.set_xlim([-1.0, 1.2])
         self.ax.set_ylim([-0.25, 3])
@@ -161,6 +184,7 @@ class lidar_tag:
 
 
     def on_pick(self, event):
+        """ Function that get the points that will make the labeling """
         thisline = event.artist
         xdata = thisline.get_xdata()
         ydata = thisline.get_ydata()
@@ -199,6 +223,7 @@ class lidar_tag:
 
 
     def createWindow(self):
+        """ Function that create the window of the application. """
         self.root = ctk.CTk()
         self.root.geometry('740x800')
         self.root.title('Lidar Labeling Tool')
