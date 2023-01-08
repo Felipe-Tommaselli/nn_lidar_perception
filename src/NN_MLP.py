@@ -67,7 +67,7 @@ class Feedforward(torch.nn.Module):
             self.dpout2 = torch.nn.Dropout(p=0.5)
             self.dpout3 = torch.nn.Dropout(p=0.5)            
             #self.fc2 = torch.nn.Linear(self.hidden_size, 2)
-                   
+            
         def forward(self, x):
             hidden = self.fc1(x)
             relu = self.relu(hidden)
