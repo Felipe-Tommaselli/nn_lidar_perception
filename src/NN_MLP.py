@@ -15,6 +15,8 @@ from statistics import mean
 #from torchvision.io import read_image
 from torch.utils.data import Dataset, DataLoader, random_split
 
+from lidar2images import *
+
 class LidarDataset(Dataset):
     def __init__(self, csv_path, transform=None, target_transform=None):
         self.labels = pd.read_csv(csv_path)
@@ -67,7 +69,7 @@ class Feedforward(torch.nn.Module):
             self.dpout2 = torch.nn.Dropout(p=0.5)
             self.dpout3 = torch.nn.Dropout(p=0.5)            
             #self.fc2 = torch.nn.Linear(self.hidden_size, 2)
-                   
+            
         def forward(self, x):
             hidden = self.fc1(x)
             relu = self.relu(hidden)
@@ -87,12 +89,12 @@ class Feedforward(torch.nn.Module):
             output = self.fc2(relu6)
             return output
 
-def TrainCollection():
-    collection_name = '/home/andres/Documents/learning_lidar/filter_syncro_data_norm.csv'
-    return collection_name
-
-def ValCollection():
-    collection_name = '/home/andres/Documents/learning_lidar/filter_syncro_data_validation_norm.csv'
+def getCollection(folder, name):
+    # move from root (\src) to \assets\tags or \datasets
+    if os.getcwd().split('\\')[-1] == 'src':
+        os.chdir('..') 
+    path = os.getcwd() + '\\' + str(folder) + '\\'
+    collection_name = os.path.join(path, name) # merge path and filename
     return collection_name
 
 def trainFunction(nc,batch_size):
@@ -101,8 +103,7 @@ def trainFunction(nc,batch_size):
     #train_ratio_lossL1 =[]
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     for step in range (1,nc):
-            name = TrainCollection()
-            path = name
+            path = getCollection(folder="datasets", name="filter_syncro_data_norm.csv")
             dl = fetch_dataloader(path,batch_size,num_workers=0)    
             print(path)
             #print('epoch:', step)
@@ -127,7 +128,7 @@ def trainFunction(nc,batch_size):
                 output.backward()
                 optimizer.step()
                 #print('training_ratio: ',ratio_lossL1,'training_heading: ',heading_lossL1)
-                print('training_heading: ',heading_lossL1)
+                # print('training_heading: ',heading_lossL1)
                 train_loss.append(output.item())
                 train_heading_lossL1.append(heading_lossL1.item())
                 #train_ratio_lossL1.append(ratio_lossL1.item())
@@ -139,8 +140,7 @@ def ValidFunction(nc, batch_size):
     #Val_ratio_lossL1 =[] 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     for step in range (1,nc):
-            name = ValCollection()
-            path = name
+            path = getCollection(folder="datasets", name="filter_syncro_data_validation_norm.csv")
             dl = fetch_dataloader(path,batch_size,num_workers=0)    
             print(path)
             #print('epoch:', step)
