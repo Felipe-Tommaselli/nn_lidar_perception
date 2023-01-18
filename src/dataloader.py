@@ -12,6 +12,7 @@ Class that loads the dataset for the neural network.
 @author: Felipe-Tommaselli
 """
 
+from sys import platform
 import os
 import random
 import cv2
@@ -21,6 +22,14 @@ import pandas as pd
 import torch
 
 from torch.utils.data import Dataset
+
+global SLASH
+if platform == "linux" or platform == "linux2":
+    # linux
+    SLASH = "/"
+elif platform == "win32":
+    # Windows...
+    SLASH = "\\"
 
 class LidarDataset(Dataset):
     ''' Dataset class for the lidar data. '''
@@ -78,9 +87,15 @@ class LidarDatasetCNN(Dataset):
         ''' Returns the sample image of the dataset. '''
 
         step = self.labels.iloc[idx, 0]
-        path = ''.join([self.img_path, str(step)+".png"])
-        print('path:', path)
-        self.image = cv2.imread(path, -1)
+        # full_path = ''.join([self.img_path, str(step)+".png"])
+        
+        # move from root (\src) to \assets\images
+        if os.getcwd().split(SLASH)[-1] == 'src':
+            os.chdir('..') 
+        path = os.getcwd() + SLASH + 'assets' + SLASH + 'images' + SLASH
+        full_path = os.path.join(path, 'image'+str(step)+'.png') # merge path and filename
+
+        self.image = cv2.imread(full_path, -1)
         azimuth1, azimuth2, intersec1, intersec2 = self.getLabels(idx=idx)
         sample = {"azimuth1": azimuth1, "azimuth2": azimuth2, "intersec1": intersec1, "intersec2": intersec2, "image": self.image}
         return sample
