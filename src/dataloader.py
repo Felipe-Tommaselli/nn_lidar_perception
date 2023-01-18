@@ -80,7 +80,7 @@ class LidarDatasetCNN(Dataset):
         step = self.labels.iloc[idx, 0]
         path = ''.join([self.img_path, str(step)+".png"])
         print('path:', path)
-        self.image = cv2.imread(path)
+        self.image = cv2.imread(path, -1)
         azimuth1, azimuth2, intersec1, intersec2 = self.getLabels(idx=idx)
         sample = {"azimuth1": azimuth1, "azimuth2": azimuth2, "intersec1": intersec1, "intersec2": intersec2, "image": self.image}
         return sample
