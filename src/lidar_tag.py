@@ -17,6 +17,8 @@ The script is executed by running the following command in the terminal:
 """
 
 import os
+from sys import platform
+
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -35,6 +37,14 @@ from lidar2images import *
 
 global POINT_WIDTH
 POINT_WIDTH = 60
+
+global SLASH
+if platform == "linux" or platform == "linux2":
+    # linux
+    SLASH = "/"
+elif platform == "win32":
+    # Windows...
+    SLASH = "\\"
 
 class lidar_tag:
     """ Class that make avaiable the UI to tags the lidar data for the Neural Network. """
@@ -125,9 +135,9 @@ class lidar_tag:
     def SaveFunction(self):
         """ Function that save the points on click of the button "Save". """
         IL = f'step, L_x0, L_y0, L_x1, L_y1, L_x2, L_y2, L_x3, L_y3'
-        if  os.getcwd().split('\\')[-1] != 'IC_NN_Lidar':
+        if  os.getcwd().split(SLASH)[-1] != 'IC_NN_Lidar':
             os.chdir('..')
-        path = os.getcwd() + '\\' + str(self.folder) + '\\'
+        path = os.getcwd() + SLASH + str(self.folder) + SLASH
         label_file_path = os.path.join(path, self.label_name) 
 
         os.remove(label_file_path)
@@ -247,7 +257,7 @@ class lidar_tag:
 
 
 if __name__ == '__main__':
-    lt = lidar_tag(lidar_name='Lidar_Data.csv', label_name='Label_Data.csv', folder='assets\\Tags')
+    lt = lidar_tag(lidar_name='Lidar_Data.csv', label_name='Label_Data.csv', folder=''.join(['assets', SLASH, 'tags']))
     root, InputStep, Bnext, Bprev, Bgo, Bcln, Bsave = lt.createWindow()
 
     Bprev.place(x=74, y = 740)

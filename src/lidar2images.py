@@ -30,6 +30,8 @@ The script is executed by running the following command in the terminal:
 @author: Felipe-Tommaselli
 """
 
+from sys import platform
+
 import matplotlib.pyplot as plt
 import numpy as np 
 import numpy as np
@@ -45,6 +47,14 @@ folder = Tags:
     "Label_Data.csv"
     "Lidar_Data.csv" '''
 folder = "datasets"
+
+global SLASH
+if platform == "linux" or platform == "linux2":
+    # linux
+    SLASH = "/"
+elif platform == "win32":
+    # Windows...
+    SLASH = "\\"
 
 class lidar2images:
     """ Class convert the lidar data to images with each step of the lidar data (angle and distance) been converted to a point in a 2D space. """
@@ -64,9 +74,9 @@ class lidar2images:
     def getData(name: str, folder: str) -> list:
         """ This function gets the data from the "syncro_data.csv" or the "filter_syncro_data_valitation" file. """
         # move from root (\src) to \assets\tags or \datasets
-        if os.getcwd().split('\\')[-1] == 'src':
+        if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..') 
-        path = os.getcwd() + '\\' + str(folder) + '\\'
+        path = os.getcwd() + SLASH + str(folder) + SLASH
         data_file_name = os.path.join(path, name) # merge path and filename
 
         # open file and read all data if possible
@@ -124,7 +134,8 @@ class lidar2images:
         plt.axis('off')
         plt.pause(0.1)
         print(f'[{t}]')
-        plt.savefig(os.getcwd() + '\\assets\\images' + '\\image' + str(t))
+        path = ''. join([os.getcwd(), SLASH, 'assets', SLASH, 'images', SLASH])
+        plt.savefig(path + str(t))
 
 if __name__ == '__main__':
     l2i = lidar2images(filename=filename, folder=folder)
