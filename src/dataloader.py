@@ -17,6 +17,7 @@ import random
 import cv2
 import numpy as np
 import pandas as pd
+import torch
 
 from torch.utils.data import Dataset
 
@@ -45,11 +46,14 @@ class LidarDataset(Dataset):
         for step in range(0,len(self.labels.iloc[idx,7:])):
             lidar[step] = (self.labels.iloc[idx, step+7])
         torch.from_numpy(lidar)
-        sample = {"dl": dl , "dr": dr, "dratio":dratio, "heading": heading, "lidar": lidar}
-        #print(sample)
-        return sample
+        self.sample = {"dl": dl , "dr": dr, "dratio":dratio, "heading": heading, "lidar": lidar}
+        #print(self.sample)
+        return self.sample
 
-ld = LidarDataset(csv_path="/home/andres/Documents/Robotics/Project/Robotics-Project-2020-2021/data/labels.csv")
+ld = LidarDataset(csv_path="~/Documents/IC_NN_Lidar/datasets/syncro_data_validation.csv")
+print(len(ld.__getitem__(idx=0)["lidar"]))
+print(len(ld.__getitem__(idx=10)["lidar"]))
+
 
 class LidarDatasetCNN(Dataset):
     ''' Dataset class for the lidar data with images. '''
