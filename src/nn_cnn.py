@@ -18,8 +18,6 @@ At the end, plot the result of the cost function with the matplotlib library by 
 @author: Felipe-Tommaselli
 """
 
-
-
 import os
 import pandas as pd
 import torch
