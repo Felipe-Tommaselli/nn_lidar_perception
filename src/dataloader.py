@@ -16,6 +16,7 @@ import os
 import random
 import cv2
 import numpy as np
+import math
 import pandas as pd
 import torch
 
@@ -63,6 +64,7 @@ class LidarDatasetCNN(Dataset):
         ''' Constructor of the class. '''
         
         self.image = None
+        self.img_path = img_path
         self.labels = pd.read_csv(csv_path)
         self.transform = transform
         self.target_transform = target_transform
@@ -75,20 +77,32 @@ class LidarDatasetCNN(Dataset):
     def __getitem__(self, idx: int) -> dict:
         ''' Returns the sample image of the dataset. '''
 
-        self.image = cv2.imread(self.labels.iloc[idx, 0])
-        azimuth1, azimuth2, intersec1, intersec2 = getLabels()
+        step = self.labels.iloc[idx, 0]
+        path = ''.join([self.img_path, str(step)+".png"])
+        print('path:', path)
+        self.image = cv2.imread(path)
+        azimuth1, azimuth2, intersec1, intersec2 = self.getLabels(idx=idx)
         sample = {"azimuth1": azimuth1, "azimuth2": azimuth2, "intersec1": intersec1, "intersec2": intersec2, "image": self.image}
         return sample
 
-    def getLabels(self):
+    def getLabels(self, idx):
         ''' Returns the labels of the image. '''
-        
-        azimuth1 = 
-        azimuth2 = 
-        intersec1 = 
-        intersec2 = 
-        return azimuth1, azimuth2, intersec1, intersec2
+        #         0 ,   1 ,  2  ,  3  ,  4  ,  5  ,  6  ,  7  
+        # step, L_x0, L_y0, L_x1, L_y1, L_x2, L_y2, L_x3, L_y3
+        labels = self.labels.iloc[idx, 1:] # take step out of labels
 
-ldCNN = LidarDatasetCNN(img_path="~/Documents/IC_NN_Lidar/assets/images", csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
+        # line equation: y = mx + b
+        # m = (y2 - y1) / (x2 - x1)
+        # b = y1 - m*x1
+        m1 = (labels[3] - labels[1]) / (labels[2] - labels[0])
+        b1 = labels[1] - m1*labels[0]
+        m2 = (labels[7] - labels[5]) / (labels[6] - labels[4])
+        b2 = labels[5] - m2*labels[4]
+
+        # azimuth1, azimuth2, intersec1, intersec2
+        # angles in radians (azimuth1, azimuth2) and meters (intersec1, intersec2)
+        return math.atan(m1), math.atan(m2), b1, b2
+
+ldCNN = LidarDatasetCNN(img_path="~/Documents/IC_NN_Lidar/assets/images/image", csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
 print(len(ldCNN.__getitem__(idx=0)["image"]))
 print(len(ldCNN.__getitem__(idx=10)["image"]))
