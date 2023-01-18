@@ -22,8 +22,6 @@ from sys import platform
 import numpy as np
 import math
 import matplotlib.pyplot as plt
-import seaborn as sns
-sns.set_theme(style="whitegrid")
 
 import tkinter
 import tkinter.ttk as ttk
@@ -36,7 +34,7 @@ NavigationToolbar2Tk)
 from lidar2images import *
 
 global POINT_WIDTH
-POINT_WIDTH = 60
+POINT_WIDTH = 10
 
 global SLASH
 if platform == "linux" or platform == "linux2":
@@ -158,18 +156,13 @@ class lidar_tag:
         # filter data
         lidar_readings = lidar2images.filterData(readings=lidar)
         # convert polar to cartesian
-        x_lidar,y_lidar = lidar2images.polar2xy(lidar=lidar_readings) 
+        self.x_lidar, self.y_lidar = lidar2images.polar2xy(lidar=lidar_readings) 
 
         # adding the subplot
         self.ax.cla()
         # plotting the graph
+        self.ax.plot(self.x_lidar,self.y_lidar, '.', markersize=POINT_WIDTH, color='#40b255',picker=3)
 
-        
-        #! TESTE COM SEABORN
-        # sns.scatterplot(x=x_lidar, y=y_lidar, color='r')
-        #plt.show()
-
-        self.ax.scatter(x=x_lidar,y=y_lidar, marker='.', s=POINT_WIDTH, c='#40b255',picker=3)
         self.ax.get_xaxis().set_visible(False)
         self.ax.get_yaxis().set_visible(False)
         self.ax.set_title('Step: ' + str(i))
@@ -187,10 +180,7 @@ class lidar_tag:
         self.fig.canvas.mpl_connect('pick_event', self.on_pick)
         # creating the Matplotlib toolbar
         # toolbar = NavigationToolbar2Tk(self.canvas, root)
-        # toolbar.update()
-    
-        # placing the toolbar on the Tkinter window
-        self.canvas.get_tk_widget().place(x=40,y=40)
+        # toolbar.update()    
 
 
     def on_pick(self, event):
@@ -198,8 +188,10 @@ class lidar_tag:
         thisline = event.artist
         xdata = thisline.get_xdata()
         ydata = thisline.get_ydata()
+        # xdata = self.x_lidar[ind]
+        # ydata = self.y_lidar[ind]
         ind = event.ind
-        
+
         if self.n_p < 4:
             x1 = np.take(xdata, ind)[0]
             y1 = np.take(ydata, ind)[0]
