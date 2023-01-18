@@ -2,3 +2,8 @@
 # *.csv
 # Images
 *.png
+assets/tags/Label_Data.csv
+assets/tags/Lidar_Data.csv
+datasets/filter_syncro_data_norm.csv
+datasets/filter_syncro_data_validation1_norm.csv
+datasets/syncro_data_validation.csv
