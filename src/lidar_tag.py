@@ -18,6 +18,7 @@ The script is executed by running the following command in the terminal:
 
 import os
 from sys import platform
+import shutil
 
 import numpy as np
 import math
@@ -64,6 +65,7 @@ class lidar_tag:
         self.points = []
         self.n_p = 0
 
+        self.fig_holding = Figure(figsize = (5, 5), dpi = 130)
         self.fig = Figure(figsize = (5, 5), dpi = 130)
         self.ax = self.fig.add_subplot(111)
         self.canvas = None
@@ -146,6 +148,15 @@ class lidar_tag:
         label_file.close()
         print('File saved: ', label_file_path)
 
+        # copy the image on the step to the folder of the images that are already classified
+        if os.getcwd().split(SLASH)[-1] == 'src':
+            os.chdir('..') 
+        folder_class = os.getcwd() + SLASH + 'assets' + SLASH + 'classified' + SLASH
+
+        if not os.path.exists(folder):
+            os.makedirs(os.getcwd() + 'classified')
+        # sabe matplotlib plot on folder_class
+        self.fig_holding.savefig(folder_class + 'image' + str(self.step) + '.png')
 
     def PlotFunction(self, i):
         """ Function that plot the image that is going to be classified."""
@@ -168,6 +179,8 @@ class lidar_tag:
         self.ax.set_xlim([-1.0, 1.2])
         self.ax.set_ylim([-0.25, 3])
         self.ax.grid(False)
+        
+        self.fig_holding = self.fig
 
         # creating the Tkinter canvas containing the Matplotlib figure
         self.canvas = FigureCanvasTkAgg(self.fig, master = self.root)
