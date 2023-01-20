@@ -60,11 +60,6 @@ class LidarDataset(Dataset):
         #print(self.sample)
         return self.sample
 
-ld = LidarDataset(csv_path="~/Documents/IC_NN_Lidar/datasets/syncro_data_validation.csv")
-print(ld.__getitem__(idx=0))
-print(ld.__getitem__(idx=0)["lidar"], len(ld.__getitem__(idx=0)["lidar"]))
-print(ld.__getitem__(idx=0)["lidar"], len(ld.__getitem__(idx=10)["lidar"]))
-
 
 class LidarDatasetCNN(Dataset):
     ''' Dataset class for the lidar data with images. '''
@@ -118,6 +113,17 @@ class LidarDatasetCNN(Dataset):
         # angles in radians (azimuth1, azimuth2) and meters (intersec1, intersec2)
         return math.atan(m1), math.atan(m2), b1, b2
 
-ldCNN = LidarDatasetCNN(img_path="~/Documents/IC_NN_Lidar/assets/images/image", csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
-print(len(ldCNN.__getitem__(idx=0)["image"]))
-print(len(ldCNN.__getitem__(idx=10)["image"]))
+
+if __name__ == "__main__":
+    # ld = LidarDataset(csv_path="~/Documents/IC_NN_Lidar/datasets/syncro_data_validation.csv")
+    # print(ld.__getitem__(idx=0))
+    # print(ld.__getitem__(idx=0)["lidar"], len(ld.__getitem__(idx=0)["lidar"]))
+    # print(ld.__getitem__(idx=0)["lidar"], len(ld.__getitem__(idx=10)["lidar"]))
+
+    # print('-'*80)
+    # ldCNN = LidarDatasetCNN(img_path="~/Documents/IC_NN_Lidar/assets/images/image", csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
+    # print(ldCNN.__getitem__(idx=0))
+    # print(ldCNN.__getitem__(idx=0)['image'], len(ldCNN.__getitem__(idx=0)['image']))
+    # print(ldCNN.__getitem__(idx=1)['image'], len(ldCNN.__getitem__(idx=1)['image']))
+    # print(ldCNN.__getitem__(idx=0)['image'] is ldCNN.__getitem__(idx=1)['image'])
+    pass 
