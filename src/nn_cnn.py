@@ -27,10 +27,12 @@ from statistics import mean
 #from torchvision.io import read_image
 from torch.utils.data import Dataset, DataLoader, random_split
 
-def getData():
+from dataloader import *
+
+def getData(img_path, csv_path):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
-    train_data = torch.utils.data.DataLoader()
-    test_data = torch.utils.data.DataLoader()
+    train_data = DataLoader(LidarDatasetCNN(img_path, csv_path, train=True), batch_size=batch_size, shuffle=True,num_workers=num_workers)
+    test_data = DataLoader(LidarDatasetCNN(img_path, csv_path, train=False), batch_size=batch_size, shuffle=True,num_workers=num_workers)
     # Resize images to a smaller size
     train_data = train_data.transform()
     test_data = test_data.transform()

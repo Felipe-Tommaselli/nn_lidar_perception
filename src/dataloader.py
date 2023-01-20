@@ -64,14 +64,13 @@ class LidarDataset(Dataset):
 class LidarDatasetCNN(Dataset):
     ''' Dataset class for the lidar data with images. '''
     
-    def __init__(self, img_path, csv_path, transform=None, target_transform=None):
+    def __init__(self, img_path, csv_path, train):
         ''' Constructor of the class. '''
         
         self.image = None
         self.img_path = img_path
         self.labels = pd.read_csv(csv_path)
-        self.transform = transform
-        self.target_transform = target_transform
+        self.train = train # bool
 
     def __len__(self) -> int:
         ''' Returns the length of the dataset (based on the labels). '''

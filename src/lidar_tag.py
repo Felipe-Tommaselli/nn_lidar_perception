@@ -71,15 +71,15 @@ class lidar_tag:
 
     def getLabel(self, raw: list, data: list) -> list:
         """ Function that get the labels from the raw data and fill the label_data with the labels if possible. """
-        label_data = []
-        if len(label_data) <= 1: 
+        IL = f'step, L_x0, L_y0, L_x1, L_y1, L_x2, L_y2, L_x3, L_y3'
+        label_data = [r if r.index != 0 else IL for r in raw]
+
+        if len(raw) <= 1: 
             # full of empty labels
-            label_data = ['' for i in range(len(data))]
+            label_data = ['' if r.index != 0 else IL for r in data]
         else:
-            # fill the label_data with the labels if possible
-            for t in range(1,len(data)):
-                label_data[t] = (raw[t])[:len(raw[t])] if t < len(raw) - 1 else ''
-        print('Data is ok to be tagged')  if len(label_data) == len(data) else print('Data is not ok to be tagged')
+            # concatena label data (from raw) with empty labels for the data that is not labeled yet
+            label_data += ['' for i in range(len(raw), len(data))]
         return label_data
 
 
@@ -132,19 +132,18 @@ class lidar_tag:
 
     def SaveFunction(self):
         """ Function that save the points on click of the button "Save". """
-        IL = f'step, L_x0, L_y0, L_x1, L_y1, L_x2, L_y2, L_x3, L_y3'
         if  os.getcwd().split(SLASH)[-1] != 'IC_NN_Lidar':
             os.chdir('..')
         path = os.getcwd() + SLASH + str(self.folder) + SLASH
         label_file_path = os.path.join(path, self.label_name) 
 
-        os.remove(label_file_path)
-        label_file = open(label_file_path,'w', encoding="utf-8")
-        self.label_data[0] = IL
+        label_file = open(label_file_path, 'r')
+        text = label_file.readlines()
+        label_file.close()
 
-        for e in self.label_data:
-            if e != '':
-                label_file.writelines(e + '\n') 
+        label_file = open(label_file_path, 'a')
+        label_file.write('\n' + self.label_data[self.step])
+        label_file.close()
         print('File saved: ', label_file_path)
 
 
