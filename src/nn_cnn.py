@@ -25,29 +25,59 @@ import numpy as np
 import matplotlib.pyplot as plt
 from statistics import mean
 #from torchvision.io import read_image
+import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader, random_split
 
 from dataloader import *
 
-def getData(img_path, csv_path):
+
+def valid_imshow_data(data):
+    data = np.asarray(data)
+    if data.ndim == 2:
+        return True
+    elif data.ndim == 3:
+        if 3 <= data.shape[2] <= 4:
+            return True
+        else:
+            print('The "data" has 3 dimensions but the last dimension '
+                    'must have a length of 3 (RGB) or 4 (RGBA), not "{}".'
+                    ''.format(data.shape[2]))
+            return False
+    else:
+        print('To visualize an image the data must be 2 dimensional or '
+                '3 dimensional, not "{}".'
+                ''.format(data.ndim))
+        return False
+
+
+
+def getData(img_path, csv_path, batch_size=10, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     train_data = DataLoader(LidarDatasetCNN(img_path, csv_path, train=True), batch_size=batch_size, shuffle=True,num_workers=num_workers)
     test_data = DataLoader(LidarDatasetCNN(img_path, csv_path, train=False), batch_size=batch_size, shuffle=True,num_workers=num_workers)
-    # Resize images to a smaller size
-    train_data = train_data.transform()
-    test_data = test_data.transform()
+
+    print('-'*50)
+    print('Train data size: ', len(train_data))
+    print('loader', len(train_data.dataset))
+
+    print('next batch:', next(iter(train_data))['image'][0].shape)
+    batch = next(iter(train_data))
+    images, labels = batch['image'], batch['labels']
+    print('labels:', labels)
+    
+    img = images[0]
+    valid_imshow_data(img)
+    plt.imshow(img.numpy().squeeze(), cmap="gray")
+    plt.show()
+    print('-'*50)
     return train_data, test_data
-    pass
 
-def getLabels():
-    ''' get labels from the file (assets/labels.csv) and return a DataLoader object '''
-    train_labels = torch.utils.data.DataLoader()
-    test_labels = torch.utils.data.DataLoader()
-    return train_labels, test_labels
-
-class NetworkCNN(torch.nn.Module):
+class NetworkCNN(nn.Module):
     def __init__(self):
         super(NetworkCNN, self).__init__()
+
+        # input image: 650x650
+
         # 1 input image, 32 output, 3x3 convs
         self.cnn1 = nn.Conv2d(in_channels=1, out_channels= 32, kernel_size=3, stride=1, padding=0)
         # 32 input image, 64 output, 3x3 convs
@@ -55,7 +85,7 @@ class NetworkCNN(torch.nn.Module):
         # 64 input image, 128 output, 3x3 convs
         self.cnn3 = nn.Conv2d(in_channels=64, out_channels= 128, kernel_size=3, stride=1, padding=0)
         # fully connected (128 * 3 * 3 -> 128)
-        self.fc1 = nn.Linear(128 * 5 * 5, 128)
+        self.fc1 = nn.Linear(128 * 5 * 5, 128) #! might need to change this
         # fully connected (128 -> 10)
         self.fc2 = nn.Linear(128, 10)
 
@@ -158,8 +188,7 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     # Get the data
-    train_data, test_data = getData()
-    train_labels, test_labels = getLabels()
+    train_data, test_data = getData(img_path="~/Documents/IC_NN_Lidar/assets/classified/image", csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
 
     # Create the model
     model = NetworkCNN()
