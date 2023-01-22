@@ -18,6 +18,7 @@ import random
 import cv2
 import numpy as np
 import math
+from scipy.special import logsumexp
 import pandas as pd
 import torch
 
@@ -64,7 +65,7 @@ class LidarDataset(Dataset):
 class LidarDatasetCNN(Dataset):
     ''' Dataset class for the lidar data with images. '''
     
-    def __init__(self, img_path, csv_path, train):
+    def __init__(self, img_path, csv_path, train=True):
         ''' Constructor of the class. '''
         
         self.image = None
@@ -114,15 +115,14 @@ class LidarDatasetCNN(Dataset):
 
 
 if __name__ == "__main__":
-    # ld = LidarDataset(csv_path="~/Documents/IC_NN_Lidar/datasets/syncro_data_validation.csv")
-    # print(ld.__getitem__(idx=0))
-    # print(ld.__getitem__(idx=0)["lidar"], len(ld.__getitem__(idx=0)["lidar"]))
-    # print(ld.__getitem__(idx=0)["lidar"], len(ld.__getitem__(idx=10)["lidar"]))
+    ld = LidarDataset(csv_path="~/Documents/IC_NN_Lidar/datasets/syncro_data_validation.csv")
+    print(ld.__getitem__(idx=0))
+    print(ld.__getitem__(idx=0)["lidar"], len(ld.__getitem__(idx=0)["lidar"]))
+    print(ld.__getitem__(idx=0)["lidar"], len(ld.__getitem__(idx=10)["lidar"]))
 
-    # print('-'*80)
-    # ldCNN = LidarDatasetCNN(img_path="~/Documents/IC_NN_Lidar/assets/images/image", csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
-    # print(ldCNN.__getitem__(idx=0))
-    # print(ldCNN.__getitem__(idx=0)['image'], len(ldCNN.__getitem__(idx=0)['image']))
-    # print(ldCNN.__getitem__(idx=1)['image'], len(ldCNN.__getitem__(idx=1)['image']))
-    # print(ldCNN.__getitem__(idx=0)['image'] is ldCNN.__getitem__(idx=1)['image'])
-    pass 
+    print('-'*80)
+    ldCNN = LidarDatasetCNN(img_path="~/Documents/IC_NN_Lidar/assets/images/image", csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
+    print(ldCNN.__getitem__(idx=0))
+    print(ldCNN.__getitem__(idx=0)['image'], len(ldCNN.__getitem__(idx=0)['image']))
+    print(ldCNN.__getitem__(idx=1)['image'], len(ldCNN.__getitem__(idx=1)['image']))
+    print(ldCNN.__getitem__(idx=0)['image'] is ldCNN.__getitem__(idx=1)['image'])
