@@ -19,6 +19,7 @@ The script is executed by running the following command in the terminal:
 import os
 from sys import platform
 import shutil
+import copy
 
 import numpy as np
 import math
@@ -180,7 +181,8 @@ class lidar_tag:
         self.ax.set_ylim([-0.25, 3])
         self.ax.grid(False)
         
-        self.fig_holding = self.fig
+        # copy the figure to save it later (without the markers that are added "on_pick")
+        self.fig_holding = copy.deepcopy(self.fig)
 
         # creating the Tkinter canvas containing the Matplotlib figure
         self.canvas = FigureCanvasTkAgg(self.fig, master = self.root)
