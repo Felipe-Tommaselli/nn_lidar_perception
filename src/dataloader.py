@@ -87,13 +87,14 @@ class LidarDatasetCNN(Dataset):
         # move from root (\src) to \assets\images
         if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..') 
-        path = os.getcwd() + SLASH + 'assets' + SLASH + 'images' + SLASH
+        path = os.getcwd() + SLASH + 'assets' + SLASH + 'classified' + SLASH
         full_path = os.path.join(path, 'image'+str(step)+'.png') # merge path and filename
 
         self.image = cv2.imread(full_path, -1)
         azimuth1, azimuth2, intersec1, intersec2 = self.getLabels(idx=idx)
-        sample = {"azimuth1": azimuth1, "azimuth2": azimuth2, "intersec1": intersec1, "intersec2": intersec2, "image": self.image}
-        return sample
+        labels = {"azimuth1": azimuth1, "azimuth2": azimuth2, "intersec1": intersec1, "intersec2": intersec2} 
+
+        return {"labels": labels, "image": self.image}
 
     def getLabels(self, idx):
         ''' Returns the labels of the image. '''
@@ -115,14 +116,15 @@ class LidarDatasetCNN(Dataset):
 
 
 if __name__ == "__main__":
-    ld = LidarDataset(csv_path="~/Documents/IC_NN_Lidar/datasets/syncro_data_validation.csv")
-    print(ld.__getitem__(idx=0))
-    print(ld.__getitem__(idx=0)["lidar"], len(ld.__getitem__(idx=0)["lidar"]))
-    print(ld.__getitem__(idx=0)["lidar"], len(ld.__getitem__(idx=10)["lidar"]))
+    # ld = LidarDataset(csv_path="~/Documents/IC_NN_Lidar/datasets/syncro_data_validation.csv")
+    # print(ld.__getitem__(idx=0))
+    # print(ld.__getitem__(idx=0)["lidar"], len(ld.__getitem__(idx=0)["lidar"]))
+    # print(ld.__getitem__(idx=0)["lidar"], len(ld.__getitem__(idx=10)["lidar"]))
 
-    print('-'*80)
-    ldCNN = LidarDatasetCNN(img_path="~/Documents/IC_NN_Lidar/assets/images/image", csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
-    print(ldCNN.__getitem__(idx=0))
-    print(ldCNN.__getitem__(idx=0)['image'], len(ldCNN.__getitem__(idx=0)['image']))
-    print(ldCNN.__getitem__(idx=1)['image'], len(ldCNN.__getitem__(idx=1)['image']))
-    print(ldCNN.__getitem__(idx=0)['image'] is ldCNN.__getitem__(idx=1)['image'])
+    # print('-'*80)
+    # ldCNN = LidarDatasetCNN(img_path="~/Documents/IC_NN_Lidar/assets/images/image", csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
+    # print(ldCNN.__getitem__(idx=0))
+    # print(ldCNN.__getitem__(idx=0)['image'], len(ldCNN.__getitem__(idx=0)['image']))
+    # print(ldCNN.__getitem__(idx=1)['image'], len(ldCNN.__getitem__(idx=1)['image']))
+    # print(ldCNN.__getitem__(idx=0)['image'] is ldCNN.__getitem__(idx=1)['image'])
+    pass
