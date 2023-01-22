@@ -108,6 +108,7 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
     
     train_losses = []
     test_losses = []
+    
     accuracy_list = []
     predictions_list = []
     labels_list = []
