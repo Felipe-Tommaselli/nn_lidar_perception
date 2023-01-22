@@ -175,13 +175,24 @@ class lidar_tag:
 
         self.ax.get_xaxis().set_visible(False)
         self.ax.get_yaxis().set_visible(False)
-        self.ax.set_title('Step: ' + str(i))
         self.ax.set_xlim([-1.0, 1.2])
         self.ax.set_ylim([-0.25, 3])
         self.ax.grid(False)
         
+        # taking borders off for the save 
+        self.ax.spines['top'].set_visible(False)
+        self.ax.spines['right'].set_visible(False)
+        self.ax.spines['bottom'].set_visible(False)
+        self.ax.spines['left'].set_visible(False)
         # copy the figure to save it later (without the markers that are added "on_pick")
         self.fig_holding = copy.deepcopy(self.fig)
+
+        # adding the borders back for the plot
+        self.ax.spines['top'].set_visible(True)
+        self.ax.spines['right'].set_visible(True)
+        self.ax.spines['bottom'].set_visible(True)
+        self.ax.spines['left'].set_visible(True)
+        self.ax.set_title('Step: ' + str(i))
 
         # creating the Tkinter canvas containing the Matplotlib figure
         self.canvas = FigureCanvasTkAgg(self.fig, master = self.root)
