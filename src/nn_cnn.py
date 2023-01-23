@@ -57,20 +57,31 @@ def getData(img_path, csv_path, batch_size=10, num_workers=0):
     test_data = DataLoader(LidarDatasetCNN(img_path, csv_path, train=False), batch_size=batch_size, shuffle=True,num_workers=num_workers)
 
     print('-'*50)
+    # print the size of the dataset
     print('Train data size: ', len(train_data))
     print('loader', len(train_data.dataset))
 
+    # print the first batch
     print('next batch:', next(iter(train_data))['image'][0].shape)
     batch = next(iter(train_data))
     images, labels = batch['image'], batch['labels']
     print('labels:', labels)
+
+    # print the dataset    
+    for i, data in enumerate(train_data):
+        d = (item.type(torch.float32) for item in data)
+    print('d:',  data)
+    print('i: ', i)
     
+
+    # print the first image
     img = images[0]
     valid_imshow_data(img)
     plt.imshow(img.numpy().squeeze(), cmap="gray")
     plt.show()
     print('-'*50)
-    return train_data, test_data
+
+    return train_data, labels
 
 class NetworkCNN(nn.Module):
     def __init__(self):
@@ -116,9 +127,14 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
     for epoch in range(num_epochs):
         running_loss = 0
 
-        for images, labels in train_loader:
+        for i, data in enumerate(train_loader):
             # Transfering images and labels to GPU if available
-            print('images:', images.shape)
+            d = (item.type(torch.float32) for item in data)
+            print('d:',  data)
+            print('i: ', i)
+            images, labels = data['image'], data['labels']
+
+            print('images:', images)
             print('images type:', type(images))
             images = images.to(device) #! without labels to device (not a tensor)
 
@@ -131,7 +147,7 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
             running_loss += loss.item()
 
         else:
-        # Testing the model*
+        # Testing the model
             with torch.no_grad():
                 # Set the model to evaluation mode
                 model.eval()
@@ -191,10 +207,7 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     # Get the data
-    train_data, test_data = getData(img_path="~/Documents/IC_NN_Lidar/assets/classified/image", csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
-    print('train_data shape:', train_data.shape)
-    print('train len', len(train_data))
-    print('train type', type(train_data))
+    train_data, labels = getData(img_path="~/Documents/IC_NN_Lidar/assets/classified/image", csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
 
     # Create the model
     model = NetworkCNN()
@@ -202,7 +215,8 @@ if __name__ == '__main__':
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
     # Train the model
-    results = fit(model=model, criterion=criterion, optimizer=optimizer, train_loader=train_data, test_loader=test_data, num_epochs=10)
+    #! without test data yet 
+    results = fit(model=model, criterion=criterion, optimizer=optimizer, train_loader=train_data, test_loader=train_data, num_epochs=10)
 
     plotResults(results)
 
