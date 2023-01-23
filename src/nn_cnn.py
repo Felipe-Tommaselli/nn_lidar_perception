@@ -131,7 +131,7 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
             running_loss += loss.item()
 
         else:
-        # Testing the model
+        # Testing the model*
             with torch.no_grad():
                 # Set the model to evaluation mode
                 model.eval()
