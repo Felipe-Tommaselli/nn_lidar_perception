@@ -108,7 +108,7 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
     
     train_losses = []
     test_losses = []
-    
+
     accuracy_list = []
     predictions_list = []
     labels_list = []
@@ -118,13 +118,15 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
 
         for images, labels in train_loader:
             # Transfering images and labels to GPU if available
-            images, labels = images.to(device), labels.to(device)
+            print('images:', images.shape)
+            print('images type:', type(images))
+            images = images.to(device) #! without labels to device (not a tensor)
 
-            outputs = model.forward(images)  # propagação para frente
-            loss = criterion(outputs, labels) # cálculo do erro
-            optimizer.zero_grad() # inicialização dos gradiente a zero
-            loss.backward() # propagação para trás
-            optimizer.step() # atualização dos pesos
+            outputs = model.forward(images)  # frontward propagation
+            loss = criterion(outputs, labels) 
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
             running_loss += loss.item()
 
@@ -190,59 +192,61 @@ if __name__ == '__main__':
 
     # Get the data
     train_data, test_data = getData(img_path="~/Documents/IC_NN_Lidar/assets/classified/image", csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
+    print('train_data shape:', train_data.shape)
+    print('train len', len(train_data))
+    print('train type', type(train_data))
 
     # Create the model
     model = NetworkCNN()
-    # Define the loss function
     criterion = nn.CrossEntropyLoss()
-    # Define the optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
     # Train the model
-    results = fit(model, criterion, optimizer, train_data, test_data, 10)
+    results = fit(model=model, criterion=criterion, optimizer=optimizer, train_loader=train_data, test_loader=test_data, num_epochs=10)
 
-    # Plot the results
     plotResults(results)
 
     # Save the model
     torch.save(model.state_dict(), 'model.pth')
     print('Saved PyTorch Model State to model.pth')
 
-    # Load the model
-    model = NetworkCNN()
-    model.load_state_dict(torch.load('model.pth'))
+    #* not there yet
 
-    # Test the model
-    with torch.no_grad():
-        # Set the model to evaluation mode
-        model.eval()
+    # # Load the model
+    # model = NetworkCNN()
+    # model.load_state_dict(torch.load('model.pth'))
 
-        total = 0
-        correct = 0
+    # # Test the model
+    # with torch.no_grad():
+    #     # Set the model to evaluation mode
+    #     model.eval()
 
-        for images, labels in test_data:
-            images, labels = images.to(device), labels.to(device)
-            outputs = model.forward(images)
-            predictions = torch.max(outputs, 1)[1].to(device)
-            correct += (predictions == labels).sum()
-            total += len(labels)
+    #     total = 0
+    #     correct = 0
 
-        print(f'Accuracy of the network on the 10000 test images: {correct * 100 / total}%')
+    #     for images, labels in test_data:
+    #         images, labels = images.to(device), labels.to(device)
+    #         outputs = model.forward(images)
+    #         predictions = torch.max(outputs, 1)[1].to(device)
+    #         correct += (predictions == labels).sum()
+    #         total += len(labels)
 
-    # Test the model with a single image
-    with torch.no_grad():
-        # Set the model to evaluation mode
-        model.eval()
+    #     print(f'Accuracy of the network on the 10000 test images: {correct * 100 / total}%')
 
-        image = test_data[0][0].to(device)
-        label = test_data[0][1].to(device)
+    # # Test the model with a single image
+    # with torch.no_grad():
+    #     # Set the model to evaluation mode
+    #     model.eval()
 
-        output = model.forward(image)
-        prediction = torch.max(output, 0)[1].to(device)
+    #     image = test_data[0][0].to(device)
+    #     label = test_data[0][1].to(device)
 
-        print(f'Prediction of the network on the first image: {prediction}')
-        print(f'Label of the first image: {label}')
+    #     output = model.forward(image)
+    #     prediction = torch.max(output, 0)[1].to(device)
 
-    # plot results of the test
-    plt.imshow(image.cpu().numpy().squeeze(), cmap='gray_r')
-    plt.show()
+    #     print(f'Prediction of the network on the first image: {prediction}')
+    #     print(f'Label of the first image: {label}')
+
+    # # plot results of the test
+    # plt.imshow(image.cpu().numpy().squeeze(), cmap='gray_r')
+    # plt.show()
