@@ -29,6 +29,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader, random_split
+from torchsummary import summary
 
 torch.cuda.empty_cache()
 
@@ -54,7 +55,7 @@ def getData(img_path, csv_path, batch_size=6, num_workers=0):
     # print the dataset    
     for i, data in enumerate(train_data):
         d = (item.type(torch.float32) for item in data)
-    print('i: ', i)
+        print('i: ', i)
     
     # print the first image
     img = images[0]
@@ -69,32 +70,31 @@ class NetworkCNN(nn.Module):
     def __init__(self):
         super(NetworkCNN, self).__init__()
 
-        # input image: 650x650
-        # help: https://medium.com/@nutanbhogendrasharma/pytorch-convolutional-neural-network-with-mnist-dataset-4e8a4265e118
-
-
         super(NetworkCNN, self).__init__()
-        self.cnn1 = nn.Conv2d(in_channels=1, out_channels= 32, kernel_size=3, stride=1, padding=0)
+        # input image: 650x650
+
+        self.cnn1 = nn.Conv2d(in_channels=1, out_channels= 32, kernel_size=5, stride=2, padding=0)
         self.cnn2 = nn.Conv2d(in_channels=32, out_channels= 64, kernel_size=3, stride=1, padding=0)
         self.cnn3 = nn.Conv2d(in_channels=64, out_channels= 128, kernel_size=3, stride=1, padding=0)
-        self.fc1 = nn.Linear(128 * 5 * 5, 128)
-        self.fc2 = nn.Linear(128, 5)
+        self.fc1 = nn.Linear(128*38*38, 128)
+        self.fc2 = nn.Linear(128, 4)
+
 
     def forward(self, x) -> torch.Tensor:
         x = F.relu(self.cnn1(x)) 
-        x = F.max_pool2d(x, kernel_size=3, stride=2)
+        x = F.max_pool2d(x, kernel_size=2, stride=2)
         x = F.relu(self.cnn2(x))
-        x = F.max_pool2d(x, kernel_size=3, stride=1) 
+        x = F.max_pool2d(x, kernel_size=2, stride=2)
         x = F.relu(self.cnn3(x)) 
-        x = F.max_pool2d(x, kernel_size=2, stride=1) 
-        x = torch.flatten(x, 1) 
+        x = F.max_pool2d(x, kernel_size=2, stride=2)
+        print(x.shape)
+        x = torch.flatten(x, 1)
         x = self.fc1(x) 
         x = self.fc2(x)
 
         return x
 
 def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
-    model.to(device)
 
     train_losses = []
     test_losses = []
@@ -192,6 +192,8 @@ if __name__ == '__main__':
 
     # Create the model on GPU if available
     model = NetworkCNN().to(device)
+    summary(model, (1, 650, 650))
+
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 

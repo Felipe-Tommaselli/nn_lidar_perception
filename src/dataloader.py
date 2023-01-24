@@ -19,6 +19,7 @@ import cv2
 import numpy as np
 import math
 from scipy.special import logsumexp
+import matplotlib.pyplot as plt
 import pandas as pd
 import torch
 
@@ -95,11 +96,12 @@ class LidarDatasetCNN(Dataset):
         # image treatment (only green channel)
         self.image = self.image[:,:,1] # take only the green channel
 
+        # plot the image with matplotlib
+        # plt.imshow(self.image, cmap='gray')
+        # plt.show()
+
         azimuth1, azimuth2, intersec1, intersec2 = self.getLabels(idx=idx)
         labels = [azimuth1, azimuth2, intersec1, intersec2]
-
-        # create a 5x5 image with numpy
-        # self.image = np.zeros((5,5), dtype=np.uint8)
 
         return {"labels": labels, "image": self.image}
 
