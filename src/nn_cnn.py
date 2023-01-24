@@ -26,29 +26,11 @@ import matplotlib.pyplot as plt
 from statistics import mean
 #from torchvision.io import read_image
 import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader, random_split
 
 from dataloader import *
-
-
-def valid_imshow_data(data):
-    data = np.asarray(data)
-    if data.ndim == 2:
-        return True
-    elif data.ndim == 3:
-        if 3 <= data.shape[2] <= 4:
-            return True
-        else:
-            print('The "data" has 3 dimensions but the last dimension '
-                    'must have a length of 3 (RGB) or 4 (RGBA), not "{}".'
-                    ''.format(data.shape[2]))
-            return False
-    else:
-        print('To visualize an image the data must be 2 dimensional or '
-                '3 dimensional, not "{}".'
-                ''.format(data.ndim))
-        return False
-
 
 
 def getData(img_path, csv_path, batch_size=10, num_workers=0):
@@ -70,53 +52,48 @@ def getData(img_path, csv_path, batch_size=10, num_workers=0):
     # print the dataset    
     for i, data in enumerate(train_data):
         d = (item.type(torch.float32) for item in data)
-    print('d:',  data)
     print('i: ', i)
     
-
     # print the first image
     img = images[0]
-    valid_imshow_data(img)
     plt.imshow(img.numpy().squeeze(), cmap="gray")
-    plt.show()
+    # plt.show()
     print('-'*50)
 
     return train_data, labels
 
 class NetworkCNN(nn.Module):
+    
     def __init__(self):
         super(NetworkCNN, self).__init__()
 
         # input image: 650x650
+        # help: https://medium.com/@nutanbhogendrasharma/pytorch-convolutional-neural-network-with-mnist-dataset-4e8a4265e118
 
-        # 1 input image, 32 output, 3x3 convs
+
+        super(NetworkCNN, self).__init__()
         self.cnn1 = nn.Conv2d(in_channels=1, out_channels= 32, kernel_size=3, stride=1, padding=0)
-        # 32 input image, 64 output, 3x3 convs
         self.cnn2 = nn.Conv2d(in_channels=32, out_channels= 64, kernel_size=3, stride=1, padding=0)
-        # 64 input image, 128 output, 3x3 convs
         self.cnn3 = nn.Conv2d(in_channels=64, out_channels= 128, kernel_size=3, stride=1, padding=0)
-        # fully connected (128 * 3 * 3 -> 128)
-        self.fc1 = nn.Linear(128 * 5 * 5, 128) #! might need to change this
-        # fully connected (128 -> 10)
+        self.fc1 = nn.Linear(128 * 5 * 5, 128)
         self.fc2 = nn.Linear(128, 10)
 
-
     def forward(self, x):
-        x = F.relu(self.cnn1(x)) # first layer conv + ReLU
-        x = F.max_pool2d(x, kernel_size=3, stride=2) # Max pooling over a (3, 3) window with stride 2
-        x = F.relu(self.cnn2(x)) # segunda layer conv + ReLU
-        x = F.max_pool2d(x, kernel_size=3, stride=1) # Max pooling over a (3, 3) window with stride 1
-        x = F.relu(self.cnn3(x)) # terceira layer conv + ReLU
-        x = F.max_pool2d(x, kernel_size=2, stride=1) # Max pooling over a (2, 2) window with stride 1
-        x = torch.flatten(x, 1) # compress the image to a vector
-        x = self.fc1(x) # first layer fully connected
-        x = self.fc2(x) # segunda layer fully connected
+        x = F.relu(self.cnn1(x)) 
+        x = F.max_pool2d(x, kernel_size=3, stride=2)
+        x = F.relu(self.cnn2(x))
+        x = F.max_pool2d(x, kernel_size=3, stride=1) 
+        x = F.relu(self.cnn3(x)) 
+        x = F.max_pool2d(x, kernel_size=2, stride=1) 
+        x = torch.flatten(x, 1) 
+        x = self.fc1(x) 
+        x = self.fc2(x)
 
         return x
 
 def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
     model.to(device)
-    
+
     train_losses = []
     test_losses = []
 
@@ -128,17 +105,29 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
         running_loss = 0
 
         for i, data in enumerate(train_loader):
-            # Transfering images and labels to GPU if available
-            d = (item.type(torch.float32) for item in data)
-            print('d:',  data)
-            print('i: ', i)
             images, labels = data['image'], data['labels']
+            print('images:', images.shape)
+            print('labels:', labels)
+            
+            # convert to float and send to device
+            #data = (item.to(device).type(torch.float32) for item in data.values()) 
 
-            print('images:', images)
-            print('images type:', type(images))
-            images = images.to(device) #! without labels to device (not a tensor)
 
-            outputs = model.forward(images)  # frontward propagation
+            # iterate each element of images and sendo it to device
+            for i in range(len(images)):
+                images[i] = images[i].to(device).type(torch.float32)
+
+            labels = list(labels.values())
+            labels = torch.Tensor([item.to(device).type(torch.float32) for item in labels])
+            print('labels -------', labels)
+
+            # Problem: RuntimeError: Input type (unsigned char) and bias type (float) should be the same
+            # Solution: input should be float
+            images = images.to(device).type(torch.float32)
+            labels = labels.to(device).type(torch.float32)
+
+            # forward pass
+            outputs = model(images)
             loss = criterion(outputs, labels) 
             optimizer.zero_grad()
             loss.backward()
@@ -147,37 +136,37 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
             running_loss += loss.item()
 
         else:
-        # Testing the model
-            with torch.no_grad():
-                # Set the model to evaluation mode
-                model.eval()
+        # # Testing the model
+        #     with torch.no_grad():
+        #         # Set the model to evaluation mode
+        #         model.eval()
 
-                total = 0
-                test_loss = 0
-                correct = 0
+        #         total = 0
+        #         test_loss = 0
+        #         correct = 0
 
-                for images, labels in test_loader:
-                    images, labels = images.to(device), labels.to(device)
-                    labels_list.append(labels)
-                    total += len(labels)
-                    
-                    outputs = model.forward(images) # propagação para frente
-                    
-                    
-                    predictions = torch.max(outputs, 1)[1].to(device)
-                    predictions_list.append(predictions)
-                    correct += (predictions == labels).sum()
-
-                    test_loss += criterion(outputs, labels).item()
-                test_losses.append(test_loss/len(test_loader))
-
-                accuracy = correct * 100 / total
-                accuracy_list.append(accuracy.item())
-            
-
-            # Set the model to training mode
-            model.train()
+        #         for images, labels in test_loader:
+        #             images = images.to(device)
+        #             labels_list.append(labels)
+        #             total += len(labels)
         
+        #             outputs = model.forward(images) # propagação para frente
+
+        #             predictions = torch.max(outputs, 1)[1].to(device)
+        #             predictions_list.append(predictions)
+        #             correct += (predictions == labels).sum()
+
+        #             test_loss += criterion(outputs, labels).item()
+        #         test_losses.append(test_loss/len(test_loader))
+
+        #         accuracy = correct * 100 / total
+        #         accuracy_list.append(accuracy.item())
+
+
+        #     # Set the model to training mode
+        #     model.train()
+            pass #! remove this line
+
         train_losses.append(running_loss/len(train_loader))
 
         print(f'Epoch {epoch+1}/{num_epochs} .. Train Loss: {train_losses[-1]:.5f} .. Test Loss: {test_losses[-1]:.5f} .. Test Accuracy: {accuracy_list[-1]:.3f}%')
@@ -203,14 +192,15 @@ def plotResults(results):
 
 if __name__ == '__main__':
     # Set the device to GPU if available
+    global device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('Using {} device'.format(device))
 
     # Get the data
     train_data, labels = getData(img_path="~/Documents/IC_NN_Lidar/assets/classified/image", csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
 
-    # Create the model
-    model = NetworkCNN()
+    # Create the model on GPU if available
+    model = NetworkCNN().to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
