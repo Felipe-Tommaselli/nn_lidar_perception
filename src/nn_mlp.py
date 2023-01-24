@@ -101,12 +101,16 @@ def trainFunction(nc,batch_size):
     train_loss =[]
     train_heading_lossL1 =[]
     #train_ratio_lossL1 =[]
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
     for step in range (1,nc):
+            
             path = getCollection(folder="datasets", name="filter_syncro_data_norm.csv")
             dl = fetch_dataloader(path,batch_size,num_workers=0)    
             print(path)
             #print('epoch:', step)
+            
             for batch in dl:    
                 batch_heading = batch['heading']
                 batch_heading_float = batch_heading.float()
