@@ -94,6 +94,9 @@ class LidarDatasetCNN(Dataset):
         azimuth1, azimuth2, intersec1, intersec2 = self.getLabels(idx=idx)
         labels = [azimuth1, azimuth2, intersec1, intersec2]
 
+        # create a 5x5 image with numpy
+        # self.image = np.zeros((5,5), dtype=np.uint8)
+
         return {"labels": labels, "image": self.image}
 
     def getLabels(self, idx):

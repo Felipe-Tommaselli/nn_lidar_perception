@@ -76,7 +76,7 @@ class NetworkCNN(nn.Module):
         self.cnn2 = nn.Conv2d(in_channels=32, out_channels= 64, kernel_size=3, stride=1, padding=0)
         self.cnn3 = nn.Conv2d(in_channels=64, out_channels= 128, kernel_size=3, stride=1, padding=0)
         self.fc1 = nn.Linear(128 * 5 * 5, 128)
-        self.fc2 = nn.Linear(128, 10)
+        self.fc2 = nn.Linear(128, 4)
 
     def forward(self, x) -> torch.Tensor:
         x = F.relu(self.cnn1(x)) 
