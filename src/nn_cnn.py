@@ -35,7 +35,7 @@ torch.cuda.empty_cache()
 from dataloader import *
 
 
-def getData(img_path, csv_path, batch_size=10, num_workers=0):
+def getData(img_path, csv_path, batch_size=6, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     train_data = DataLoader(LidarDatasetCNN(img_path, csv_path, train=True), batch_size=batch_size, shuffle=True,num_workers=num_workers)
     test_data = DataLoader(LidarDatasetCNN(img_path, csv_path, train=False), batch_size=batch_size, shuffle=True,num_workers=num_workers)
@@ -115,10 +115,8 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
             images = images.type(torch.float32).to(device)
             labels = [item.to(device).type(torch.float32) for item in labels]
 
-            # permute the image dimensions
-            # but firts we need to add 1 dim for the channel
+            # image dimension: batch x 1 x 650 x 650 (batch, channels, height, width)
             images = images.unsqueeze(1)
-            images = images.permute(0, 1, 2, 3)
 
             outputs = model(images)
             loss = criterion(outputs, labels) 
