@@ -78,7 +78,7 @@ class NetworkCNN(nn.Module):
         self.fc1 = nn.Linear(128 * 5 * 5, 128)
         self.fc2 = nn.Linear(128, 10)
 
-    def forward(self, x):
+    def forward(self, x) -> torch.Tensor:
         x = F.relu(self.cnn1(x)) 
         x = F.max_pool2d(x, kernel_size=3, stride=2)
         x = F.relu(self.cnn2(x))
@@ -109,24 +109,10 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
             print('images:', images.shape)
             print('labels:', labels)
             
-            # convert to float and send to device
-            #data = (item.to(device).type(torch.float32) for item in data.values()) 
+            # convert to float32 
+            images = images.type(torch.float32)
+            labels = [item.to(device).type(torch.float32) for item in labels]
 
-
-            # iterate each element of images and sendo it to device
-            for i in range(len(images)):
-                images[i] = images[i].to(device).type(torch.float32)
-
-            labels = list(labels.values())
-            labels = torch.Tensor([item.to(device).type(torch.float32) for item in labels])
-            print('labels -------', labels)
-
-            # Problem: RuntimeError: Input type (unsigned char) and bias type (float) should be the same
-            # Solution: input should be float
-            images = images.to(device).type(torch.float32)
-            labels = labels.to(device).type(torch.float32)
-
-            # forward pass
             outputs = model(images)
             loss = criterion(outputs, labels) 
             optimizer.zero_grad()

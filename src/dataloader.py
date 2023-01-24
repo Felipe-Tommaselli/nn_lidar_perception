@@ -92,7 +92,7 @@ class LidarDatasetCNN(Dataset):
 
         self.image = cv2.imread(full_path, -1)
         azimuth1, azimuth2, intersec1, intersec2 = self.getLabels(idx=idx)
-        labels = {"azimuth1": azimuth1, "azimuth2": azimuth2, "intersec1": intersec1, "intersec2": intersec2} 
+        labels = [azimuth1, azimuth2, intersec1, intersec2]
 
         return {"labels": labels, "image": self.image}
 
