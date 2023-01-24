@@ -30,6 +30,8 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader, random_split
 
+torch.cuda.empty_cache()
+
 from dataloader import *
 
 
@@ -76,7 +78,7 @@ class NetworkCNN(nn.Module):
         self.cnn2 = nn.Conv2d(in_channels=32, out_channels= 64, kernel_size=3, stride=1, padding=0)
         self.cnn3 = nn.Conv2d(in_channels=64, out_channels= 128, kernel_size=3, stride=1, padding=0)
         self.fc1 = nn.Linear(128 * 5 * 5, 128)
-        self.fc2 = nn.Linear(128, 4)
+        self.fc2 = nn.Linear(128, 5)
 
     def forward(self, x) -> torch.Tensor:
         x = F.relu(self.cnn1(x)) 
@@ -109,9 +111,14 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
             print('images:', images.shape)
             print('labels:', labels)
             
-            # convert to float32 
-            images = images.type(torch.float32)
+            # convert to float32 and send it to the device
+            images = images.type(torch.float32).to(device)
             labels = [item.to(device).type(torch.float32) for item in labels]
+
+            # permute the image dimensions
+            # but firts we need to add 1 dim for the channel
+            images = images.unsqueeze(1)
+            images = images.permute(0, 1, 2, 3)
 
             outputs = model(images)
             loss = criterion(outputs, labels) 

@@ -91,6 +91,10 @@ class LidarDatasetCNN(Dataset):
         full_path = os.path.join(path, 'image'+str(step)+'.png') # merge path and filename
 
         self.image = cv2.imread(full_path, -1)
+        
+        # image treatment (only green channel)
+        self.image = self.image[:,:,1] # take only the green channel
+
         azimuth1, azimuth2, intersec1, intersec2 = self.getLabels(idx=idx)
         labels = [azimuth1, azimuth2, intersec1, intersec2]
 
@@ -116,6 +120,7 @@ class LidarDatasetCNN(Dataset):
         # azimuth1, azimuth2, intersec1, intersec2
         # angles in radians (azimuth1, azimuth2) and meters (intersec1, intersec2)
         return math.atan(m1), math.atan(m2), b1, b2
+
 
 
 if __name__ == "__main__":
