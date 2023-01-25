@@ -36,6 +36,7 @@ import matplotlib.pyplot as plt
 import numpy as np 
 import numpy as np
 import os
+import cv2
 
 
 global SLASH
@@ -58,6 +59,10 @@ folder = Dataset:
 folder = Tags:
     "Label_Data.csv"
     "Lidar_Data.csv" '''
+
+global POINT_WIDTH
+POINT_WIDTH = 10
+
 class lidar2images:
     """ Class convert the lidar data to images with each step of the lidar data (angle and distance) been converted to a point in a 2D space. """
     
@@ -128,22 +133,31 @@ class lidar2images:
     @staticmethod
     def plot_lines(xl: list, yl: list, t: int) -> None:
         """ This function plots the lidar data in a 2D space. """
-        LW=0.8 # distance for the plot (region avaiable for navigation) 
-        plt.cla() 
-        plt.plot(xl,yl,'g.')
-        plt.xlim(-LW,LW)
-        plt.ylim(-1,5)
+
+        # adding the subplot
+        plt.cla()
+        # plotting the graph
+        plt.plot(xl,yl, '.', markersize=POINT_WIDTH, color='#40b255',picker=3)
+
+        # disable axes
         plt.axis('off')
+        # set xlim and ylim
+        plt.xlim([-1.0, 1.2])
+        plt.ylim([-0.25, 3])
+        plt.grid(False)
+        
+        # taking borders off for the save 
+        plt.gca().spines['top'].set_visible(False)
+        plt.gca().spines['right'].set_visible(False)
+        plt.gca().spines['bottom'].set_visible(False)
+        plt.gca().spines['left'].set_visible(False)
+        # copy the figure to save it later (without the markers that are added "on_pick")
         plt.pause(0.1)
+
         print(f'[{t}]')
         path = ''. join([os.getcwd(), SLASH, 'assets', SLASH, 'images', SLASH])
         plt.savefig(path + str(t))
 
-    @staticmethod
-    def save_image(t: int) -> None:
-        """ This function saves the image in the assets/images folder. """
-        path = ''. join([os.getcwd(), SLASH, 'assets', SLASH, 'test', SLASH])
-        plt.savefig(path + 'image'+str(t)+'.png')
 
 if __name__ == '__main__':
     l2i = lidar2images(filename=filename, folder=folder)
@@ -157,5 +171,12 @@ if __name__ == '__main__':
         x,y = l2i.polar2xy(lidar=lidar_readings) 
         # plot image
         l2i.plot_lines(xl=x, yl=y, t=step)
-        # save image
-        l2i.save_image(t=step)
+        break
+
+    # open the image wiith cv2 and show it
+    path = ''. join([os.getcwd(), SLASH, 'assets', SLASH, 'images', SLASH])
+
+    img = cv2.imread(path + str(0) + '.png')
+    cv2.imshow('image', img)
+    cv2.waitKey(0)
+    
