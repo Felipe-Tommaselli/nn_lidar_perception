@@ -94,7 +94,7 @@ class LidarDatasetCNN(Dataset):
         self.image = cv2.imread(full_path, -1)
         
         # image treatment (only green channel)
-        self.image = self.image[:,:,1] # take only the green channel
+        self.image = self.image[74:581,78:585,1] # take only the green channel and crop the image
 
         # plot the image with matplotlib
         # plt.imshow(self.image, cmap='gray')

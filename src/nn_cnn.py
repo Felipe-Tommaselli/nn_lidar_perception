@@ -41,6 +41,11 @@ def getData(img_path, csv_path, batch_size=10, num_workers=0):
     train_data = DataLoader(LidarDatasetCNN(img_path, csv_path, train=True), batch_size=batch_size, shuffle=True,num_workers=num_workers)
     test_data = DataLoader(LidarDatasetCNN(img_path, csv_path, train=False), batch_size=batch_size, shuffle=True,num_workers=num_workers)
 
+    # get one image shape from the train_data
+    for i, data in enumerate(train_data):
+        print(f'images shape: {data["image"].shape}')
+        break
+    print('-'*65)
     return train_data, test_data
 
 class NetworkCNN(nn.Module):
@@ -49,11 +54,11 @@ class NetworkCNN(nn.Module):
         super(NetworkCNN, self).__init__()
 
         super(NetworkCNN, self).__init__()
-        # input image: 650x650
+        # input image: 507x507
         self.cnn1 = nn.Conv2d(in_channels=1, out_channels= 32, kernel_size=5, stride=2, padding=0)
         self.cnn2 = nn.Conv2d(in_channels=32, out_channels= 64, kernel_size=3, stride=1, padding=0)
         self.cnn3 = nn.Conv2d(in_channels=64, out_channels= 128, kernel_size=3, stride=1, padding=0)
-        self.fc1 = nn.Linear(128*38*38, 128)
+        self.fc1 = nn.Linear(128*30*30, 128)
         self.fc2 = nn.Linear(128, 4)
 
 
