@@ -50,7 +50,6 @@ class NetworkCNN(nn.Module):
 
         super(NetworkCNN, self).__init__()
         # input image: 650x650
-
         self.cnn1 = nn.Conv2d(in_channels=1, out_channels= 32, kernel_size=5, stride=2, padding=0)
         self.cnn2 = nn.Conv2d(in_channels=32, out_channels= 64, kernel_size=3, stride=1, padding=0)
         self.cnn3 = nn.Conv2d(in_channels=64, out_channels= 128, kernel_size=3, stride=1, padding=0)
@@ -138,8 +137,7 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
 
         #     # Set the model to training mode
         #     model.train()
-            pass #! remove this line
-
+            pass
         train_losses.append(running_loss/len(train_loader))
         test_losses.append(running_loss/len(train_loader))
 
@@ -179,7 +177,7 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     # Get the data
-    train_data, test_data = getData(img_path="~/Documents/IC_NN_Lidar/assets/classified/image", csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
+    train_data, test_data = getData(img_path="~/Documents/IC_NN_Lidar/assets/train/image", csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
 
     # Create the model on GPU if available
     model = NetworkCNN().to(device)

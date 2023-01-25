@@ -37,16 +37,6 @@ import numpy as np
 import numpy as np
 import os
 
-global filename 
-filename = "syncro_data_validation.csv" # default file name
-''' There are other options:
-folder = Dataset:
-    "filter_syncro_data_validation.csv"
-    "filter_syncro_data_norm.csv"
-folder = Tags:
-    "Label_Data.csv"
-    "Lidar_Data.csv" '''
-folder = "datasets"
 
 global SLASH
 if platform == "linux" or platform == "linux2":
@@ -56,6 +46,18 @@ elif platform == "win32":
     # Windows...
     SLASH = "\\"
 
+global filename 
+global folder
+filename = "Lidar_Data.csv"
+folder = "assets" + SLASH + "tags"
+
+''' There are other options:
+folder = Dataset:
+    "filter_syncro_data_validation.csv"
+    "filter_syncro_data_norm.csv"
+folder = Tags:
+    "Label_Data.csv"
+    "Lidar_Data.csv" '''
 class lidar2images:
     """ Class convert the lidar data to images with each step of the lidar data (angle and distance) been converted to a point in a 2D space. """
     
@@ -137,6 +139,12 @@ class lidar2images:
         path = ''. join([os.getcwd(), SLASH, 'assets', SLASH, 'images', SLASH])
         plt.savefig(path + str(t))
 
+    @staticmethod
+    def save_image(t: int) -> None:
+        """ This function saves the image in the assets/images folder. """
+        path = ''. join([os.getcwd(), SLASH, 'assets', SLASH, 'test', SLASH])
+        plt.savefig(path + 'image'+str(t)+'.png')
+
 if __name__ == '__main__':
     l2i = lidar2images(filename=filename, folder=folder)
     print('L2I OG')
@@ -149,3 +157,5 @@ if __name__ == '__main__':
         x,y = l2i.polar2xy(lidar=lidar_readings) 
         # plot image
         l2i.plot_lines(xl=x, yl=y, t=step)
+        # save image
+        l2i.save_image(t=step)

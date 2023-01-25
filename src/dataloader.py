@@ -88,7 +88,7 @@ class LidarDatasetCNN(Dataset):
         # move from root (\src) to \assets\images
         if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..') 
-        path = os.getcwd() + SLASH + 'assets' + SLASH + 'classified' + SLASH
+        path = os.getcwd() + SLASH + 'assets' + SLASH + 'train' + SLASH
         full_path = os.path.join(path, 'image'+str(step)+'.png') # merge path and filename
 
         self.image = cv2.imread(full_path, -1)

@@ -151,10 +151,10 @@ class lidar_tag:
         # copy the image on the step to the folder of the images that are already classified
         if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..') 
-        folder_class = os.getcwd() + SLASH + 'assets' + SLASH + 'classified' + SLASH
+        folder_class = os.getcwd() + SLASH + 'assets' + SLASH + 'train' + SLASH
 
         if not os.path.exists(folder):
-            os.makedirs(os.getcwd() + 'classified')
+            os.makedirs(os.getcwd() + 'train')
         # sabe matplotlib plot on folder_class
         self.fig_holding.savefig(folder_class + 'image' + str(self.step) + '.png')
 
