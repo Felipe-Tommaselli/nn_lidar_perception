@@ -66,11 +66,9 @@ class LidarDataset(Dataset):
 class LidarDatasetCNN(Dataset):
     ''' Dataset class for the lidar data with images. '''
     
-    def __init__(self, img_path, csv_path, train=True):
+    def __init__(self, csv_path, train=True):
         ''' Constructor of the class. '''
         
-        self.image = None
-        self.img_path = img_path
         self.labels = pd.read_csv(csv_path)
         self.train = train # bool
 
@@ -88,7 +86,12 @@ class LidarDatasetCNN(Dataset):
         # move from root (\src) to \assets\images
         if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..') 
-        path = os.getcwd() + SLASH + 'assets' + SLASH + 'train' + SLASH
+
+        if self.train:
+            path = os.getcwd() + SLASH + 'assets' + SLASH + 'train' + SLASH
+        else:
+            path = os.getcwd() + SLASH + 'assets' + SLASH + 'test' + SLASH
+        
         full_path = os.path.join(path, 'image'+str(step)+'.png') # merge path and filename
 
         self.image = cv2.imread(full_path, -1)

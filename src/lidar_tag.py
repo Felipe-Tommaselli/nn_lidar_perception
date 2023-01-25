@@ -23,14 +23,14 @@ import copy
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
+NavigationToolbar2Tk)
 
 import tkinter
 import tkinter.ttk as ttk
-from matplotlib.figure import Figure
 import customtkinter as ctk
 
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, 
-NavigationToolbar2Tk)
 
 from lidar2images import *
 

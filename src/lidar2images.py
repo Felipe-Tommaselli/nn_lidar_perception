@@ -155,6 +155,8 @@ class lidar2images:
         plt.pause(0.1)
 
         print(f'[{t}]')
+        if os.getcwd().split(SLASH)[-1] == 'src':
+            os.chdir('..')
         path = ''. join([os.getcwd(), SLASH, 'assets', SLASH, 'images', SLASH])
         plt.savefig(path + str(t))
 
@@ -171,12 +173,19 @@ if __name__ == '__main__':
         x,y = l2i.polar2xy(lidar=lidar_readings) 
         # plot image
         l2i.plot_lines(xl=x, yl=y, t=step)
-        break
+        if step == 50:
+            break
 
     # open the image wiith cv2 and show it
+    if os.getcwd().split(SLASH)[-1] == 'src':
+        os.chdir('..')
     path = ''. join([os.getcwd(), SLASH, 'assets', SLASH, 'images', SLASH])
 
-    img = cv2.imread(path + str(0) + '.png')
-    cv2.imshow('image', img)
-    cv2.waitKey(0)
-    
+    path = os.getcwd()
+    name = 'image'+str(step)+'.png'
+    path = os.path.join(path, name)
+
+    # Using cv2.imread() method to the path 
+    # but we only want de green 'g' channel
+    # the others are 0
+    img = cv2.imread(path, -1)
