@@ -36,12 +36,12 @@ torch.cuda.empty_cache()
 from dataloader import *
 
 
-def getData(img_path, csv_path, batch_size=6, num_workers=0):
+def getData(img_path, csv_path, batch_size=4, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     train_data = DataLoader(LidarDatasetCNN(img_path, csv_path, train=True), batch_size=batch_size, shuffle=True,num_workers=num_workers)
     test_data = DataLoader(LidarDatasetCNN(img_path, csv_path, train=False), batch_size=batch_size, shuffle=True,num_workers=num_workers)
 
-    print('-'*50)
+    print('-'*65)
     # print the size of the dataset
     print('Train data size: ', len(train_data))
     print('loader', len(train_data.dataset))
@@ -58,10 +58,10 @@ def getData(img_path, csv_path, batch_size=6, num_workers=0):
         print('i: ', i)
     
     # print the first image
-    img = images[0]
-    plt.imshow(img.numpy().squeeze(), cmap="gray")
+    #img = images[0]
+    #plt.imshow(img.numpy().squeeze(), cmap="gray")
     # plt.show()
-    print('-'*50)
+    print('-'*65)
 
     return train_data, labels
 
@@ -87,7 +87,7 @@ class NetworkCNN(nn.Module):
         x = F.max_pool2d(x, kernel_size=2, stride=2)
         x = F.relu(self.cnn3(x)) 
         x = F.max_pool2d(x, kernel_size=2, stride=2)
-        print(x.shape)
+        # print(x.shape)
         x = torch.flatten(x, 1)
         x = self.fc1(x) 
         x = self.fc2(x)
@@ -97,9 +97,9 @@ class NetworkCNN(nn.Module):
 def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
 
     train_losses = []
-    test_losses = []
+    test_losses = [0]
 
-    accuracy_list = []
+    accuracy_list = [0]
     predictions_list = []
     labels_list = []
 
@@ -108,12 +108,12 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
 
         for i, data in enumerate(train_loader):
             images, labels = data['image'], data['labels']
-            print('images:', images.shape)
-            print('labels:', labels)
             
             # convert to float32 and send it to the device
             images = images.type(torch.float32).to(device)
             labels = [item.to(device).type(torch.float32) for item in labels]
+            # convert labels to tensor
+            labels = torch.stack(labels)
 
             # image dimension: batch x 1 x 650 x 650 (batch, channels, height, width)
             images = images.unsqueeze(1)
@@ -158,7 +158,9 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
         #     model.train()
             pass #! remove this line
 
-        train_losses.append(running_loss/len(train_loader))
+        train_losses.append(running_loss/(1000*len(train_loader)))
+        print('train_losses len:', len(train_losses))
+        test_losses.append(running_loss/len(train_loader))
 
         print(f'Epoch {epoch+1}/{num_epochs} .. Train Loss: {train_losses[-1]:.5f} .. Test Loss: {test_losses[-1]:.5f} .. Test Accuracy: {accuracy_list[-1]:.3f}%')
 
@@ -171,15 +173,24 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
     
     return results
 
-def plotResults(results):
+def plotResults(results, epochs):
+    print('train losses:', results['train_losses'])
+    # losses
     plt.plot(results['train_losses'], label='Training loss')
-    plt.plot(results['test_losses'], label='Validation loss')
     plt.legend(frameon=False)
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title("Loss")
     plt.show()
 
+    # accuracy
     plt.plot(results['accuracy_list'], label='Accuracy')
     plt.legend(frameon=False)
+    plt.xlabel("Epoch")
+    plt.ylabel("Accuracy")
+    plt.title("Accuracy")
     plt.show()
+
 
 if __name__ == '__main__':
     # Set the device to GPU if available
@@ -192,16 +203,20 @@ if __name__ == '__main__':
 
     # Create the model on GPU if available
     model = NetworkCNN().to(device)
-    summary(model, (1, 650, 650))
+    # summary(model, (1, 650, 650))
 
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    global epochs
+    epochs = 10
+    global batch_size
+    batch_size = 4
 
     # Train the model
     #! without test data yet 
-    results = fit(model=model, criterion=criterion, optimizer=optimizer, train_loader=train_data, test_loader=train_data, num_epochs=10)
+    results = fit(model=model, criterion=criterion, optimizer=optimizer, train_loader=train_data, test_loader=train_data, num_epochs=epochs)
 
-    plotResults(results)
+    plotResults(results, epochs)
 
     # Save the model
     torch.save(model.state_dict(), 'model.pth')
