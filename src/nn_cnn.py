@@ -36,34 +36,12 @@ torch.cuda.empty_cache()
 from dataloader import *
 
 
-def getData(img_path, csv_path, batch_size=4, num_workers=0):
+def getData(img_path, csv_path, batch_size=10, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     train_data = DataLoader(LidarDatasetCNN(img_path, csv_path, train=True), batch_size=batch_size, shuffle=True,num_workers=num_workers)
     test_data = DataLoader(LidarDatasetCNN(img_path, csv_path, train=False), batch_size=batch_size, shuffle=True,num_workers=num_workers)
 
-    print('-'*65)
-    # print the size of the dataset
-    print('Train data size: ', len(train_data))
-    print('loader', len(train_data.dataset))
-
-    # print the first batch
-    print('next batch:', next(iter(train_data))['image'][0].shape)
-    batch = next(iter(train_data))
-    images, labels = batch['image'], batch['labels']
-    print('labels:', labels)
-
-    # print the dataset    
-    for i, data in enumerate(train_data):
-        d = (item.type(torch.float32) for item in data)
-        print('i: ', i)
-    
-    # print the first image
-    #img = images[0]
-    #plt.imshow(img.numpy().squeeze(), cmap="gray")
-    # plt.show()
-    print('-'*65)
-
-    return train_data, labels
+    return train_data, test_data
 
 class NetworkCNN(nn.Module):
     
@@ -110,13 +88,17 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
             images, labels = data['image'], data['labels']
             
             # convert to float32 and send it to the device
-            images = images.type(torch.float32).to(device)
-            labels = [item.to(device).type(torch.float32) for item in labels]
-            # convert labels to tensor
-            labels = torch.stack(labels)
 
             # image dimension: batch x 1 x 650 x 650 (batch, channels, height, width)
+            images = images.type(torch.float32).to(device)
             images = images.unsqueeze(1)
+
+            labels = [label.type(torch.float32).to(device) for label in labels]
+            # convert labels to tensor
+            labels = torch.stack(labels)
+            # convert to format: tensor([[value1, value2, value3, value4], [value1, value2, value3, value4], ...])
+            # this is: labels for each image, "batch" times -> shape: (batch, 4)
+            labels = labels.permute(1, 0)
 
             outputs = model(images)
             loss = criterion(outputs, labels) 
@@ -159,10 +141,9 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
             pass #! remove this line
 
         train_losses.append(running_loss/len(train_loader))
-        print('train_losses len:', len(train_losses))
         test_losses.append(running_loss/len(train_loader))
 
-        print(f'Epoch {epoch+1}/{num_epochs} .. Train Loss: {train_losses[-1]:.5f} .. Test Loss: {test_losses[-1]:.5f} .. Test Accuracy: {accuracy_list[-1]:.3f}%')
+        print(f'[{epoch+1}/{num_epochs}] .. Train Loss: {train_losses[-1]:.5f} .. Test Loss: {test_losses[-1]:.5f} .. Test Accuracy: {accuracy_list[-1]:.3f}%')
 
             
     results = {
@@ -174,7 +155,6 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
     return results
 
 def plotResults(results, epochs):
-    print('train losses:', results['train_losses'])
     # losses
     plt.plot(results['train_losses'], label='Training loss')
     plt.legend(frameon=False)
@@ -199,16 +179,17 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     # Get the data
-    train_data, labels = getData(img_path="~/Documents/IC_NN_Lidar/assets/classified/image", csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
+    train_data, test_data = getData(img_path="~/Documents/IC_NN_Lidar/assets/classified/image", csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
 
     # Create the model on GPU if available
     model = NetworkCNN().to(device)
     # summary(model, (1, 650, 650))
 
-    criterion = nn.CrossEntropyLoss()
+    # loss function for regression
+    criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     global epochs
-    epochs = 10
+    epochs = 20
     global batch_size
     batch_size = 4
 
