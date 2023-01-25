@@ -158,7 +158,7 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
         #     model.train()
             pass #! remove this line
 
-        train_losses.append(running_loss/(1000*len(train_loader)))
+        train_losses.append(running_loss/len(train_loader))
         print('train_losses len:', len(train_losses))
         test_losses.append(running_loss/len(train_loader))
 
