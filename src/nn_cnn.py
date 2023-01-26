@@ -107,7 +107,6 @@ class NetworkCNN(nn.Module):
         x = self.layer3(x)
 
         x = self.avgpool(x)
-        print('shape:', x.shape)
         x = x.view(x.size(0), -1)
         x = self.fc(x)
 
@@ -128,9 +127,9 @@ def getData(csv_path, batch_size=5, num_workers=0):
 def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
 
     train_losses = []
-    test_losses = []
+    test_losses = [0]
 
-    accuracy_list = []
+    accuracy_list = [0]
     predictions_list = []
     labels_list = []
 
@@ -163,44 +162,44 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
 
         else:
         # Testing the model
-            with torch.no_grad():
-                # Set the model to evaluation mode
-                model.eval()
+            # with torch.no_grad():
+            #     # Set the model to evaluation mode
+            #     model.eval()
 
-                total = 0
-                test_loss = 0
-                correct = 0
+            #     total = 0
+            #     test_loss = 0
+            #     correct = 0
 
-                for i, data in enumerate(test_loader):
-                    images, labels = data['image'], data['labels']
-                    # image dimension: batch x 1 x 650 x 650 (batch, channels, height, width)
-                    images = images.type(torch.float32).to(device)
-                    images = images.unsqueeze(1)
+            #     for i, data in enumerate(test_loader):
+            #         images, labels = data['image'], data['labels']
+            #         # image dimension: batch x 1 x 650 x 650 (batch, channels, height, width)
+            #         images = images.type(torch.float32).to(device)
+            #         images = images.unsqueeze(1)
 
-                    labels = [label.type(torch.float32).to(device) for label in labels]
-                    labels = torch.stack(labels)
-                    labels = labels.permute(1, 0)
+            #         labels = [label.type(torch.float32).to(device) for label in labels]
+            #         labels = torch.stack(labels)
+            #         labels = labels.permute(1, 0)
 
-                    labels_list.append(labels)
-                    total += len(labels)
+            #         labels_list.append(labels)
+            #         total += len(labels)
         
-                    outputs = model.forward(images) # propagação para frente
+            #         outputs = model.forward(images) # propagação para frente
 
-                    predictions = torch.max(outputs, 1)[1].to(device)
-                    predictions_list.append(predictions)
-                    print('predictions:', predictions)
-                    print('labels:', labels)
-                    correct += (predictions == labels).sum()
+            #         predictions = torch.max(outputs, 1)[1].to(device)
+            #         predictions_list.append(predictions)
+            #         print('predictions:', predictions)
+            #         print('labels:', labels)
+            #         correct += (predictions == labels).sum()
 
-                    test_loss += criterion(outputs, labels).item()
-                test_losses.append(test_loss/len(test_loader))
+            #         test_loss += criterion(outputs, labels).item()
+            #     test_losses.append(test_loss/len(test_loader))
 
-                accuracy = correct * 100 / total
-                accuracy_list.append(accuracy.item())
+            #     accuracy = correct * 100 / total
+            #     accuracy_list.append(accuracy.item())
 
 
-            # Set the model to training mode
-            model.train()
+            # # Set the model to training mode
+            # model.train()
             pass
         train_losses.append(running_loss/len(train_loader))
         test_losses.append(running_loss/len(train_loader))

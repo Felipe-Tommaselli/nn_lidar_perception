@@ -152,13 +152,18 @@ class lidar2images:
         plt.gca().spines['bottom'].set_visible(False)
         plt.gca().spines['left'].set_visible(False)
         # copy the figure to save it later (without the markers that are added "on_pick")
+        
+        plt.tight_layout()
+
+        # change image size to 507x507 pixels
+
         plt.pause(0.1)
 
         print(f'[{t}]')
         if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..')
         path = ''. join([os.getcwd(), SLASH, 'assets', SLASH, 'images', SLASH])
-        plt.savefig(path + str(t))
+        plt.savefig(path + 'image'+str(t), dpi=100)
 
 
 if __name__ == '__main__':
@@ -173,19 +178,5 @@ if __name__ == '__main__':
         x,y = l2i.polar2xy(lidar=lidar_readings) 
         # plot image
         l2i.plot_lines(xl=x, yl=y, t=step)
-        if step == 50:
+        if step == 5:
             break
-
-    # open the image wiith cv2 and show it
-    if os.getcwd().split(SLASH)[-1] == 'src':
-        os.chdir('..')
-    path = ''. join([os.getcwd(), SLASH, 'assets', SLASH, 'images', SLASH])
-
-    path = os.getcwd()
-    name = 'image'+str(step)+'.png'
-    path = os.path.join(path, name)
-
-    # Using cv2.imread() method to the path 
-    # but we only want de green 'g' channel
-    # the others are 0
-    img = cv2.imread(path, -1)
