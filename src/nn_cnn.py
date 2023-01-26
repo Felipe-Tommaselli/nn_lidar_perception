@@ -127,13 +127,14 @@ def getData(csv_path, batch_size=5, num_workers=0):
 def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
 
     train_losses = []
-    test_losses = [0]
+    test_losses = []
 
-    accuracy_list = [0]
+    accuracy_list = []
     predictions_list = []
     labels_list = []
 
     for epoch in range(num_epochs):
+        model.train()
         running_loss = 0
 
         for i, data in enumerate(train_loader):
@@ -162,44 +163,43 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
 
         else:
         # Testing the model
-            # with torch.no_grad():
-            #     # Set the model to evaluation mode
-            #     model.eval()
+            with torch.no_grad():
+                # Set the model to evaluation mode
+                model.eval()
 
-            #     total = 0
-            #     test_loss = 0
-            #     correct = 0
+                total = 0
+                test_loss = 0
+                correct = 0
 
-            #     for i, data in enumerate(test_loader):
-            #         images, labels = data['image'], data['labels']
-            #         # image dimension: batch x 1 x 650 x 650 (batch, channels, height, width)
-            #         images = images.type(torch.float32).to(device)
-            #         images = images.unsqueeze(1)
+                for i, data in enumerate(test_loader):
+                    images, labels = data['image'], data['labels']
+                    print('images shaoe:', images.shape)
 
-            #         labels = [label.type(torch.float32).to(device) for label in labels]
-            #         labels = torch.stack(labels)
-            #         labels = labels.permute(1, 0)
+                    # image dimension: batch x 1 x 650 x 650 (batch, channels, height, width)
+                    images = images.type(torch.float32).to(device)
+                    images = images.unsqueeze(1)
 
-            #         labels_list.append(labels)
-            #         total += len(labels)
+                    labels = [label.type(torch.float32).to(device) for label in labels]
+                    labels = torch.stack(labels)
+                    labels = labels.permute(1, 0)
+
+                    labels_list.append(labels)
+                    total += len(labels)
         
-            #         outputs = model.forward(images) # propagação para frente
+                    outputs = model.forward(images) # propagação para frente
 
-            #         predictions = torch.max(outputs, 1)[1].to(device)
-            #         predictions_list.append(predictions)
-            #         print('predictions:', predictions)
-            #         print('labels:', labels)
-            #         correct += (predictions == labels).sum()
+                    print('outputs:', outputs)
+                    predictions = torch.max(outputs, 1)[1].to(device)
+                    predictions_list.append(predictions)
+                    print('predictions:', predictions)
+                    print('labels:', labels)
+                    correct += (predictions == labels).sum()
 
-            #         test_loss += criterion(outputs, labels).item()
-            #     test_losses.append(test_loss/len(test_loader))
+                    test_loss += criterion(outputs, labels).item()
+                test_losses.append(test_loss/len(test_loader))
 
-            #     accuracy = correct * 100 / total
-            #     accuracy_list.append(accuracy.item())
-
-
-            # # Set the model to training mode
-            # model.train()
+                accuracy = correct * 100 / total
+                accuracy_list.append(accuracy.item())
             pass
         train_losses.append(running_loss/len(train_loader))
         test_losses.append(running_loss/len(train_loader))
@@ -241,7 +241,11 @@ if __name__ == '__main__':
 
     # Get the data
     train_data, test_data = getData(csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
-
+    print('test data length:', len(test_data))
+    for item in test_data:
+        print('image:', item['image'].shape)
+        print('labels:', item['labels'])
+        break
     # Create the model on GPU if available
     model = NetworkCNN(ResidualBlock).to(device)
     # summary(model, (1, 650, 650))
@@ -255,8 +259,7 @@ if __name__ == '__main__':
     batch_size = 4
 
     # Train the model
-    #! without test data yet 
-    results = fit(model=model, criterion=criterion, optimizer=optimizer, train_loader=train_data, test_loader=train_data, num_epochs=epochs)
+    results = fit(model=model, criterion=criterion, optimizer=optimizer, train_loader=train_data, test_loader=test_data, num_epochs=epochs)
 
     plotResults(results, epochs)
 
