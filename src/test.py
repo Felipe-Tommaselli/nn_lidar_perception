@@ -9,7 +9,7 @@ if os.getcwd().split(SLASH)[-1] == 'src':
     os.chdir('..')
 path = ''. join([os.getcwd(), SLASH, 'assets', SLASH, 'images', SLASH])
 
-name = 'image'+str(10)+'.png'
+name = 'image'+str(3)+'.png'
 path = os.path.join(path, name)
 
 print('path: ', path)
@@ -19,7 +19,8 @@ print('path: ', path)
 # the others are 0
 img = cv2.imread(path, -1)
 print('image shape og:', img.shape)
-img = img[74:580,78:585,1]
+# img = img[74:580,78:585,1]
+img = img[:,:,1]
 
 print('img:', img.shape)
 print('len shape', len(img.shape))

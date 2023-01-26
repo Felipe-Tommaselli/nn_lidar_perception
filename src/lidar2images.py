@@ -154,6 +154,8 @@ class lidar2images:
         # copy the figure to save it later (without the markers that are added "on_pick")
         
         plt.tight_layout()
+        plt.gcf().set_size_inches(5.07, 5.07)
+        plt.gcf().canvas.draw()
 
         # change image size to 507x507 pixels
 
@@ -163,7 +165,7 @@ class lidar2images:
         if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..')
         path = ''. join([os.getcwd(), SLASH, 'assets', SLASH, 'images', SLASH])
-        plt.savefig(path + 'image'+str(t), dpi=100)
+        plt.savefig(path + 'image'+str(t))
 
 
 if __name__ == '__main__':
