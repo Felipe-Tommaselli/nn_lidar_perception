@@ -83,28 +83,18 @@ class LidarDatasetCNN(Dataset):
         # move from root (\src) to \assets\images
         if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..') 
-        
-        if self.train:
-            print('train')
-            # get the step number by the index
-            step = self.labels.iloc[idx, 0]
 
-            # get the path of the image
-            path = os.getcwd() + SLASH + 'assets' + SLASH + 'train' + SLASH
-            full_path = os.path.join(path, 'image'+str(step)+'.png') # merge path and filename
+        # get the step number by the index
+        step = self.labels.iloc[idx, 0]
 
-            # image treatment (only green channel)
-            self.image = cv2.imread(full_path, -1)
-            self.image = self.image[74:581,78:585,1] # take only the green channel and crop the image
-        else:
-            print('test')
-            path = os.getcwd() + SLASH + 'assets' + SLASH + 'test' + SLASH
-            full_path = os.path.join(path, 'image'+str(step)+'.png') # merge path and filename
+        # get the path of the image
+        path = os.getcwd() + SLASH + 'assets' + SLASH + 'train' + SLASH
+        full_path = os.path.join(path, 'image'+str(step)+'.png') # merge path and filename
 
-            # image treatment (only green channel)
-            self.image = cv2.imread(full_path, -1)
-            self.image = self.image[:,:,1] # take only the green channel and crop the image
-        
+        # image treatment (only green channel)
+        self.image = cv2.imread(full_path, -1)
+        self.image = self.image[74:581,78:585,1] # take only the green channel and crop the image
+
         # # plot the image with matplotlib
         # plt.imshow(self.image, cmap='gray')
         # plt.show()

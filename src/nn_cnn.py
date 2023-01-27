@@ -97,7 +97,6 @@ class NetworkCNN(nn.Module):
 
         return nn.Sequential(*layers)
     
-    
     def forward(self, x):
         x = self.conv1(x)
         x = self.maxpool(x)
@@ -112,24 +111,30 @@ class NetworkCNN(nn.Module):
 
         return x
 
-def getData(csv_path, batch_size=5, num_workers=0):
+def getData(csv_path, batch_size=20, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
-    train_data = DataLoader(LidarDatasetCNN(csv_path, train=True), batch_size=batch_size, shuffle=True,num_workers=num_workers)
-    test_data = DataLoader(LidarDatasetCNN(csv_path, train=False), batch_size=batch_size, shuffle=True,num_workers=num_workers)
+    
+    dataset = LidarDatasetCNN(csv_path, train=False)
+
+    train_size, val_size = int(0.8*len(dataset)), np.ceil(0.2*len(dataset)).astype('int')
+    train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
+
+    train_data = DataLoader(train_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
+    val_data  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
 
     # get one image shape from the train_data
     for i, data in enumerate(train_data):
         print(f'images shape: {data["image"].shape}')
         break
     print('-'*65)
-    return train_data, test_data
+    return train_data, val_data
 
-def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
+def fit(model, criterion, optimizer, train_loader, val_loader, num_epochs):
 
     train_losses = []
-    test_losses = []
+    val_losses = []
 
-    accuracy_list = []
+    accuracy_list = [0]
     predictions_list = []
     labels_list = []
 
@@ -162,18 +167,17 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
             running_loss += loss.item()
 
         else:
-        # Testing the model
+        # valing the model
             with torch.no_grad():
                 # Set the model to evaluation mode
                 model.eval()
 
                 total = 0
-                test_loss = 0
+                val_loss = 0
                 correct = 0
 
-                for i, data in enumerate(test_loader):
+                for i, data in enumerate(val_loader):
                     images, labels = data['image'], data['labels']
-                    print('images shaoe:', images.shape)
 
                     # image dimension: batch x 1 x 650 x 650 (batch, channels, height, width)
                     images = images.type(torch.float32).to(device)
@@ -188,28 +192,42 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
         
                     outputs = model.forward(images) # propagação para frente
 
-                    print('outputs:', outputs)
-                    predictions = torch.max(outputs, 1)[1].to(device)
-                    predictions_list.append(predictions)
-                    print('predictions:', predictions)
-                    print('labels:', labels)
-                    correct += (predictions == labels).sum()
+                    # print output and ouput shape
+                    #print(f'output: {outputs}, output shape: {outputs.shape}')
+                    # label
+                    #print(f'label: {labels}, label shape: {labels.shape}') 
 
-                    test_loss += criterion(outputs, labels).item()
-                test_losses.append(test_loss/len(test_loader))
+                    # output shape: (batch, 4)
+                    # label shape: (batch, 4)
+                    # predictions shape: ?
 
-                accuracy = correct * 100 / total
-                accuracy_list.append(accuracy.item())
+                    # get the predictions to calculate the accuracy
+                    # Calcula a acurácia
+                    _, preds = torch.max(outputs, 1)
+                    print(f'_: {_}, preds: {preds}, preds shape: {preds.shape}')
+                    # correct += torch.sum(preds == label.data)
+        
+                    # predictions
+                    #print(f'predictions: {predictions}, predictions shape: {predictions.shape}')
+
+                    #correct += (predictions == labels).sum()
+                    #predictions_list.append(predictions)
+
+                    val_loss += criterion(outputs, labels).item()
+                val_losses.append(val_loss/len(val_loader))
+
+                #accuracy = correct * 100 / total
+                #accuracy_list.append(accuracy.item())
             pass
         train_losses.append(running_loss/len(train_loader))
-        test_losses.append(running_loss/len(train_loader))
+        val_losses.append(running_loss/len(val_loader))
 
-        print(f'[{epoch+1}/{num_epochs}] .. Train Loss: {train_losses[-1]:.5f} .. Test Loss: {test_losses[-1]:.5f} .. Test Accuracy: {accuracy_list[-1]:.3f}%')
+        print(f'[{epoch+1}/{num_epochs}] .. Train Loss: {train_losses[-1]:.5f} .. val Loss: {val_losses[-1]:.5f} .. val Accuracy: {accuracy_list[-1]:.3f}%')
 
-            
+
     results = {
         'train_losses': train_losses,
-        'test_losses': test_losses,
+        'val_losses': val_losses,
         'accuracy_list': accuracy_list
     }
     
@@ -217,11 +235,22 @@ def fit(model, criterion, optimizer, train_loader, test_loader, num_epochs):
 
 def plotResults(results, epochs):
     # losses
-    plt.plot(results['train_losses'], label='Training loss')
-    plt.legend(frameon=False)
-    plt.xlabel("Epoch")
-    plt.ylabel("Loss")
-    plt.title("Loss")
+    # print both losses side by side with subplots (1 row, 2 columns)
+    # ax1 for train losses and ax2 for val losses
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+    
+    ax1.plot(results['train_losses'], label='Train Loss')
+    ax1.legend(frameon=False)
+    ax1.set_xlabel("Epoch")
+    ax1.set_ylabel("Loss")
+    ax1.set_title("Train Loss")
+
+    ax2.plot(results['val_losses'], label='Val Loss')
+    ax2.legend(frameon=False)
+    ax2.set_xlabel("Epoch")
+    ax2.set_ylabel("Loss")
+    ax2.set_title("Val Loss")
+
     plt.show()
 
     # accuracy
@@ -240,9 +269,9 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     # Get the data
-    train_data, test_data = getData(csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
-    print('test data length:', len(test_data))
-    for item in test_data:
+    train_data, val_data = getData(csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
+    print('val data length:', len(val_data))
+    for item in val_data:
         print('image:', item['image'].shape)
         print('labels:', item['labels'])
         break
@@ -252,14 +281,13 @@ if __name__ == '__main__':
 
     # loss function for regression
     criterion = nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.005)
     global epochs
     epochs = 20
     global batch_size
-    batch_size = 4
 
     # Train the model
-    results = fit(model=model, criterion=criterion, optimizer=optimizer, train_loader=train_data, test_loader=test_data, num_epochs=epochs)
+    results = fit(model=model, criterion=criterion, optimizer=optimizer, train_loader=train_data, val_loader=val_data, num_epochs=epochs)
 
     plotResults(results, epochs)
 
@@ -267,43 +295,30 @@ if __name__ == '__main__':
     torch.save(model.state_dict(), 'model.pth')
     print('Saved PyTorch Model State to model.pth')
 
-    #* not there yet
+    # test the model with the validation data for one random image
+    # showing the image and the predicted and real labels
+    # get the first image from the validation data
+    random_image = val_data[0]
+    image = random_image['image']
+    labels = random_image['labels']
 
-    # # Load the model
-    # model = NetworkCNN()
-    # model.load_state_dict(torch.load('model.pth'))
+    # convert image to tensor
+    image = image.type(torch.float32).to(device)
+    # add a dimension to the image tensor
+    image = image.unsqueeze(0)
+    # add a dimension to the image tensor
 
-    # # Test the model
-    # with torch.no_grad():
-    #     # Set the model to evaluation mode
-    #     model.eval()
+    # get the model predictions
+    predictions = model(image)
+    # convert the predictions to numpy array
+    predictions = predictions.cpu().detach().numpy()
+    # convert the labels to numpy array
+    labels = labels.cpu().detach().numpy()
 
-    #     total = 0
-    #     correct = 0
+    # print the predictions and labels
+    print('predictions:', predictions)
+    print('labels:', labels)
 
-    #     for images, labels in test_data:
-    #         images, labels = images.to(device), labels.to(device)
-    #         outputs = model.forward(images)
-    #         predictions = torch.max(outputs, 1)[1].to(device)
-    #         correct += (predictions == labels).sum()
-    #         total += len(labels)
-
-    #     print(f'Accuracy of the network on the 10000 test images: {correct * 100 / total}%')
-
-    # # Test the model with a single image
-    # with torch.no_grad():
-    #     # Set the model to evaluation mode
-    #     model.eval()
-
-    #     image = test_data[0][0].to(device)
-    #     label = test_data[0][1].to(device)
-
-    #     output = model.forward(image)
-    #     prediction = torch.max(output, 0)[1].to(device)
-
-    #     print(f'Prediction of the network on the first image: {prediction}')
-    #     print(f'Label of the first image: {label}')
-
-    # # plot results of the test
-    # plt.imshow(image.cpu().numpy().squeeze(), cmap='gray_r')
-    # plt.show()
+    # show the image
+    plt.imshow(image[0][0], cmap='gray')
+    plt.show()
