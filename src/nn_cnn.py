@@ -111,7 +111,7 @@ class NetworkCNN(nn.Module):
 
         return x
 
-def getData(csv_path, batch_size=20, num_workers=0):
+def getData(csv_path, batch_size=7, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     
     dataset = LidarDatasetCNN(csv_path, train=False)
@@ -129,7 +129,7 @@ def getData(csv_path, batch_size=20, num_workers=0):
     print('-'*65)
     return train_data, val_data
 
-def fit(model, criterion, optimizer, train_loader, val_loader, num_epochs):
+def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_epochs):
 
     train_losses = []
     val_losses = []
@@ -163,6 +163,7 @@ def fit(model, criterion, optimizer, train_loader, val_loader, num_epochs):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            scheduler.step()
 
             running_loss += loss.item()
 
@@ -204,7 +205,7 @@ def fit(model, criterion, optimizer, train_loader, val_loader, num_epochs):
                     # get the predictions to calculate the accuracy
                     # Calcula a acurácia
                     _, preds = torch.max(outputs, 1)
-                    print(f'_: {_}, preds: {preds}, preds shape: {preds.shape}')
+                    #print(f'_: {_}, preds: {preds}, preds shape: {preds.shape}')
                     # correct += torch.sum(preds == label.data)
         
                     # predictions
@@ -282,12 +283,14 @@ if __name__ == '__main__':
     # loss function for regression
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.005)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
+
     global epochs
     epochs = 20
     global batch_size
 
     # Train the model
-    results = fit(model=model, criterion=criterion, optimizer=optimizer, train_loader=train_data, val_loader=val_data, num_epochs=epochs)
+    results = fit(model=model, criterion=criterion, optimizer=optimizer, scheduler=scheduler, train_loader=train_data, val_loader=val_data, num_epochs=epochs)
 
     plotResults(results, epochs)
 
