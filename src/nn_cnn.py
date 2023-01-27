@@ -298,30 +298,3 @@ if __name__ == '__main__':
     torch.save(model.state_dict(), 'model.pth')
     print('Saved PyTorch Model State to model.pth')
 
-    # test the model with the validation data for one random image
-    # showing the image and the predicted and real labels
-    # get the first image from the validation data
-    random_image = val_data[0]
-    image = random_image['image']
-    labels = random_image['labels']
-
-    # convert image to tensor
-    image = image.type(torch.float32).to(device)
-    # add a dimension to the image tensor
-    image = image.unsqueeze(0)
-    # add a dimension to the image tensor
-
-    # get the model predictions
-    predictions = model(image)
-    # convert the predictions to numpy array
-    predictions = predictions.cpu().detach().numpy()
-    # convert the labels to numpy array
-    labels = labels.cpu().detach().numpy()
-
-    # print the predictions and labels
-    print('predictions:', predictions)
-    print('labels:', labels)
-
-    # show the image
-    plt.imshow(image[0][0], cmap='gray')
-    plt.show()
