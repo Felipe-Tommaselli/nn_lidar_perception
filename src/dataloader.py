@@ -95,12 +95,22 @@ class LidarDatasetCNN(Dataset):
         self.image = cv2.imread(full_path, -1)
         self.image = self.image[74:581,78:585,1] # take only the green channel and crop the image
 
-        # # plot the image with matplotlib
-        # plt.imshow(self.image, cmap='gray')
-        # plt.show()
+        labels = self.labels.iloc[idx, 1:] # take step out of labels
+        # print the points of the labels
+        print('Labels: ', labels)
+        # plot the labels points and the labels line
+        plt.plot([labels[0], labels[1]], 'ro')
+        plt.plot([labels[2], labels[3]], 'ro')
+        plt.plot([labels[4], labels[5]], 'ro')
+        plt.plot([labels[6], labels[7]], 'ro')
 
         azimuth1, azimuth2, intersec1, intersec2 = self.getLabels(idx=idx)
         labels = [azimuth1, azimuth2, intersec1, intersec2]
+
+
+        # plot the image with matplotlib
+        plt.imshow(self.image, cmap='gray')
+        plt.show()
 
         return {"labels": labels, "image": self.image}
 

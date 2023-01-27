@@ -217,6 +217,9 @@ class lidar_tag:
         ind = event.ind
 
         if self.n_p < 4:
+            print('n_p: ', self.n_p)
+            print('ind: ', ind)
+            print('xdata: ', xdata)
             x1 = np.take(xdata, ind)[0]
             y1 = np.take(ydata, ind)[0]
             self.points.append([x1, y1])
@@ -227,6 +230,8 @@ class lidar_tag:
             # print (f'Y={y1:.2f}')# Print Y point
             # print(f'Pointsx: ' + f', '.join(f'{p:.2f}' for p in self.points_x))
             # print(f'Pointsy: ' + f', '.join(f'{p:.2f}' for p in self.points_y))
+            print('x1: ', x1)
+            print('y1: ', y1)
             self.ax.plot(x1,y1,'k*')
             self.canvas = FigureCanvasTkAgg(self.fig, master = root)  
             self.canvas.draw()
