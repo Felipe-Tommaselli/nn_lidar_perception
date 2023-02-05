@@ -209,9 +209,37 @@ class lidar_tag:
 
     def on_pick(self, event):
         """ Function that get the points that will make the labeling """
+        
         thisline = event.artist
         xdata = thisline.get_xdata()
         ydata = thisline.get_ydata()
+        
+        # x and y from mouseevent are in PIXELS
+        # xdata and ydata are in mouse coordinates
+        # for this reason, we need to convert the mouse coordinates to pixels
+        # to do that, we need to know the limits of the plot
+        # and the limits of the canvas
+        # and then we can convert the mouse coordinates to pixels
+        # and then we can get the index of the point that is closest to the mouse coordinates
+        # and then we can get the x and y of the point that is closest to the mouse coordinates
+        
+        x = event.mouseevent.x
+        y = event.mouseevent.y
+        
+        # get the limits of the plot
+        xmin, xmax = thisline.axes.get_xlim()
+        ymin, ymax = thisline.axes.get_ylim()
+
+        # get the limits of the canvas
+        canvas_width = thisline.axes.get_figure().canvas.get_width_height()[0]
+        canvas_height = thisline.axes.get_figure().canvas.get_width_height()[1]
+
+        # convert the mouse coordinates to pixels
+        x = (x/canvas_width)*(xmax-xmin) + xmin
+
+        print('xdata: ', xdata, 'x: ', x)
+        print('ydata: ', ydata, 'y: ', y)
+
         # xdata = self.x_lidar[ind]
         # ydata = self.y_lidar[ind]
         ind = event.ind
@@ -219,9 +247,9 @@ class lidar_tag:
         if self.n_p < 4:
             print('n_p: ', self.n_p)
             print('ind: ', ind)
-            print('xdata: ', xdata)
             x1 = np.take(xdata, ind)[0]
             y1 = np.take(ydata, ind)[0]
+
             self.points.append([x1, y1])
             self.points_x[self.n_p] = x1
             self.points_y[self.n_p] = y1
