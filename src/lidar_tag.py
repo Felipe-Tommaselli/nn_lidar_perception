@@ -70,6 +70,9 @@ class lidar_tag:
         self.ax = self.fig.add_subplot(111)
         self.canvas = None
 
+        # adjust the plotting area (fit the image space)
+        self.fig.subplots_adjust(left=0.05, bottom=0.05, right=0.95, top=0.95, wspace=0, hspace=0)
+        self.fig_holding.subplots_adjust(left=0.05, bottom=0.05, right=0.95, top=0.95, wspace=0, hspace=0)
 
     def getLabel(self, raw: list, data: list) -> list:
         """ Function that get the labels from the raw data and fill the label_data with the labels if possible. """
@@ -170,6 +173,7 @@ class lidar_tag:
 
         # adding the subplot
         self.ax.cla()
+
         # plotting the graph
         self.ax.plot(self.x_lidar,self.y_lidar, '.', markersize=POINT_WIDTH, color='#40b255',picker=3)
 
@@ -193,6 +197,24 @@ class lidar_tag:
         self.ax.spines['bottom'].set_visible(True)
         self.ax.spines['left'].set_visible(True)
         self.ax.set_title('Step: ' + str(i))
+
+        # print plot size (height, width) in pixels 
+        print('plot size (height, width) in pixels: ', self.fig.get_size_inches()*self.fig.dpi)
+        # print ax plot size, area with the points (height, width) in pixels
+        print('ax size (height, width) in pixels: ', self.ax.get_window_extent().height, self.ax.get_window_extent().width)
+
+        # self.fig.canvas.draw()
+        # bbox = self.ax.get_tightbbox(self.fig.canvas.get_renderer())
+        # width, height = bbox.transformed(self.fig.dpi_scale_trans.inverted()).width, bbox.transformed(self.fig.dpi_scale_trans.inverted()).height
+        # print(f"Plot width: {width} inches")
+        # print(f"Plot height: {height} inches")
+
+        # # Calculate the size in pixels
+        # dpi = fig.dpi
+        # plot_width_pixels = int(width * dpi)
+        # plot_height_pixels = int(height * dpi)
+        # print(f"Plot width: {plot_width_pixels} pixels")
+        # print(f"Plot height: {plot_height_pixels} pixels")
 
         # creating the Tkinter canvas containing the Matplotlib figure
         self.canvas = FigureCanvasTkAgg(self.fig, master = self.root)
@@ -226,27 +248,24 @@ class lidar_tag:
         x = event.mouseevent.x
         y = event.mouseevent.y
         
-        # get the limits of the plot
-        xmin, xmax = thisline.axes.get_xlim()
-        ymin, ymax = thisline.axes.get_ylim()
+        # get the limits of the plot in pixels
 
         # get the limits of the canvas
         canvas_width = thisline.axes.get_figure().canvas.get_width_height()[0]
         canvas_height = thisline.axes.get_figure().canvas.get_width_height()[1]
 
-        # convert the mouse coordinates to pixels
-        x = (x/canvas_width)*(xmax-xmin) + xmin
+        # print limits
+        print('canvas_width, canvas_height: ', canvas_width, canvas_height)
 
-        print('xdata: ', xdata, 'x: ', x)
-        print('ydata: ', ydata, 'y: ', y)
+
+        print('x: ', x)
+        print('y: ', y)
 
         # xdata = self.x_lidar[ind]
         # ydata = self.y_lidar[ind]
         ind = event.ind
 
         if self.n_p < 4:
-            print('n_p: ', self.n_p)
-            print('ind: ', ind)
             x1 = np.take(xdata, ind)[0]
             y1 = np.take(ydata, ind)[0]
 
@@ -254,10 +273,6 @@ class lidar_tag:
             self.points_x[self.n_p] = x1
             self.points_y[self.n_p] = y1
             self.n_p += 1
-            # print (f'X= {x1:.2f}') # Print X point
-            # print (f'Y={y1:.2f}')# Print Y point
-            # print(f'Pointsx: ' + f', '.join(f'{p:.2f}' for p in self.points_x))
-            # print(f'Pointsy: ' + f', '.join(f'{p:.2f}' for p in self.points_y))
             print('x1: ', x1)
             print('y1: ', y1)
             self.ax.plot(x1,y1,'k*')
