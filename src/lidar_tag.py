@@ -35,7 +35,7 @@ import customtkinter as ctk
 from lidar2images import *
 
 global POINT_WIDTH
-POINT_WIDTH = 10
+POINT_WIDTH = 14
 
 global SLASH
 if platform == "linux" or platform == "linux2":
@@ -65,8 +65,8 @@ class lidar_tag:
         self.points = []
         self.n_p = 0
 
-        self.fig_holding = Figure(figsize = (5, 5), dpi = 130)
-        self.fig = Figure(figsize = (5, 5), dpi = 130)
+        self.fig_holding = Figure(figsize = (5, 5), dpi = 120)
+        self.fig = Figure(figsize = (5, 5), dpi = 120)
         self.ax = self.fig.add_subplot(111)
         self.canvas = None
 
@@ -299,7 +299,7 @@ class lidar_tag:
     def createWindow(self):
         """ Function that create the window of the application. """
         self.root = ctk.CTk()
-        self.root.geometry('740x800')
+        self.root.geometry('700x770')
         self.root.title('Lidar Labeling Tool')
         ctk.set_appearance_mode("dark")
         
@@ -324,10 +324,10 @@ if __name__ == '__main__':
     lt = lidar_tag(lidar_name='Lidar_Data.csv', label_name='Label_Data.csv', folder=''.join(['assets', SLASH, 'tags']))
     root, InputStep, Bnext, Bprev, Bgo, Bcln, Bsave = lt.createWindow()
 
-    Bprev.place(x=74, y = 740)
-    Bnext.place(x=177, y = 740)
-    InputStep.place(x=307, y = 741)
-    Bgo.place(x=367, y = 740)
-    Bsave.place(x=464, y = 740)
-    Bcln.place(x=567, y = 740)
+    Bprev.place(x=45, y = 700)
+    Bnext.place(x=150, y = 700)
+    InputStep.place(x=290, y = 701)
+    Bgo.place(x=350, y = 700)
+    Bsave.place(x=457, y = 700)
+    Bcln.place(x=560, y = 700)
     root.mainloop()
