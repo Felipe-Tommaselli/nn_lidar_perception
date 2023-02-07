@@ -42,7 +42,10 @@ import customtkinter as ctk
 from lidar2images import *
 
 global POINT_WIDTH
+global PIXEL_OFFSET
+
 POINT_WIDTH = 14
+PIXEL_OFFSET = 30
 
 global SLASH
 if platform == "linux" or platform == "linux2":
@@ -69,6 +72,9 @@ class lidar_tag:
         self.max_step = len(self.lidar_data)
         self.points_x = [0, 0, 0, 0]
         self.points_y = [0, 0, 0, 0]
+        self.points_xc = [0, 0, 0, 0]
+        self.points_yc = [0, 0, 0, 0]
+
         self.points = []
         self.n_p = 0
 
@@ -225,31 +231,32 @@ class lidar_tag:
         thisline = event.artist
         xdata = thisline.get_xdata()
         ydata = thisline.get_ydata()
-
-
-
-        # xdata = self.x_lidar[ind]
-        # ydata = self.y_lidar[ind]
-        ind = event.ind
+        ind = event.ind # index of the point that was clicked
 
         if self.n_p < 4:
             # x,y in pixels = xp, yp
             xp = event.mouseevent.x
             yp = event.mouseevent.y
-            print('xp: ', xp)
-            print('yp: ', yp)
 
             # x,y in coordinate = xc, yc
             xc = np.take(xdata, ind)[0]
             yc = np.take(ydata, ind)[0]
-            print('xc: ', xc)
-            print('yc: ', yc)
+
+            # approximating min values and max values
+            xp = PIXEL_OFFSET if xp < PIXEL_OFFSET else xp
+            yp = PIXEL_OFFSET if yp < PIXEL_OFFSET else yp
+            xp = 540 + PIXEL_OFFSET if xp > 540 + PIXEL_OFFSET else xp
+            yp = 540 + PIXEL_OFFSET if yp > 540 + PIXEL_OFFSET else yp
 
             # saving the points for the labels (in pixels)
-            # we need to take the borders offset: 30 pixels for 600x canvas and 540x image
-            self.points_x[self.n_p] = xp - 30
-            self.points_y[self.n_p] = yp - 30
+            # we need to take the borders offset: PIXEL_OFFSET (30) pixels for 600x canvas and 540x image
+            self.points_x[self.n_p] = xp - PIXEL_OFFSET
+            self.points_y[self.n_p] = yp - PIXEL_OFFSET
             
+            # saving the points for the plot (in coordinate)
+            self.points_xc[self.n_p] = xc
+            self.points_yc[self.n_p] = yc
+
             self.n_p += 1
             
             self.ax.plot(xc,yc,'k*')
@@ -260,10 +267,10 @@ class lidar_tag:
             
         else:
             print('Lines are already drawn!') if self.n_p == 4 else print("IT IS NOT POSSIBLE TO SAVE MORE THAN 4 POINTS")
-            left_xpoints = self.points_x[0:2]
-            left_ypoints = self.points_y[0:2]
-            right_xpoints = self.points_x[2:4]
-            right_ypoints = self.points_y[2:4]  
+            left_xpoints = self.points_xc[0:2]
+            left_ypoints = self.points_yc[0:2]
+            right_xpoints = self.points_xc[2:4]
+            right_ypoints = self.points_yc[2:4]  
             
             data_s = f'{str(self.step)}, {str(self.points_x[0])}, {str(self.points_y[0])},  {str(self.points_x[1])}, {str(self.points_y[1])}, {str(self.points_x[2])}, {str(self.points_y[2])}, {str(self.points_x[3])}, {str(self.points_y[3])}'
             self.label_data[self.step] = data_s         
