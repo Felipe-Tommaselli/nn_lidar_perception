@@ -210,19 +210,6 @@ class lidar_tag:
         # print ax plot size, area with the points (height, width) in pixels
         print('ax size (height, width) in pixels: ', self.ax.get_window_extent().height, self.ax.get_window_extent().width)
 
-        # self.fig.canvas.draw()
-        # bbox = self.ax.get_tightbbox(self.fig.canvas.get_renderer())
-        # width, height = bbox.transformed(self.fig.dpi_scale_trans.inverted()).width, bbox.transformed(self.fig.dpi_scale_trans.inverted()).height
-        # print(f"Plot width: {width} inches")
-        # print(f"Plot height: {height} inches")
-
-        # # Calculate the size in pixels
-        # dpi = fig.dpi
-        # plot_width_pixels = int(width * dpi)
-        # plot_height_pixels = int(height * dpi)
-        # print(f"Plot width: {plot_width_pixels} pixels")
-        # print(f"Plot height: {plot_height_pixels} pixels")
-
         # creating the Tkinter canvas containing the Matplotlib figure
         self.canvas = FigureCanvasTkAgg(self.fig, master = self.root)
         self.canvas.draw()
@@ -231,10 +218,6 @@ class lidar_tag:
         self.canvas.get_tk_widget().place(x=50,y=50)
 
         self.fig.canvas.mpl_connect('pick_event', self.on_pick)
-        # creating the Matplotlib toolbar
-        # toolbar = NavigationToolbar2Tk(self.canvas, root)
-        # toolbar.update()    
-
 
     def on_pick(self, event):
         """ Function that get the points that will make the labeling """
@@ -242,61 +225,52 @@ class lidar_tag:
         thisline = event.artist
         xdata = thisline.get_xdata()
         ydata = thisline.get_ydata()
-        
-        # x and y from mouseevent are in PIXELS
-        # xdata and ydata are in mouse coordinates
-        # for this reason, we need to convert the mouse coordinates to pixels
-        # to do that, we need to know the limits of the plot
-        # and the limits of the canvas
-        # and then we can convert the mouse coordinates to pixels
-        # and then we can get the index of the point that is closest to the mouse coordinates
-        # and then we can get the x and y of the point that is closest to the mouse coordinates
-        
-        x = event.mouseevent.x
-        y = event.mouseevent.y
-        
-        # get the limits of the plot in pixels
-
-        # get the limits of the canvas
-        canvas_width = thisline.axes.get_figure().canvas.get_width_height()[0]
-        canvas_height = thisline.axes.get_figure().canvas.get_width_height()[1]
-
-        # print limits
-        print('canvas_width, canvas_height: ', canvas_width, canvas_height)
 
 
-        print('x: ', x)
-        print('y: ', y)
 
         # xdata = self.x_lidar[ind]
         # ydata = self.y_lidar[ind]
         ind = event.ind
 
         if self.n_p < 4:
-            x1 = np.take(xdata, ind)[0]
-            y1 = np.take(ydata, ind)[0]
+            # x,y in pixels = xp, yp
+            xp = event.mouseevent.x
+            yp = event.mouseevent.y
+            print('xp: ', xp)
+            print('yp: ', yp)
 
-            self.points.append([x1, y1])
-            self.points_x[self.n_p] = x1
-            self.points_y[self.n_p] = y1
+            # x,y in coordinate = xc, yc
+            xc = np.take(xdata, ind)[0]
+            yc = np.take(ydata, ind)[0]
+            print('xc: ', xc)
+            print('yc: ', yc)
+
+            # saving the points for the labels (in pixels)
+            # we need to take the borders offset: 30 pixels for 600x canvas and 540x image
+            self.points_x[self.n_p] = xp - 30
+            self.points_y[self.n_p] = yp - 30
+            
             self.n_p += 1
-            print('x1: ', x1)
-            print('y1: ', y1)
-            self.ax.plot(x1,y1,'k*')
+            
+            self.ax.plot(xc,yc,'k*')
             self.canvas = FigureCanvasTkAgg(self.fig, master = root)  
             self.canvas.draw()
             self.canvas.get_tk_widget().place(x=50,y=50)
             self.fig.canvas.mpl_connect('pick_event', self.on_pick)
+            
         else:
             print('Lines are already drawn!') if self.n_p == 4 else print("IT IS NOT POSSIBLE TO SAVE MORE THAN 4 POINTS")
             left_xpoints = self.points_x[0:2]
             left_ypoints = self.points_y[0:2]
             right_xpoints = self.points_x[2:4]
             right_ypoints = self.points_y[2:4]  
+            
             data_s = f'{str(self.step)}, {str(self.points_x[0])}, {str(self.points_y[0])},  {str(self.points_x[1])}, {str(self.points_y[1])}, {str(self.points_x[2])}, {str(self.points_y[2])}, {str(self.points_x[3])}, {str(self.points_y[3])}'
             self.label_data[self.step] = data_s         
+            
             self.ax.plot(left_xpoints,left_ypoints,'r', linewidth=2)
             self.ax.plot(right_xpoints,right_ypoints,'r',linewidth=2)
+
             self.canvas = FigureCanvasTkAgg(self.fig, master = root)  
             self.canvas.draw()
             self.canvas.get_tk_widget().place(x=50,y=50)
