@@ -93,26 +93,28 @@ class LidarDatasetCNN(Dataset):
 
         # image treatment (only green channel)
         self.image = cv2.imread(full_path, -1)
-        self.image = self.image[74:581,78:585,1] # take only the green channel and crop the image
+        self.image = self.image[30:570, 30:570,1] # take only the green channel and crop the image
+        # to understand the crop, see the image in the assets folder and the lidar_tag.py file
 
         labels = self.labels.iloc[idx, 1:] # take step out of labels
-        # print the points of the labels
-        print('Labels: ', labels)
-        # plot the labels points and the labels line
-        #plt.plot([labels[0], labels[1]], 'ro')
-        #plt.plot([labels[2], labels[3]], 'ro')
-        #plt.plot([labels[4], labels[5]], 'ro')
-        #plt.plot([labels[6], labels[7]], 'ro')
+
+        # we need to invert the y axis, for some reason there is a difference between the 0,0 in matplotlib and cv2 
+        plt.scatter(labels[0], 540 - labels[1], c='r', s=20)
+        plt.scatter(labels[2], 540 - labels[3], c='r', s=20)
+        plt.scatter(labels[4], 540 - labels[5], c='r', s=20)
+        plt.scatter(labels[6], 540 - labels[7], c='r', s=20)
+        plt.scatter(530, 530, c='g', s=30)
 
         azimuth1, azimuth2, intersec1, intersec2 = self.getLabels(idx=idx)
         labels = [azimuth1, azimuth2, intersec1, intersec2]
 
-        # get rid of the plot axis 
-        plt.axis('off')
 
+        # print the points of the labels
+        # print('Labels: ', labels)
         # plot the image with matplotlib
-        plt.imshow(self.image, cmap='gray')
-        plt.show()
+        #plt.axis('off')
+        #plt.imshow(self.image, cmap='gray')
+        #plt.show()
 
         return {"labels": labels, "image": self.image}
 
@@ -125,11 +127,22 @@ class LidarDatasetCNN(Dataset):
         # line equation: y = mx + b
         # m = (y2 - y1) / (x2 - x1)
         # b = y1 - m*x1
+        
+        # note that we need to prevent division by 0 exception
+        # RuntimeWarning: divide by zero encountered in long_scalars
+        if labels[2] - labels[0] == 0:
+            labels[2] += 1
+        if labels[6] - labels[4] == 0:
+            labels[6] += 1
+
         m1 = (labels[3] - labels[1]) / (labels[2] - labels[0])
-        b1 = labels[1] - m1*labels[0]
         m2 = (labels[7] - labels[5]) / (labels[6] - labels[4])
+        
+        b1 = labels[1] - m1*labels[0]
         b2 = labels[5] - m2*labels[4]
 
+        print(f'm1 = labels[3] - labels[1] / labels[2] - labels[0] = {labels[3]} - {labels[1]} / {labels[2]} - {labels[0]} = {m1}')
+        
         # azimuth1, azimuth2, intersec1, intersec2
         # angles in radians (azimuth1, azimuth2) and meters (intersec1, intersec2)
         return math.atan(m1), math.atan(m2), b1, b2
@@ -138,14 +151,11 @@ class LidarDatasetCNN(Dataset):
 
 if __name__ == "__main__":
     # ld = LidarDataset(csv_path="~/Documents/IC_NN_Lidar/datasets/syncro_data_validation.csv")
-    # print(ld.__getitem__(idx=0))
     # print(ld.__getitem__(idx=0)["lidar"], len(ld.__getitem__(idx=0)["lidar"]))
     # print(ld.__getitem__(idx=0)["lidar"], len(ld.__getitem__(idx=10)["lidar"]))
 
     # print('-'*80)
-    # ldCNN = LidarDatasetCNN(img_path="~/Documents/IC_NN_Lidar/assets/images/image", csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
-    # print(ldCNN.__getitem__(idx=0))
+    # ldCNN = LidarDatasetCNN(csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
     # print(ldCNN.__getitem__(idx=0)['image'], len(ldCNN.__getitem__(idx=0)['image']))
     # print(ldCNN.__getitem__(idx=1)['image'], len(ldCNN.__getitem__(idx=1)['image']))
-    # print(ldCNN.__getitem__(idx=0)['image'] is ldCNN.__getitem__(idx=1)['image'])
     pass
