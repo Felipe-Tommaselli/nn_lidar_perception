@@ -141,7 +141,7 @@ class LidarDatasetCNN(Dataset):
         b1 = labels[1] - m1*labels[0]
         b2 = labels[5] - m2*labels[4]
 
-        print(f'm1 = labels[3] - labels[1] / labels[2] - labels[0] = {labels[3]} - {labels[1]} / {labels[2]} - {labels[0]} = {m1}')
+        #print(f'm1 = labels[3] - labels[1] / labels[2] - labels[0] = {labels[3]} - {labels[1]} / {labels[2]} - {labels[0]} = {m1}')
         
         # azimuth1, azimuth2, intersec1, intersec2
         # angles in radians (azimuth1, azimuth2) and meters (intersec1, intersec2)

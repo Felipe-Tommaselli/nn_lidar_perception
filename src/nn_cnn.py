@@ -274,7 +274,7 @@ if __name__ == '__main__':
     print('val data length:', len(val_data))
     for item in val_data:
         print('image:', item['image'].shape)
-        print('labels:', item['labels'])
+        print('labels:', item['labels'].shape)
         break
     # Create the model on GPU if available
     model = NetworkCNN(ResidualBlock).to(device)
