@@ -1,2 +1,4 @@
 # ignore .csv files in datasets/ folder 
 datasets/
+assets/tags/ 
+!assets/tags/Label_Data.csv
