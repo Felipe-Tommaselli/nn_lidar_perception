@@ -5,27 +5,34 @@ import random
 import os
 import matplotlib.pyplot as plt
 
-def RANSAC(lines, iterations, threshold):
-    best_line1 = None
-    best_line2 = None
-    best_inliers = 0
-    for i in range(iterations):
-        idx = random.randint(0, len(lines) - 1)
-        line1 = lines[idx][0]
-        inliers1 = [idx]
-        for j in range(len(lines)):
-            if j == idx:
-                continue
-            line2 = lines[j][0]
-            distance = np.abs(line2[0] * line1[1] - line2[1] * line1[0]) / np.sqrt(line1[0] ** 2 + line1[1] ** 2)
-            if distance < threshold:
-                inliers1.append(j)
-        if len(inliers1) > best_inliers:
-            best_inliers = len(inliers1)
-            best_line1 = line1
-            best_line2 = line2
-    return best_line1, best_line2
+def RANSAC(img):
+    # Converter a imagem para binário utilizando um threshold de limiarização
+    ret, thresh = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+    
+    # Encontrar os contornos da imagem binária
+    contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    
+    # Selecionar os dois maiores contornos
+    contours = sorted(contours, key=cv2.contourArea, reverse=True)[:2]
+    
+    # Inicializar as equações das retas
+    lines = []
+    for contour in contours:
+        # Converter o contorno em uma matriz de pontos
+        points = contour.reshape(-1, 2)
+        
+        # Aplicar RANSAC para encontrar a equação da reta
+        model = cv2.fitLine(points, cv2.DIST_L2, 0, 0.01, 0.01)
+        vx, vy, x0, y0 = model
 
+        m = vy/vx
+        b = y0 - m * x0
+        lines.append((m, b))
+    
+    # Devolver os coeficientes das equações das retas
+    # escrever em termos de m e b
+    m1, m2, b1, b2 = lines[0][0], lines[1][0], lines[0][1], lines[1][1]
+    return m1, m2, b1, b2
 
 SLASH = '/'
 
@@ -45,31 +52,18 @@ print('path: ', path)
 img = cv2.imread(path, -1)
 print('image shape og:', img.shape)
 
-img = img[30:570,30:570,1]
+img = img[30:570,30:570]
+
+img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 print('img:', img.shape)
 print('len shape', len(img.shape))
 
-plt.imshow(img)
-plt.show()
+#plt.imshow(img)
+#plt.show()
 
-gray = img 
-
-# implement ransac for 2 lines detection
-edges = cv2.Canny(gray, 50, 150)
-
-lines = cv2.HoughLinesP(edges, 1, np.pi/180, 100, minLineLength=100, maxLineGap=10)
-
-line1, line2 = RANSAC(lines, 100, 10)
-if line1 is not None and line2 is not None:
-    x1, y1, x2, y2 = line1
-    cv2.line(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
-    x1, y1, x2, y2 = line2
-    cv2.line(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
-
-cv2.imshow('image', image)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# Aplicar RANSAC para encontrar as equações das retas
+m1, m2, b1, b2 = RANSAC(img)
 
 # Para plotar as retas, precisamos de dois pontos para cada uma
 y1 = 0

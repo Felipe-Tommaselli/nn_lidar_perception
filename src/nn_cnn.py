@@ -124,13 +124,6 @@ def getData(csv_path, batch_size=5, num_workers=0):
     train_data = DataLoader(train_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
     val_data  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
 
-    # show one image from image from train_data 
-    img = train_data.dataset[0]['image']
-    print('Image shape: ', img.shape)
-
-    plt.imshow(img, cmap='gray')
-    plt.show()
-
     # print the label of the image from train_data
     label = train_data.dataset[0]['labels']
     print('Label: ', label)
@@ -299,7 +292,7 @@ if __name__ == '__main__':
     global batch_size
 
     # network summary with torchsummary
-    summary(model, (1, 540, 540))
+    # summary(model, (1, 540, 540))
 
 
     # Train the model

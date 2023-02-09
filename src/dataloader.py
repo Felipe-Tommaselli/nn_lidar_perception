@@ -101,19 +101,22 @@ class LidarDatasetCNN(Dataset):
         azimuth1, azimuth2, intersec1, intersec2 = self.getLabels(idx=idx)
         labels = [azimuth1, azimuth2, intersec1, intersec2]
 
+        # print('labels: ', labels)
+        # m1, m2, b1, b2 = labels[0], labels[1], labels[2], labels[3]
+        # # get the x and y coordinates of the lines
+        # x1 = np.arange(0, 540)
+        # y1 = m1*x1 + b1
+        # x2 = np.arange(0, 540)
+        # y2 = m2*x2 + b2
 
-        # we need to invert the y axis, for some reason there is a difference between the 0,0 in matplotlib and cv2 
-        # plt.scatter(labels[0], 540 - labels[1], c='r', s=20)
-        # plt.scatter(labels[2], 540 - labels[3], c='r', s=20)
-        # plt.scatter(labels[4], 540 - labels[5], c='r', s=20)
-        # plt.scatter(labels[6], 540 - labels[7], c='r', s=20)
-
-        # print the points of the labels
-        # print('Labels: ', labels)
-        # plot the image with matplotlib
-        #plt.axis('off')
-        #plt.imshow(self.image, cmap='gray')
-        #plt.show()
+        # # plot the lines
+        # plt.plot(x1, y1, color='green')
+        # plt.plot(x2, y2, color='green')
+        # # plot the image
+        # plt.imshow(self.image, cmap='gray')
+        # # put caption to the image
+        # plt.title('Image ' + str(step))
+        # plt.show()
 
         return {"labels": labels, "image": self.image}
 
@@ -134,6 +137,12 @@ class LidarDatasetCNN(Dataset):
         if labels[6] - labels[4] == 0:
             labels[6] += 1
 
+        # invert all the y coordinates -> 540 - y
+        labels[1] = 540 - labels[1]
+        labels[3] = 540 - labels[3]
+        labels[5] = 540 - labels[5]
+        labels[7] = 540 - labels[7]
+
         m1 = (labels[3] - labels[1]) / (labels[2] - labels[0])
         m2 = (labels[7] - labels[5]) / (labels[6] - labels[4])
         
@@ -142,7 +151,7 @@ class LidarDatasetCNN(Dataset):
         
         # azimuth1, azimuth2, intersec1, intersec2
         # angles in radians (azimuth1, azimuth2) and meters (intersec1, intersec2)
-        return math.atan(m1), math.atan(m2), b1, b2
+        return m1, m2, b1, b2
 
 
 

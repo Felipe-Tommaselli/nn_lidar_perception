@@ -49,7 +49,7 @@ for i, data in enumerate(train_data):
     print('l:', labels)
     break
 
-# image dimension: batch x 1 x 650 x 650 (batch, channels, height, width)
+# image dimension: (batch, channels, height, width)
 images = images.type(torch.float32).to(device)
 images = images.unsqueeze(1)
 
@@ -87,17 +87,40 @@ image = image.to('cpu').cpu().detach().numpy()
 # image it is shape (1, 1, 507, 507), we need to remove the first dimension
 image = image[0][0]
 
-x = np.linspace(0, 507, 507) # 0 to 507 with 507 points
-p1 = predictions[0][0] * x + predictions[0][2]
-p2 = predictions[0][1] * x + predictions[0][3]
+# plot the labels and the predictions on the image
+# note that labels and predicts are an array of 4 values
+# [m1, m2, b1, b2] -> m1, m2 are the slopes and b1, b2 are the intercepts of 2 lines
+# the first line is the left line and the second line is the right line
+# the lines are the borders of the road
+# the image is 540x540 pixels
 
-l1 = label[0][0] * x + label[0][1]
-l2 = label[0][2] * x + label[0][3]
+# get the slopes and intercepts
+m1, m2, b1, b2 = predictions[0]
+# get the x and y coordinates of the lines
+x1 = np.arange(0, 540)
+y1 = m1*x1 + b1
+x2 = np.arange(0, 540)
+y2 = m2*x2 + b2
 
-plt.plot(x, p1, '-r', label=f'p1={predictions[0][0]}x+{predictions[0][2]}', linewidth=2)
-plt.plot(x, p2, 'r', label=f'p2={predictions[0][1]}x+{predictions[0][3]}', linewidth=2)
-plt.plot(x, l1, '-b', label=f'l1={label[0][0]}x+{label[0][2]}', linewidth=2)
-plt.plot(x, l2, 'b', label=f'l2={label[0][1]}x+{label[0][3]}', linewidth=2)
+# plot the lines
+plt.plot(x1, y1, color='red')
+plt.plot(x2, y2, color='red')
+
+# get the slopes and intercepts
+m1, m2, b1, b2 = label[0]
+# get the x and y coordinates of the lines
+x1 = np.arange(0, 540)
+y1 = m1*x1 + b1
+x2 = np.arange(0, 540)
+y2 = m2*x2 + b2
+
+# plot the lines
+plt.plot(x1, y1, color='green')
+plt.plot(x2, y2, color='green')
+
+# plot one point on the image in blue color on 250x250 coordinates
+
+
 # show the image
 plt.imshow(image, cmap='gray')
 plt.show()
