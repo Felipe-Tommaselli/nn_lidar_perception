@@ -111,7 +111,7 @@ class NetworkCNN(nn.Module):
 
         return x
 
-def getData(csv_path, batch_size=7, num_workers=0):
+def getData(csv_path, batch_size=10, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     
     dataset = LidarDatasetCNN(csv_path, train=False)
@@ -123,10 +123,6 @@ def getData(csv_path, batch_size=7, num_workers=0):
 
     train_data = DataLoader(train_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
     val_data  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
-
-    # print the label of the image from train_data
-    label = train_data.dataset[0]['labels']
-    print('Label: ', label)
 
     print('-'*65)
     return train_data, val_data
@@ -159,22 +155,6 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
             # convert to format: tensor([[value1, value2, value3, value4], [value1, value2, value3, value4], ...])
             # this is: labels for each image, "batch" times -> shape: (batch, 4)
             labels = labels.permute(1, 0)
-
-            # show all the images in the batch and their labels
-            for i in range(len(images)):
-                m1, m2, b1, b2 = labels[i].squeeze(0).cpu().numpy()
-                # get the x and y coordinates of the lines
-                x1 = np.arange(0, 540)
-                y1 = m1*x1 + b1
-                x2 = np.arange(0, 540)
-                y2 = m2*x2 + b2
-
-                # plot the lines
-                plt.plot(x1, y1, color='green')
-                plt.plot(x2, y2, color='green')
-
-                plt.imshow(images[i].squeeze(0).cpu().numpy(), cmap='gray')
-                plt.show()
             
             outputs = model(images)
             loss = criterion(outputs, labels) 
@@ -294,13 +274,13 @@ if __name__ == '__main__':
         print('image shape:', item['image'].shape)
         print('labels len:', len(item['labels']))
         break
+
     # Create the model on GPU if available
     model = NetworkCNN(ResidualBlock).to(device)
 
-
     # loss function for regression
     criterion = nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.005)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
     global epochs
