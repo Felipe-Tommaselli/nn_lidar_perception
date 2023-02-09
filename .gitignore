@@ -4,4 +4,4 @@ datasets/*
 ./datasets/ ** / *.csv
 
 # ignore all files in the folder ./assets/images
-assets/images/ ** / *
+assets/images/ *
