@@ -79,7 +79,7 @@ class NetworkCNN(nn.Module):
         self.layer2 = self._make_layer(block, 256, layers[2], stride = 2)
         self.layer3 = self._make_layer(block, 512, layers[3], stride = 2)
         self.avgpool = nn.AvgPool2d(7, stride=1)
-        self.fc = nn.Linear(512 * 26 * 26, num_classes)
+        self.fc = nn.Linear(512 * 28 * 28, num_classes)
         
     def _make_layer(self, block, planes, blocks, stride=1):
         downsample = None
@@ -104,28 +104,37 @@ class NetworkCNN(nn.Module):
         x = self.layer1(x)
         x = self.layer2(x)
         x = self.layer3(x)
-
         x = self.avgpool(x)
+
         x = x.view(x.size(0), -1)
         x = self.fc(x)
 
         return x
 
-def getData(csv_path, batch_size=7, num_workers=0):
+def getData(csv_path, batch_size=5, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     
     dataset = LidarDatasetCNN(csv_path, train=False)
 
     train_size, val_size = int(0.8*len(dataset)), np.ceil(0.2*len(dataset)).astype('int')
+    print(f'train size: {train_size}, val size: {val_size}')
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
+
 
     train_data = DataLoader(train_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
     val_data  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
 
-    # get one image shape from the train_data
-    for i, data in enumerate(train_data):
-        print(f'images shape: {data["image"].shape}')
-        break
+    # show one image from image from train_data 
+    img = train_data.dataset[0]['image']
+    print('Image shape: ', img.shape)
+
+    plt.imshow(img, cmap='gray')
+    plt.show()
+
+    # print the label of the image from train_data
+    label = train_data.dataset[0]['labels']
+    print('Label: ', label)
+
     print('-'*65)
     return train_data, val_data
 
@@ -147,7 +156,7 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
             
             # convert to float32 and send it to the device
 
-            # image dimension: batch x 1 x 650 x 650 (batch, channels, height, width)
+            # image dimension: (batch, channels, height, width)
             images = images.type(torch.float32).to(device)
             images = images.unsqueeze(1)
 
@@ -180,7 +189,7 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
                 for i, data in enumerate(val_loader):
                     images, labels = data['image'], data['labels']
 
-                    # image dimension: batch x 1 x 650 x 650 (batch, channels, height, width)
+                    # image dimension: (batch, channels, height, width)
                     images = images.type(torch.float32).to(device)
                     images = images.unsqueeze(1)
 
@@ -273,12 +282,12 @@ if __name__ == '__main__':
     train_data, val_data = getData(csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
     print('val data length:', len(val_data))
     for item in val_data:
-        print('image:', item['image'].shape)
-        print('labels:', item['labels'].shape)
+        print('image shape:', item['image'].shape)
+        print('labels len:', len(item['labels']))
         break
     # Create the model on GPU if available
     model = NetworkCNN(ResidualBlock).to(device)
-    # summary(model, (1, 650, 650))
+
 
     # loss function for regression
     criterion = nn.MSELoss()
@@ -288,6 +297,10 @@ if __name__ == '__main__':
     global epochs
     epochs = 20
     global batch_size
+
+    # network summary with torchsummary
+    summary(model, (1, 540, 540))
+
 
     # Train the model
     results = fit(model=model, criterion=criterion, optimizer=optimizer, scheduler=scheduler, train_loader=train_data, val_loader=val_data, num_epochs=epochs)

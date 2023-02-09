@@ -98,16 +98,15 @@ class LidarDatasetCNN(Dataset):
 
         labels = self.labels.iloc[idx, 1:] # take step out of labels
 
-        # we need to invert the y axis, for some reason there is a difference between the 0,0 in matplotlib and cv2 
-        plt.scatter(labels[0], 540 - labels[1], c='r', s=20)
-        plt.scatter(labels[2], 540 - labels[3], c='r', s=20)
-        plt.scatter(labels[4], 540 - labels[5], c='r', s=20)
-        plt.scatter(labels[6], 540 - labels[7], c='r', s=20)
-        plt.scatter(530, 530, c='g', s=30)
-
         azimuth1, azimuth2, intersec1, intersec2 = self.getLabels(idx=idx)
         labels = [azimuth1, azimuth2, intersec1, intersec2]
 
+
+        # we need to invert the y axis, for some reason there is a difference between the 0,0 in matplotlib and cv2 
+        # plt.scatter(labels[0], 540 - labels[1], c='r', s=20)
+        # plt.scatter(labels[2], 540 - labels[3], c='r', s=20)
+        # plt.scatter(labels[4], 540 - labels[5], c='r', s=20)
+        # plt.scatter(labels[6], 540 - labels[7], c='r', s=20)
 
         # print the points of the labels
         # print('Labels: ', labels)
@@ -140,8 +139,6 @@ class LidarDatasetCNN(Dataset):
         
         b1 = labels[1] - m1*labels[0]
         b2 = labels[5] - m2*labels[4]
-
-        #print(f'm1 = labels[3] - labels[1] / labels[2] - labels[0] = {labels[3]} - {labels[1]} / {labels[2]} - {labels[0]} = {m1}')
         
         # azimuth1, azimuth2, intersec1, intersec2
         # angles in radians (azimuth1, azimuth2) and meters (intersec1, intersec2)

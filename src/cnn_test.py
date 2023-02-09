@@ -22,7 +22,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 def getData(csv_path, batch_size=7, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     
-    dataset = LidarDatasetCNN(csv_path, train=False)
+    dataset = LidarDatasetCNN(csv_path, train=True)
 
     train_size, val_size = int(0.8*len(dataset)), np.ceil(0.2*len(dataset)).astype('int')
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
@@ -46,6 +46,7 @@ train_data, val_data = getData(csv_path="~/Documents/IC_NN_Lidar/assets/tags/Lab
 for i, data in enumerate(train_data):
     images = data['image']
     labels = data['labels']
+    print('l:', labels)
     break
 
 # image dimension: batch x 1 x 650 x 650 (batch, channels, height, width)
