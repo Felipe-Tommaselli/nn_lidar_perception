@@ -1,11 +1,12 @@
 import numpy as np
 import cv2
 import random
+from sklearn.linear_model import RANSACRegressor
 
 import os
 import matplotlib.pyplot as plt
 
-def RANSAC(img):
+def RANSACs(img):
     # Converter a imagem para binário utilizando um threshold de limiarização
     ret, thresh = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
     
@@ -24,15 +25,48 @@ def RANSAC(img):
         # Aplicar RANSAC para encontrar a equação da reta
         model = cv2.fitLine(points, cv2.DIST_L2, 0, 0.01, 0.01)
         vx, vy, x0, y0 = model
-
+        
+        print(f'vx: {vx}, vy: {vy}, x0: {x0}, y0: {y0}')
         m = vy/vx
         b = y0 - m * x0
         lines.append((m, b))
     
     # Devolver os coeficientes das equações das retas
     # escrever em termos de m e b
-    m1, m2, b1, b2 = lines[0][0], lines[1][0], lines[0][1], lines[1][1]
+    print('lines:', lines)
+    # if lines has 4 values: else (2 values):
+    if len(lines) == 4:
+        m1, m2, b1, b2 = lines[0][0], lines[1][0], lines[2][0], lines[3][0]
+    else:
+        m1, b1 = lines[0][0], lines[0][1]
+        m2, b2 = 0, 0
     return m1, m2, b1, b2
+
+def RANSAC(img):
+    # Converter a imagem para binário utilizando um threshold de limiarização
+    ret, thresh = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+    
+    # Encontrar os contornos da imagem binária
+    contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    
+    # Selecionar o maior contorno
+    contour = sorted(contours, key=cv2.contourArea, reverse=True)[0]
+    
+    # Converter o contorno em uma matriz de pontos
+    points = contour.reshape(-1, 2)
+    
+    # Criar o modelo de regressão RANSAC
+    model = RANSACRegressor(min_samples=2)
+    
+    # Ajustar o modelo aos pontos do contorno
+    model.fit(points[:, 0].reshape(-1, 1), points[:, 1])
+    
+    # Recuperar a inclinação e o viés do modelo
+    m = model.estimator_.coef_[0]
+    b = model.estimator_.intercept_
+    
+    # Devolver os coeficientes da equação da reta (m e b)
+    return m, b
 
 SLASH = '/'
 
@@ -63,7 +97,14 @@ print('len shape', len(img.shape))
 #plt.show()
 
 # Aplicar RANSAC para encontrar as equações das retas
-m1, m2, b1, b2 = RANSAC(img)
+#m1, m2, b1, b2 = RANSACs(img)
+m1, b1 = RANSAC(img)
+print(f'm1: {m1}, b1: {b1}')
+
+m2, b2 = 0, 0
+
+
+
 
 # Para plotar as retas, precisamos de dois pontos para cada uma
 y1 = 0

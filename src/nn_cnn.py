@@ -111,7 +111,7 @@ class NetworkCNN(nn.Module):
 
         return x
 
-def getData(csv_path, batch_size=5, num_workers=0):
+def getData(csv_path, batch_size=7, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     
     dataset = LidarDatasetCNN(csv_path, train=False)
@@ -160,6 +160,22 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
             # this is: labels for each image, "batch" times -> shape: (batch, 4)
             labels = labels.permute(1, 0)
 
+            # show all the images in the batch and their labels
+            for i in range(len(images)):
+                m1, m2, b1, b2 = labels[i].squeeze(0).cpu().numpy()
+                # get the x and y coordinates of the lines
+                x1 = np.arange(0, 540)
+                y1 = m1*x1 + b1
+                x2 = np.arange(0, 540)
+                y2 = m2*x2 + b2
+
+                # plot the lines
+                plt.plot(x1, y1, color='green')
+                plt.plot(x2, y2, color='green')
+
+                plt.imshow(images[i].squeeze(0).cpu().numpy(), cmap='gray')
+                plt.show()
+            
             outputs = model(images)
             loss = criterion(outputs, labels) 
             optimizer.zero_grad()
