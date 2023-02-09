@@ -19,12 +19,11 @@ At the end, plot the result of the cost function with the matplotlib library by 
 """
 
 import os
-import pandas as pd
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-from statistics import mean
-#from torchvision.io import read_image
+from sklearn.preprocessing import MinMaxScaler
+
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F

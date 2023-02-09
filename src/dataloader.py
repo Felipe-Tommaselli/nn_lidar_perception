@@ -154,7 +154,6 @@ class LidarDatasetCNN(Dataset):
         return m1, m2, b1, b2
 
 
-
 if __name__ == "__main__":
     # ld = LidarDataset(csv_path="~/Documents/IC_NN_Lidar/datasets/syncro_data_validation.csv")
     # print(ld.__getitem__(idx=0)["lidar"], len(ld.__getitem__(idx=0)["lidar"]))
