@@ -277,6 +277,27 @@ class lidar_tag:
             self.ax.plot(left_xpoints,left_ypoints,'r', linewidth=2)
             self.ax.plot(right_xpoints,right_ypoints,'r',linewidth=2)
 
+            # plot one line with de line equation of left and right points
+            # y = mx + b
+            # m = (y2-y1)/(x2-x1)
+            # b = y1 - m*x1
+
+            # left line
+            ml = (left_ypoints[1] - left_ypoints[0])/(left_xpoints[1] - left_xpoints[0])
+            bl = left_ypoints[0] - ml*left_xpoints[0]
+            # right line
+            mr = (right_ypoints[1] - right_ypoints[0])/(right_xpoints[1] - right_xpoints[0])
+            br = right_ypoints[0] - mr*right_xpoints[0]
+
+            # plot the line (x in coordinates)
+            # get x min and x max of the ax plot (in coordinates)
+            x = np.linspace(self.ax.get_xlim()[0], self.ax.get_xlim()[1], 100)
+            yl = ml *x + bl
+            yr = mr *x + br
+            
+            self.ax.plot(x, yl, 'r', linewidth=1, linestyle='--')
+            self.ax.plot(x, yr, 'r', linewidth=1, linestyle='--')
+
             self.canvas = FigureCanvasTkAgg(self.fig, master = root)  
             self.canvas.draw()
             self.canvas.get_tk_widget().place(x=50,y=50)
