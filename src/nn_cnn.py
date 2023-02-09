@@ -111,7 +111,7 @@ class NetworkCNN(nn.Module):
 
         return x
 
-def getData(csv_path, batch_size=10, num_workers=0):
+def getData(csv_path, batch_size=5, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     
     dataset = LidarDatasetCNN(csv_path, train=False)
@@ -284,7 +284,7 @@ if __name__ == '__main__':
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
     global epochs
-    epochs = 20
+    epochs = 50
     global batch_size
 
     # network summary with torchsummary
