@@ -1,2 +1,2 @@
 # ignore .csv files in datasets/ folder 
-*.csv
+datasets/
