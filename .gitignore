@@ -1,7 +1,5 @@
 # ignore .csv files in datasets/ folder 
 datasets/* 
-# ignore .csv files in datasets/ folder and all subfolders 
-./datasets/ ** / *.csv
 
 # ignore all files in the folder ./assets/images
-assets/images/ *
+assets/*
