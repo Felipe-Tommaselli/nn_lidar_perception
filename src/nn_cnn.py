@@ -143,11 +143,13 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
             images, labels = data['image'], data['labels']
             
             # convert to float32 and send it to the device
-
             # image dimension: (batch, channels, height, width)
             images = images.type(torch.float32).to(device)
             images = images.unsqueeze(1)
 
+            # normalize the labels to be between 0 and 1 with min-max normalization
+
+            # convert labels to float32 and send it to the device
             labels = [label.type(torch.float32).to(device) for label in labels]
             # convert labels to tensor
             labels = torch.stack(labels)
@@ -268,11 +270,6 @@ if __name__ == '__main__':
 
     # Get the data
     train_data, val_data = getData(csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
-    print('val data length:', len(val_data))
-    for item in val_data:
-        print('image shape:', item['image'].shape)
-        print('labels len:', len(item['labels']))
-        break
 
     # Create the model on GPU if available
     model = NetworkCNN(ResidualBlock).to(device)
