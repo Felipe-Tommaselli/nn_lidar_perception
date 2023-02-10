@@ -119,12 +119,37 @@ def getData(csv_path, batch_size=5, num_workers=0):
     print(f'train size: {train_size}, val size: {val_size}')
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
 
-
     train_data = DataLoader(train_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
     val_data  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
 
+    # labels = []
+    # for i in range(len(dataset)):
+    #     labels.append(dataset[i]['labels'])
+
+    # rewrite with list comprehension
+    labels = np.array([item['labels'] for item in dataset])
+    labels = labels.reshape(-1, 4).tolist()
+
+    label_norm = [[], [], [], []]
+    for label in labels:
+        label_norm[0].append(label[0])
+        label_norm[1].append(label[1])
+        label_norm[2].append(label[2])
+        label_norm[3].append(label[3])
+
+    # normalize the labels with sklearn minmax scaler
+    scaler = MinMaxScaler()
+    label_norm[0] = scaler.fit_transform(np.array(label_norm[0]).reshape(-1, 1))
+    label_norm[1] = scaler.fit_transform(np.array(label_norm[1]).reshape(-1, 1))
+    label_norm[2] = scaler.fit_transform(np.array(label_norm[2]).reshape(-1, 1))
+    label_norm[3] = scaler.fit_transform(np.array(label_norm[3]).reshape(-1, 1))
+
+    # get the mean and std of the labels
+    mean = [np.mean(label_norm[0]), np.mean(label_norm[1]), np.mean(label_norm[2]), np.mean(label_norm[3])]
+    std = [np.std(label_norm[0]), np.std(label_norm[1]), np.std(label_norm[2]), np.std(label_norm[3])]
+
     print('-'*65)
-    return train_data, val_data
+    return train_data, val_data, [mean, std]
 
 def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_epochs):
 
@@ -146,8 +171,6 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
             # image dimension: (batch, channels, height, width)
             images = images.type(torch.float32).to(device)
             images = images.unsqueeze(1)
-
-            # normalize the labels to be between 0 and 1 with min-max normalization
 
             # convert labels to float32 and send it to the device
             labels = [label.type(torch.float32).to(device) for label in labels]
@@ -269,24 +292,24 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     # Get the data
-    train_data, val_data = getData(csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
+    train_data, val_data, params = getData(csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
 
     # Create the model on GPU if available
     model = NetworkCNN(ResidualBlock).to(device)
 
     # loss function for regression
     criterion = nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.5)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
     global epochs
-    epochs = 50
+    epochs = 15
     global batch_size
 
     # network summary with torchsummary
-    # summary(model, (1, 540, 540))
+    summary(model, (1, 540, 540))
 
-
+    print(model)
     # Train the model
     results = fit(model=model, criterion=criterion, optimizer=optimizer, scheduler=scheduler, train_loader=train_data, val_loader=val_data, num_epochs=epochs)
 
