@@ -8,7 +8,6 @@ Class that loads the dataset for the neural network.
 - "class LidarDatasetCNN(Dataset)" loads the dataset from the images already processed from the lidar dataset.
     This class with the images (instead of the raw data) it is used in the nn_cnn.py file (convolutional Network).
 
-@author: andres
 @author: Felipe-Tommaselli
 """
 

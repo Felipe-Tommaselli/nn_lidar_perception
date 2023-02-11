@@ -14,7 +14,6 @@ create a neural network with convolutional layers in Python with the Pytorch fra
 
 At the end, plot the result of the cost function with the matplotlib library by number of epochs.
 
-@author: andres
 @author: Felipe-Tommaselli
 """
 
@@ -22,7 +21,6 @@ import os
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import MinMaxScaler
 
 import torch.nn as nn
 import torch.optim as optim
@@ -33,6 +31,7 @@ from torchsummary import summary
 torch.cuda.empty_cache()
 
 from dataloader import *
+from pre_process import *
 
 class ResidualBlock(nn.Module):
     def __init__(self, in_channels, out_channels, stride = 1, downsample = None):
@@ -115,38 +114,16 @@ def getData(csv_path, batch_size=5, num_workers=0):
     
     dataset = LidarDatasetCNN(csv_path, train=False)
 
+    dataset = PreProcess(dataset) # pre-process the dataset
+
+    _ = input('----------------- Press Enter to continue -----------------')
+
     train_size, val_size = int(0.8*len(dataset)), np.ceil(0.2*len(dataset)).astype('int')
     print(f'train size: {train_size}, val size: {val_size}')
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
 
     train_data = DataLoader(train_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
     val_data  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
-
-    # labels = []
-    # for i in range(len(dataset)):
-    #     labels.append(dataset[i]['labels'])
-
-    # rewrite with list comprehension
-    labels = np.array([item['labels'] for item in dataset])
-    labels = labels.reshape(-1, 4).tolist()
-
-    label_norm = [[], [], [], []]
-    for label in labels:
-        label_norm[0].append(label[0])
-        label_norm[1].append(label[1])
-        label_norm[2].append(label[2])
-        label_norm[3].append(label[3])
-
-    # normalize the labels with sklearn minmax scaler
-    scaler = MinMaxScaler()
-    label_norm[0] = scaler.fit_transform(np.array(label_norm[0]).reshape(-1, 1))
-    label_norm[1] = scaler.fit_transform(np.array(label_norm[1]).reshape(-1, 1))
-    label_norm[2] = scaler.fit_transform(np.array(label_norm[2]).reshape(-1, 1))
-    label_norm[3] = scaler.fit_transform(np.array(label_norm[3]).reshape(-1, 1))
-
-    # get the mean and std of the labels
-    mean = [np.mean(label_norm[0]), np.mean(label_norm[1]), np.mean(label_norm[2]), np.mean(label_norm[3])]
-    std = [np.std(label_norm[0]), np.std(label_norm[1]), np.std(label_norm[2]), np.std(label_norm[3])]
 
     print('-'*65)
     return train_data, val_data, [mean, std]

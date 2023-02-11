@@ -25,8 +25,6 @@ The data visualization part is divided in 2 functions:
 The script is executed by running the following command in the terminal:
 > python lidar2images.py
 
-
-@author: andres
 @author: Felipe-Tommaselli
 """
 
