@@ -114,8 +114,13 @@ def getData(csv_path, batch_size=5, num_workers=0):
     
     dataset = LidarDatasetCNN(csv_path, train=False)
 
-    dataset = PreProcess(dataset) # pre-process the dataset
+    
+    pp = PreProcess(dataset) # pre-process the dataset
+    dataset = pp.pre_process()
 
+    print(dataset[0][0].shape)
+    
+    
     _ = input('----------------- Press Enter to continue -----------------')
 
     train_size, val_size = int(0.8*len(dataset)), np.ceil(0.2*len(dataset)).astype('int')

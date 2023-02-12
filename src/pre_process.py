@@ -31,17 +31,33 @@ class PreProcess:
 
     def __init__(self, dataset) -> None:
         ''' Constructor of the class. '''
-    
+
+
+        self.dataset = dataset
+
         self.labels = np.array([item['labels'] for item in dataset])
         self.labels = self.labels.reshape(-1, 4).tolist()
         print(f'labels: {self.labels[:1]}..., len: {len(self.labels)}')
 
         self.images = np.array([item['image'] for item in dataset])
         print(f'images shape: {self.images.shape}, len: {len(self.images)}')
-    
+
+
+    def pre_process(self) -> list:
+        ''' Returns the processed data. '''
+
         # PROCESS THE DATA
         self.labels = self.process_label(self.labels)
         self.images = self.process_image(self.images)
+
+        # we want to return dataset in the same format as the original dataset
+        # just with the processed data
+        for data in self.dataset:
+            # TODO: check if this is the correct way to do it
+            data['labels'] = self.labels[self.dataset.index(data)]
+            data['image'] = self.images[self.dataset.index(data)]
+
+        return self.dataset
 
 
     def process_label(self, labels: list) -> list:
@@ -70,6 +86,7 @@ class PreProcess:
         std = [np.std(label_norm[0]), np.std(label_norm[1]), np.std(label_norm[2]), np.std(label_norm[3])]
 
         print('labels after normalization: ', label_norm[0][:3])
+        print(f'labels len: {len(label_norm)}, labels 0 shape: {label_norm[0].shape}')
         print(f'mean: {mean}, std: {std}')
 
         # TODO: reintegrate the labels in the dataset
