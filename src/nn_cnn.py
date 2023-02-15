@@ -114,12 +114,10 @@ def getData(csv_path, batch_size=5, num_workers=0):
     
     dataset = LidarDatasetCNN(csv_path, train=False)
 
-    
     pp = PreProcess(dataset) # pre-process the dataset
-    dataset = pp.pre_process()
-
-    print(dataset[0][0].shape)
-    
+    dataset, stats = pp.pre_process()
+    print('===== Pre-Processing Done =====')
+    print('===== dataset: ', dataset[0])
     
     _ = input('----------------- Press Enter to continue -----------------')
 
@@ -131,7 +129,7 @@ def getData(csv_path, batch_size=5, num_workers=0):
     val_data  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
 
     print('-'*65)
-    return train_data, val_data, [mean, std]
+    return train_data, val_data, stats
 
 def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_epochs):
 
