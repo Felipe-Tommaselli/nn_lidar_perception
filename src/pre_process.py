@@ -35,7 +35,7 @@ global MAX_M
 global MIN_M
 
 MAX_WIDTH = 540
-MAX_HEIGHT = -540
+MAX_HEIGHT = 540
 MAX_M = 540
 MIN_M = -540
 
@@ -84,16 +84,20 @@ class PreProcess:
         # where the minimum distance is when:
         # y = 0 and x = MAX_WIDTH with m = MAX_M
         # so b = 0 - (MAX_M)*MAX_WIDTH <- minimum distance
-        dmin = MAX_M * MAX_WIDTH
+        dmin = - MAX_M * MAX_WIDTH
         # and the maximum distance is when:
         # y = MAX_HEIGTH and x = MAX_WIDTH with m = MIN_M
         # so b = MAX_HEIGHT - (MIN_M)*MAX_WIDTH <- maximum distance
         dmax = MAX_HEIGHT - (MIN_M)*MAX_WIDTH
 
-        # normalize the distance (-291600 to 292140) -> (0 to 1)
-        d1 = (d1 - dmin) / (dmax - dmin)
-        d2 = (d2 - dmin) / (dmax - dmin)
+        # normalize the distance (-291600 to 292140) -> (-1 to 1)
+        print(f'dmin = {dmin}, dmax = {dmax}')
+        print(f'BEFORE d1 = {d1}, d2 = {d2}')
 
+        d1 = 2*((d1 - dmin)/(dmax - dmin)) - 1
+        d2 = 2*((d2 - dmin)/(dmax - dmin)) - 1
+
+        print(f'a1: {azimuth1}, a2: {azimuth2}, d1: {d1}, d2: {d2}')
         return [azimuth1, azimuth2, d1, d2]
 
     def process_image(self, images: np.array) -> np.array:
