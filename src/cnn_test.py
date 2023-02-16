@@ -14,6 +14,7 @@ torch.cuda.empty_cache()
 
 from dataloader import *
 from nn_cnn import ResidualBlock, NetworkCNN
+from pre_process import *
 
 # set the device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -22,7 +23,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 def getData(csv_path, batch_size=7, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     
-    dataset = LidarDatasetCNN(csv_path, train=True)
+    dataset = LidarDatasetCNN(csv_path)
 
     train_size, val_size = int(0.8*len(dataset)), np.ceil(0.2*len(dataset)).astype('int')
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
@@ -46,6 +47,7 @@ train_data, val_data = getData(csv_path="~/Documents/IC_NN_Lidar/assets/tags/Lab
 for i, data in enumerate(train_data):
     images = data['image']
     labels = data['labels']
+    print('l:', labels)
     break
 
 # image dimension: (batch, channels, height, width)
@@ -65,71 +67,65 @@ model = model.to(device)
 model.load_state_dict(torch.load(os.getcwd() + '/model.pth'))
 model.eval()
 
+# image it is the first image from the images batch
+image = images[0].unsqueeze(0)
+# label it is the first label from the labels batch
+label = labels[0].unsqueeze(0)
 
-def search():
-    # step it is a random number between 0 and batch size
-    step = np.random.randint(0, images.shape[0])
+# get the model predictions
+predictions = model(image)
+# convert the predictions to numpy array
+predictions = predictions.to('cpu').cpu().detach().numpy()
+# convert the labels to numpy array
+label = labels.to('cpu').cpu().detach().numpy()
 
-    # get a random image from the images batch
-    image = images[step].unsqueeze(0)
-    # get the label from the labels batch
-    label = labels[step].unsqueeze(0)
+# print the predictions and labels
+print('predictions:', predictions)
+print('label:', label[0])
 
-    # get the model predictions
-    predictions = model(image)
-    # convert the predictions to numpy array
-    predictions = predictions.to('cpu').cpu().detach().numpy()
-    # convert the labels to numpy array
-    label = labels.to('cpu').cpu().detach().numpy()
+# convert image to cpu 
+image = image.to('cpu').cpu().detach().numpy()
+# image it is shape (1, 1, 507, 507), we need to remove the first dimension
+image = image[0][0]
 
-    # print the predictions and labels
-    print('predictions:', predictions)
-    print('label:', label[0])
+image, label = PreProcess.deprocess(image, label[0])
 
-    # convert image to cpu 
-    image = image.to('cpu').cpu().detach().numpy()
-    # image it is shape (1, 1, 507, 507), we need to remove the first dimension
-    image = image[0][0]
+print('label (deprocessed):', label)
 
-    # plot the labels and the predictions on the image
-    # note that labels and predicts are an array of 4 values
-    # [m1, m2, b1, b2] -> m1, m2 are the slopes and b1, b2 are the intercepts of 2 lines
-    # the first line is the left line and the second line is the right line
-    # the lines are the borders of the road
-    # the image is 540x540 pixels
+# plot the labels and the predictions on the image
+# note that labels and predicts are an array of 4 values
+# [m1, m2, b1, b2] -> m1, m2 are the slopes and b1, b2 are the intercepts of 2 lines
+# the first line is the left line and the second line is the right line
+# the lines are the borders of the road
+# the image is 540x540 pixels
 
-    # get the slopes and intercepts
-    m1, m2, b1, b2 = predictions[0]
-    # get the x and y coordinates of the lines
-    x1 = np.arange(0, 540)
-    y1 = m1*x1 + b1
-    x2 = np.arange(0, 540)
-    y2 = m2*x2 + b2
+# get the slopes and intercepts
+m1, m2, b1, b2 = predictions[0]
+# get the x and y coordinates of the lines
+x1 = np.arange(0, 540)
+y1 = m1*x1 + b1
+x2 = np.arange(0, 540)
+y2 = m2*x2 + b2
 
-    # plot the lines
-    plt.plot(x1, y1, color='red')
-    plt.plot(x2, y2, color='red')
+# plot the lines
+plt.plot(x1, y1, color='red')
+plt.plot(x2, y2, color='red')
 
-    # get the slopes and intercepts
-    m1, m2, b1, b2 = label[0]
-    # get the x and y coordinates of the lines
-    x1 = np.arange(0, 540)
-    y1 = m1*x1 + b1
-    x2 = np.arange(0, 540)
-    y2 = m2*x2 + b2
+# get the slopes and intercepts
+m1, m2, b1, b2 = label
+# get the x and y coordinates of the lines
+x1 = np.arange(0, 540)
+y1 = m1*x1 + b1
+x2 = np.arange(0, 540)
+y2 = m2*x2 + b2
 
-    # plot the lines
-    plt.plot(x1, y1, color='green')
-    plt.plot(x2, y2, color='green')
+# plot the lines
+plt.plot(x1, y1, color='green')
+plt.plot(x2, y2, color='green')
 
-    # plot one point on the image in blue color on 250x250 coordinates
+# plot one point on the image in blue color on 250x250 coordinates
 
 
-    # show the image with caption (step)
-    plt.title(f'step: {step}')
-    plt.imshow(image, cmap='gray')
-    plt.show()
-
-    search()
-
-search()
+# show the image
+plt.imshow(image, cmap='gray')
+plt.show()

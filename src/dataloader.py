@@ -37,7 +37,6 @@ class LidarDatasetCNN(Dataset):
     
     def __init__(self, csv_path):
         ''' Constructor of the class. '''
-        print('===== Entering Dataset =====')
         self.labels = pd.read_csv(csv_path)
 
 
@@ -49,7 +48,6 @@ class LidarDatasetCNN(Dataset):
     def __getitem__(self, idx: int) -> dict:
         ''' Returns the sample image of the dataset. '''
 
-        print('===== Entering Get Item =====')
         # move from root (\src) to \assets\images
         if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..') 
@@ -72,13 +70,10 @@ class LidarDatasetCNN(Dataset):
         m1, m2, b1, b2 = self.getLabels(idx=idx)
         labels = [m1, m2, b1, b2]
 
-        print('===== Entering Pre-Processing =====')
-
         # PRE-PROCESSING
         pre_process = PreProcess(dataset={'labels': labels, 'image': self.image})
         labels, image = pre_process.pre_process()
 
-        print('===== Pre-Processing Done =====')
 
         return {"labels": labels, "image": image}
 

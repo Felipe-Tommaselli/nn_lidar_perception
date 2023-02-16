@@ -125,7 +125,7 @@ def getData(csv_path, batch_size=5, num_workers=0):
     train_data = DataLoader(train_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
     val_data  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
 
-    _ = input('----------------- Press Enter to continue -----------------')
+    #_ = input('----------------- Press Enter to continue -----------------')
     return train_data, val_data
 
 def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_epochs):
@@ -155,33 +155,7 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
             labels = torch.stack(labels)
             # convert to format: tensor([[value1, value2, value3, value4], [value1, value2, value3, value4], ...])
             # this is: labels for each image, "batch" times -> shape: (batch, 4)
-            labels = labels.permute(1, 0)
-
-            print(f'labels[0]: {labels[0]}, images[0]: {images[0]}')
-
-            # transfer image to cpu and convert to numpy array
-            img = images[0].cpu().numpy()
-            labels[0] = labels[0].cpu().numpy()
-            img, lb = PreProcess.deprocess(img, labels)
-
-            print(f'lb: {lb}, img: {img}')
-
-            # plot the images in the batch
-            # get the slopes and intercepts
-            m1, m2, b1, b2 = lb[0], lb[1], lb[2], lb[3]
-            # get the x and y coordinates of the lines
-            x1 = np.arange(0, 540)
-            y1 = m1*x1 + b1
-            x2 = np.arange(0, 540)
-            y2 = m2*x2 + b2
-
-            # plot the lines
-            plt.plot(x1, y1, color='green')
-            plt.plot(x2, y2, color='green')
-
-            # show the image with caption (step)
-            plt.imshow(img, cmap='gray')
-            plt.show()            
+            labels = labels.permute(1, 0)    
 
             outputs = model(images)
             loss = criterion(outputs, labels) 

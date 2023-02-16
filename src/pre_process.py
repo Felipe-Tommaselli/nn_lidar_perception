@@ -103,25 +103,26 @@ class PreProcess:
         return images
 
     @staticmethod
-    def deprocess(images, labels):
+    def deprocess(image, label):
         ''' Returns the deprocessed image and label. '''
 
         # DEPROCESS THE LABEL
 
         # azimuths 1 e 2: tangent of the azimuth
-        m1 = np.tan(np.pi * labels[0])
-        m2 = np.tan(np.pi * labels[1])
+        m1 = np.tan(np.pi * label[0])
+        m2 = np.tan(np.pi * label[1])
 
         # distances 1 e 2: image borders normalization
         dmin = - MAX_M * MAX_WIDTH
         dmax = MAX_HEIGHT - (MIN_M)*MAX_WIDTH
 
-        d1 = (dmax - dmin)*(labels[2] + 1)/2 + dmin
-        d2 = (dmax - dmin)*(labels[3] + 1)/2 + dmin
+        d1 = (dmax - dmin)*(label[2] + 1)/2 + dmin
+        d2 = (dmax - dmin)*(label[3] + 1)/2 + dmin
 
-        labels = [m1, m2, d1, d2]
+        print('d1: ', d1)
+        label = [m1, m2, d1, d2]
 
         # DEPROCESS THE IMAGE
-        images = images 
+        image = image 
 
-        return images, labels
+        return image, label
