@@ -108,7 +108,8 @@ class LidarDatasetCNN(Dataset):
         print(f'labels: {labels}')
         m1 = (labels[3] - labels[1]) / (labels[2] - labels[0])
         m2 = (labels[7] - labels[5]) / (labels[6] - labels[4])
-        
+        print(f'm1: {m1}, m2: {m2}')
+
         b1 = labels[1] - m1*labels[0]
         b2 = labels[5] - m2*labels[4]
         

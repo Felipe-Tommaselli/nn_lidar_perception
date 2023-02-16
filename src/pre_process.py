@@ -29,6 +29,16 @@ elif platform == "win32":
     # Windows...
     SLASH = "\\"
 
+global MAX_WIDTH
+global MAX_HEIGHT
+global MAX_M
+global MIN_M
+
+MAX_WIDTH = 540
+MAX_HEIGHT = -540
+MAX_M = 540
+MIN_M = -540
+
 class PreProcess:
 
     def __init__(self, dataset) -> None:
@@ -71,7 +81,19 @@ class PreProcess:
         # since the data it is compatible to the image size we will relate as:
         # image = IMAGE_WIDTH x IMAGE_HEIGHT
         # as y = a*x + b -> b = y - a*x
-        # where the minimum distance is when y = 0 and x = 1 (max azimuth)
+        # where the minimum distance is when:
+        # y = 0 and x = MAX_WIDTH with m = MAX_M
+        # so b = 0 - (MAX_M)*MAX_WIDTH <- minimum distance
+        dmin = MAX_M * MAX_WIDTH
+        # and the maximum distance is when:
+        # y = MAX_HEIGTH and x = MAX_WIDTH with m = MIN_M
+        # so b = MAX_HEIGHT - (MIN_M)*MAX_WIDTH <- maximum distance
+        dmax = MAX_HEIGHT - (MIN_M)*MAX_WIDTH
+
+        # normalize the distance (-291600 to 292140) -> (0 to 1)
+        d1 = (d1 - dmin) / (dmax - dmin)
+        d2 = (d2 - dmin) / (dmax - dmin)
+
         return [azimuth1, azimuth2, d1, d2]
 
     def process_image(self, images: np.array) -> np.array:
