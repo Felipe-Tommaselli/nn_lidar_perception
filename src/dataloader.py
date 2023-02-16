@@ -13,16 +13,16 @@ Class that loads the dataset for the neural network.
 
 from sys import platform
 import os
-import random
 import cv2
 import numpy as np
-import math
 # from scipy.special import logsumexp
 import matplotlib.pyplot as plt
 import pandas as pd
 import torch
 
 from torch.utils.data import Dataset
+from pre_process import *
+
 
 global SLASH
 if platform == "linux" or platform == "linux2":
@@ -35,11 +35,10 @@ elif platform == "win32":
 class LidarDatasetCNN(Dataset):
     ''' Dataset class for the lidar data with images. '''
     
-    def __init__(self, csv_path, train=True):
+    def __init__(self, csv_path):
         ''' Constructor of the class. '''
-        
+        print('===== Entering Dataset =====')
         self.labels = pd.read_csv(csv_path)
-        self.train = train # bool
 
 
     def __len__(self) -> int:
@@ -50,6 +49,7 @@ class LidarDatasetCNN(Dataset):
     def __getitem__(self, idx: int) -> dict:
         ''' Returns the sample image of the dataset. '''
 
+        print('===== Entering Get Item =====')
         # move from root (\src) to \assets\images
         if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..') 
@@ -61,6 +61,7 @@ class LidarDatasetCNN(Dataset):
         path = os.getcwd() + SLASH + 'assets' + SLASH + 'train' + SLASH
         full_path = os.path.join(path, 'image'+str(step)+'.png') # merge path and filename
 
+        # TODO: IMPORT IMAGE WITH PIL
         # image treatment (only green channel)
         self.image = cv2.imread(full_path, -1)
         self.image = self.image[30:570, 30:570,1] # take only the green channel and crop the image
@@ -68,12 +69,18 @@ class LidarDatasetCNN(Dataset):
 
         labels = self.labels.iloc[idx, 1:] # take step out of labels
 
-        azimuth1, azimuth2, intersec1, intersec2 = self.getLabels(idx=idx)
-        labels = [azimuth1, azimuth2, intersec1, intersec2]
+        m1, m2, b1, b2 = self.getLabels(idx=idx)
+        labels = [m1, m2, b1, b2]
 
+        print('===== Entering Pre-Processing =====')
 
+        # PRE-PROCESSING
+        pre_process = PreProcess(dataset={'labels': labels, 'image': self.image})
+        labels, image = pre_process.pre_process()
 
-        return {"labels": labels, "image": self.image}
+        print('===== Pre-Processing Done =====')
+
+        return {"labels": labels, "image": image}
 
     def getLabels(self, idx):
         ''' Returns the labels of the image. '''
@@ -97,14 +104,17 @@ class LidarDatasetCNN(Dataset):
         labels[3] = 540 - labels[3]
         labels[5] = 540 - labels[5]
         labels[7] = 540 - labels[7]
-
+        
+        print(f'labels: {labels}')
         m1 = (labels[3] - labels[1]) / (labels[2] - labels[0])
         m2 = (labels[7] - labels[5]) / (labels[6] - labels[4])
         
         b1 = labels[1] - m1*labels[0]
         b2 = labels[5] - m2*labels[4]
         
-        # azimuth1, azimuth2, intersec1, intersec2
-        # angles in radians (azimuth1, azimuth2) and meters (intersec1, intersec2)
+        # slope1, slope2, intersec1, intersec2
+        # angles in radians (slope1, slope2) and meters (intersec1, intersec2)
         return m1, m2, b1, b2
 
+if __name__ == '__main__':
+    pass

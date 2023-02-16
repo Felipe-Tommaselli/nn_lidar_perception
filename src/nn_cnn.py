@@ -31,7 +31,6 @@ from torchsummary import summary
 torch.cuda.empty_cache()
 
 from dataloader import *
-from pre_process import *
 
 class ResidualBlock(nn.Module):
     def __init__(self, in_channels, out_channels, stride = 1, downsample = None):
@@ -112,12 +111,10 @@ class NetworkCNN(nn.Module):
 def getData(csv_path, batch_size=5, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     
-    dataset = LidarDatasetCNN(csv_path, train=False)
-
-    print('===== Pre-Processing Done =====')
-    print('===== dataset: ', dataset[0])
+    dataset = LidarDatasetCNN(csv_path)
     
-    _ = input('----------------- Press Enter to continue -----------------')
+    print('dataset 0;', dataset[0])
+    print('-'*65)
 
     train_size, val_size = int(0.8*len(dataset)), np.ceil(0.2*len(dataset)).astype('int')
     print(f'train size: {train_size}, val size: {val_size}')
@@ -126,7 +123,7 @@ def getData(csv_path, batch_size=5, num_workers=0):
     train_data = DataLoader(train_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
     val_data  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
 
-    print('-'*65)
+    _ = input('----------------- Press Enter to continue -----------------')
     return train_data, val_data, stats
 
 def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_epochs):
