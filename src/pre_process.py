@@ -91,13 +91,9 @@ class PreProcess:
         dmax = MAX_HEIGHT - (MIN_M)*MAX_WIDTH
 
         # normalize the distance (-291600 to 292140) -> (-1 to 1)
-        print(f'dmin = {dmin}, dmax = {dmax}')
-        print(f'BEFORE d1 = {d1}, d2 = {d2}')
-
         d1 = 2*((d1 - dmin)/(dmax - dmin)) - 1
         d2 = 2*((d2 - dmin)/(dmax - dmin)) - 1
 
-        print(f'a1: {azimuth1}, a2: {azimuth2}, d1: {d1}, d2: {d2}')
         return [azimuth1, azimuth2, d1, d2]
 
     def process_image(self, images: np.array) -> np.array:
@@ -105,3 +101,27 @@ class PreProcess:
         
 
         return images
+
+    @staticmethod
+    def deprocess(images, labels):
+        ''' Returns the deprocessed image and label. '''
+
+        # DEPROCESS THE LABEL
+
+        # azimuths 1 e 2: tangent of the azimuth
+        m1 = np.tan(np.pi * labels[0])
+        m2 = np.tan(np.pi * labels[1])
+
+        # distances 1 e 2: image borders normalization
+        dmin = - MAX_M * MAX_WIDTH
+        dmax = MAX_HEIGHT - (MIN_M)*MAX_WIDTH
+
+        d1 = (dmax - dmin)*(labels[2] + 1)/2 + dmin
+        d2 = (dmax - dmin)*(labels[3] + 1)/2 + dmin
+
+        labels = [m1, m2, d1, d2]
+
+        # DEPROCESS THE IMAGE
+        images = images 
+
+        return images, labels

@@ -31,6 +31,7 @@ from torchsummary import summary
 torch.cuda.empty_cache()
 
 from dataloader import *
+from pre_process import *
 
 class ResidualBlock(nn.Module):
     def __init__(self, in_channels, out_channels, stride = 1, downsample = None):
@@ -125,7 +126,7 @@ def getData(csv_path, batch_size=5, num_workers=0):
     val_data  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
 
     _ = input('----------------- Press Enter to continue -----------------')
-    return train_data, val_data, stats
+    return train_data, val_data
 
 def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_epochs):
 
@@ -155,7 +156,33 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
             # convert to format: tensor([[value1, value2, value3, value4], [value1, value2, value3, value4], ...])
             # this is: labels for each image, "batch" times -> shape: (batch, 4)
             labels = labels.permute(1, 0)
-            
+
+            print(f'labels[0]: {labels[0]}, images[0]: {images[0]}')
+
+            # transfer image to cpu and convert to numpy array
+            img = images[0].cpu().numpy()
+            labels[0] = labels[0].cpu().numpy()
+            img, lb = PreProcess.deprocess(img, labels)
+
+            print(f'lb: {lb}, img: {img}')
+
+            # plot the images in the batch
+            # get the slopes and intercepts
+            m1, m2, b1, b2 = lb[0], lb[1], lb[2], lb[3]
+            # get the x and y coordinates of the lines
+            x1 = np.arange(0, 540)
+            y1 = m1*x1 + b1
+            x2 = np.arange(0, 540)
+            y2 = m2*x2 + b2
+
+            # plot the lines
+            plt.plot(x1, y1, color='green')
+            plt.plot(x2, y2, color='green')
+
+            # show the image with caption (step)
+            plt.imshow(img, cmap='gray')
+            plt.show()            
+
             outputs = model(images)
             loss = criterion(outputs, labels) 
             optimizer.zero_grad()
@@ -191,17 +218,7 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
         
                     outputs = model.forward(images) # propagação para frente
 
-                    # print output and ouput shape
-                    #print(f'output: {outputs}, output shape: {outputs.shape}')
-                    # label
-                    #print(f'label: {labels}, label shape: {labels.shape}') 
-
-                    # output shape: (batch, 4)
-                    # label shape: (batch, 4)
-                    # predictions shape: ?
-
                     # get the predictions to calculate the accuracy
-                    # Calcula a acurácia
                     _, preds = torch.max(outputs, 1)
                     #print(f'_: {_}, preds: {preds}, preds shape: {preds.shape}')
                     # correct += torch.sum(preds == label.data)
@@ -268,7 +285,7 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     # Get the data
-    train_data, val_data, params = getData(csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
+    train_data, val_data = getData(csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
 
     # Create the model on GPU if available
     model = NetworkCNN(ResidualBlock).to(device)
@@ -283,9 +300,9 @@ if __name__ == '__main__':
     global batch_size
 
     # network summary with torchsummary
-    summary(model, (1, 540, 540))
+    #summary(model, (1, 540, 540))
+    #print(model)
 
-    print(model)
     # Train the model
     results = fit(model=model, criterion=criterion, optimizer=optimizer, scheduler=scheduler, train_loader=train_data, val_loader=val_data, num_epochs=epochs)
 
