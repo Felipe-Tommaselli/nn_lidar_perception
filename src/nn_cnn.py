@@ -114,8 +114,6 @@ def getData(csv_path, batch_size=5, num_workers=0):
     
     dataset = LidarDatasetCNN(csv_path, train=False)
 
-    pp = PreProcess(dataset) # pre-process the dataset
-    dataset, stats = pp.pre_process()
     print('===== Pre-Processing Done =====')
     print('===== dataset: ', dataset[0])
     

@@ -17,7 +17,7 @@ import random
 import cv2
 import numpy as np
 import math
-from scipy.special import logsumexp
+# from scipy.special import logsumexp
 import matplotlib.pyplot as plt
 import pandas as pd
 import torch
@@ -32,36 +32,6 @@ elif platform == "win32":
     # Windows...
     SLASH = "\\"
 
-class LidarDataset(Dataset):
-    ''' Dataset class for the lidar data. '''
-    def __init__(self, csv_path, transform=None, target_transform=None) -> None:
-        ''' Constructor of the class. '''
-        
-        self.labels = pd.read_csv(csv_path)
-        self.transform = transform
-        self.target_transform = target_transform
-    
-    def __len__(self) -> int:
-        ''' Returns the length of the dataset (based on the labels). '''
-        
-        return len(self.labels)
-
-    def __getitem__(self, idx: int) -> dict:
-        ''' Returns the sample of the dataset. '''
-        
-        dl = self.labels.iloc[idx, 2]
-        dr = self.labels.iloc[idx, 3]
-        dratio = self.labels.iloc[idx, 4]
-        heading = self.labels.iloc[idx, 1]
-        lidar = np.empty(1081)
-        for step in range(0,len(self.labels.iloc[idx,7:])):
-            lidar[step] = (self.labels.iloc[idx, step+7])
-        torch.from_numpy(lidar)
-        self.sample = {"dl": dl , "dr": dr, "dratio":dratio, "heading": heading, "lidar": lidar}
-        #print(self.sample)
-        return self.sample
-
-
 class LidarDatasetCNN(Dataset):
     ''' Dataset class for the lidar data with images. '''
     
@@ -70,6 +40,7 @@ class LidarDatasetCNN(Dataset):
         
         self.labels = pd.read_csv(csv_path)
         self.train = train # bool
+
 
     def __len__(self) -> int:
         ''' Returns the length of the dataset (based on the labels). '''
@@ -100,22 +71,7 @@ class LidarDatasetCNN(Dataset):
         azimuth1, azimuth2, intersec1, intersec2 = self.getLabels(idx=idx)
         labels = [azimuth1, azimuth2, intersec1, intersec2]
 
-        # print('labels: ', labels)
-        # m1, m2, b1, b2 = labels[0], labels[1], labels[2], labels[3]
-        # # get the x and y coordinates of the lines
-        # x1 = np.arange(0, 540)
-        # y1 = m1*x1 + b1
-        # x2 = np.arange(0, 540)
-        # y2 = m2*x2 + b2
 
-        # # plot the lines
-        # plt.plot(x1, y1, color='green')
-        # plt.plot(x2, y2, color='green')
-        # # plot the image
-        # plt.imshow(self.image, cmap='gray')
-        # # put caption to the image
-        # plt.title('Image ' + str(step))
-        # plt.show()
 
         return {"labels": labels, "image": self.image}
 
@@ -151,6 +107,37 @@ class LidarDatasetCNN(Dataset):
         # azimuth1, azimuth2, intersec1, intersec2
         # angles in radians (azimuth1, azimuth2) and meters (intersec1, intersec2)
         return m1, m2, b1, b2
+
+
+#! NOT USED
+class LidarDataset(Dataset):
+    ''' Dataset class for the lidar data. '''
+    def __init__(self, csv_path, transform=None, target_transform=None) -> None:
+        ''' Constructor of the class. '''
+        
+        self.labels = pd.read_csv(csv_path)
+        self.transform = transform
+        self.target_transform = target_transform
+    
+    def __len__(self) -> int:
+        ''' Returns the length of the dataset (based on the labels). '''
+        
+        return len(self.labels)
+
+    def __getitem__(self, idx: int) -> dict:
+        ''' Returns the sample of the dataset. '''
+        
+        dl = self.labels.iloc[idx, 2]
+        dr = self.labels.iloc[idx, 3]
+        dratio = self.labels.iloc[idx, 4]
+        heading = self.labels.iloc[idx, 1]
+        lidar = np.empty(1081)
+        for step in range(0,len(self.labels.iloc[idx,7:])):
+            lidar[step] = (self.labels.iloc[idx, step+7])
+        torch.from_numpy(lidar)
+        self.sample = {"dl": dl , "dr": dr, "dratio":dratio, "heading": heading, "lidar": lidar}
+        #print(self.sample)
+        return self.sample
 
 
 if __name__ == "__main__":
