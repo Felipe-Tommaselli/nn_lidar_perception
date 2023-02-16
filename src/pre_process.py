@@ -72,7 +72,7 @@ class PreProcess:
         # image = IMAGE_WIDTH x IMAGE_HEIGHT
         # as y = a*x + b -> b = y - a*x
         # where the minimum distance is when y = 0 and x = 1 (max azimuth)
-
+        return [azimuth1, azimuth2, d1, d2]
 
     def process_image(self, images: np.array) -> np.array:
         ''' Returns the processed image. '''

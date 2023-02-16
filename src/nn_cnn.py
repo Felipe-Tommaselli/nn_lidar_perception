@@ -114,6 +114,7 @@ def getData(csv_path, batch_size=5, num_workers=0):
     dataset = LidarDatasetCNN(csv_path)
     
     print('dataset 0;', dataset[0])
+    
     print('-'*65)
 
     train_size, val_size = int(0.8*len(dataset)), np.ceil(0.2*len(dataset)).astype('int')
