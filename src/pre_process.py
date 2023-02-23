@@ -124,5 +124,5 @@ class PreProcess:
 
         # DEPROCESS THE IMAGE
         image = image 
-
+        
         return image, label

@@ -266,6 +266,7 @@ class lidar_tag:
             
         else:
             print('Lines are already drawn!') if self.n_p == 4 else print("IT IS NOT POSSIBLE TO SAVE MORE THAN 4 POINTS")
+            # saving the data in a dictionary
             left_xpoints = self.points_xc[0:2]
             left_ypoints = self.points_yc[0:2]
             right_xpoints = self.points_xc[2:4]
