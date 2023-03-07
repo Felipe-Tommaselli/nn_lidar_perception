@@ -308,7 +308,7 @@ class lidar_tag:
     def createWindow(self):
         """ Function that create the window of the application. """
         self.root = ctk.CTk()
-        self.root.geometry('700x770')
+        self.root.geometry('850x670')
         self.root.title('Lidar Labeling Tool')
         ctk.set_appearance_mode("dark")
         
@@ -333,10 +333,10 @@ if __name__ == '__main__':
     lt = lidar_tag(lidar_name='Lidar_Data.csv', label_name='Label_Data.csv', folder=''.join(['assets', SLASH, 'tags']))
     root, InputStep, Bnext, Bprev, Bgo, Bcln, Bsave = lt.createWindow()
 
-    Bprev.place(x=45, y = 700)
-    Bnext.place(x=150, y = 700)
-    InputStep.place(x=290, y = 701)
-    Bgo.place(x=350, y = 700)
-    Bsave.place(x=457, y = 700)
-    Bcln.place(x=560, y = 700)
+    Bprev.place(x=680, y = 100)
+    Bnext.place(x=680, y = 150)
+    InputStep.place(x=680, y = 201)
+    Bgo.place(x=680, y = 250)
+    Bsave.place(x=680, y = 300)
+    Bcln.place(x=680, y = 350)
     root.mainloop()
