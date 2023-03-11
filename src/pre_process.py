@@ -42,7 +42,7 @@ MAX_M = 540
 MIN_M = -540 
 CROP_FACTOR_Y = 0.7 #%
 CROP_FACTOR_X = 0.05 #%
-RESIZE_FACTOR = 1
+RESIZE_FACTOR = 0.5
 
 class PreProcess:
 
@@ -55,15 +55,32 @@ class PreProcess:
     def pre_process(self) -> list:
         ''' Returns the processed data. '''
 
-        # PROCESS THE DATA
+        self.image = self.process_image(self.image, self.labels)
         self.labels = self.process_label(self.labels)
-        self.image = self.process_image(self.image)
 
         return self.labels, self.image
 
+    def process_image(self, image: np.array, labels) -> np.array:
+
+        ''' Returns the processed image. '''
+        MAX_WIDTH = image.shape[0]
+        MAX_HEIGHT = image.shape[1]
+
+        # Crop the image to the region of interest
+        cropped_size_y = int(MAX_HEIGHT * CROP_FACTOR_Y)
+        cropped_size_x = int(MAX_WIDTH * CROP_FACTOR_X)
+        cropped_image = image[-cropped_size_y:, cropped_size_x:-cropped_size_x]
+
+        # Resize the image to a smaller size
+        resized_image = cv2.resize(cropped_image, (int(MAX_WIDTH*RESIZE_FACTOR), int(MAX_HEIGHT*RESIZE_FACTOR)))
+
+        return resized_image
 
     def process_label(self, labels: list) -> list:
         ''' Returns the processed label. '''
+
+        # scale the labels acording to the image size
+        labels = PreProcess.scale_labels(labels)
 
         # NORMALIZE THE AZIMUTH 1 AND 2 
         m1 = labels[0]
@@ -101,25 +118,7 @@ class PreProcess:
 
         return [azimuth1, azimuth2, d1, d2]
 
-    def process_image(self, image: np.array) -> np.array:
-        ''' Returns the processed image. '''
-        print('Image size: ', image.shape)
-        cv2.imshow('image', image)
-        cv2.waitKey(0)
-        # Crop the image to the region of interest
-        cropped_size_y = int(MAX_HEIGHT * CROP_FACTOR_Y)
-        cropped_size_x = int(MAX_WIDTH * CROP_FACTOR_X)
-        cropped_image = image[-cropped_size_y:, cropped_size_x:-cropped_size_x]
-
-        # Resize the image to a smaller size
-        #resized_image = cv2.resize(cropped_image, (250, 250))
-        resized_image = cropped_image
-        # print the image size and show with cv2
-        print('Image size: ', resized_image.shape)
-        cv2.imshow('image', resized_image)
-        cv2.waitKey(0)
-
-        return image
+    # UTILITIES FUNCTIONS FOR DEPROCESSING AND ROUTINE OPERATIONS
 
     @staticmethod
     def deprocess(image, label):
@@ -145,3 +144,23 @@ class PreProcess:
         image = image 
         
         return image, label
+
+    @staticmethod
+    def scale_labels(labels):
+        m1, m2, b1, b2 = labels
+        # note that m = yb - ya / xb - xa
+        # where the crop process in y are null and in x this crop
+        # it is canceled between xb and xa, so:
+        # m_cropped = m
+        # and the resize it is a simple multiplication in the denominator and numerator
+        # so: m_resized = m_cropped
+        # -----------------------
+        # now, as y = a*x + b -> b = y - a*x
+        # the crop will make: b = b - CROP_FACTOR_X*MAX_WIDTH
+        # and the resize will make: b = RESIZE_FACTOR * (b - CROP_FACTOR_X*MAX_WIDTH)
+        m1 = m1 
+        m2 = m2 
+        b1 = RESIZE_FACTOR * (b1 - CROP_FACTOR_X*MAX_WIDTH)
+        b2 = RESIZE_FACTOR * (b2 - CROP_FACTOR_X*MAX_WIDTH)
+
+        return [m1, m2, b1, b2]
