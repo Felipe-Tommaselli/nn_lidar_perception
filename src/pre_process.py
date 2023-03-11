@@ -33,11 +33,16 @@ global MAX_WIDTH
 global MAX_HEIGHT
 global MAX_M
 global MIN_M
+global CROP_FACTOR
+global RESIZE_FACTOR
 
 MAX_WIDTH = 540
 MAX_HEIGHT = 540
 MAX_M = 540
-MIN_M = -540
+MIN_M = -540 
+CROP_FACTOR_Y = 0.7 #%
+CROP_FACTOR_X = 0.05 #%
+RESIZE_FACTOR = 1
 
 class PreProcess:
 
@@ -96,11 +101,25 @@ class PreProcess:
 
         return [azimuth1, azimuth2, d1, d2]
 
-    def process_image(self, images: np.array) -> np.array:
+    def process_image(self, image: np.array) -> np.array:
         ''' Returns the processed image. '''
-        
+        print('Image size: ', image.shape)
+        cv2.imshow('image', image)
+        cv2.waitKey(0)
+        # Crop the image to the region of interest
+        cropped_size_y = int(MAX_HEIGHT * CROP_FACTOR_Y)
+        cropped_size_x = int(MAX_WIDTH * CROP_FACTOR_X)
+        cropped_image = image[-cropped_size_y:, cropped_size_x:-cropped_size_x]
 
-        return images
+        # Resize the image to a smaller size
+        #resized_image = cv2.resize(cropped_image, (250, 250))
+        resized_image = cropped_image
+        # print the image size and show with cv2
+        print('Image size: ', resized_image.shape)
+        cv2.imshow('image', resized_image)
+        cv2.waitKey(0)
+
+        return image
 
     @staticmethod
     def deprocess(image, label):

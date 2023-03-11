@@ -125,7 +125,7 @@ def getData(csv_path, batch_size=5, num_workers=0):
     train_data = DataLoader(train_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
     val_data  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
 
-    #_ = input('----------------- Press Enter to continue -----------------')
+    _ = input('----------------- Press Enter to continue -----------------')
     return train_data, val_data
 
 def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_epochs):

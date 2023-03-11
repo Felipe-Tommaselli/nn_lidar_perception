@@ -9,13 +9,12 @@ Class that loads the dataset for the neural network.
     This class with the images (instead of the raw data) it is used in the nn_cnn.py file (convolutional Network).
 
 @author: Felipe-Tommaselli
-"""
+""" 
 
 from sys import platform
 import os
 import cv2
 import numpy as np
-# from scipy.special import logsumexp
 import matplotlib.pyplot as plt
 import pandas as pd
 import torch
