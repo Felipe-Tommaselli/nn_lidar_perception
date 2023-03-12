@@ -20,11 +20,13 @@ At the end, plot the result of the cost function with the matplotlib library by 
 import os
 import torch
 import numpy as np
+import random
 import matplotlib.pyplot as plt
 
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+from torchvision.transforms import functional as F
 from torch.utils.data import Dataset, DataLoader, random_split
 from torchsummary import summary
 from torchvision import transforms
@@ -111,25 +113,42 @@ class NetworkCNN(nn.Module):
 
         return x
 
+class RotatedDataset(torch.utils.data.Dataset):
+    def __init__(self, dataset, rotate_prob=0.2):
+        self.dataset = dataset
+        self.rotate_prob = rotate_prob
+        self.rotate = rotate_image
+
+    def __getitem__(self, index):
+        x, y = self.dataset[index]
+        if random.random() < self.rotate_prob:
+            x = self.rotate(x)
+        return x, y
+
+    def __len__(self):
+        return len(self.dataset)
+
+def rotate_image(img):
+    angle = random.uniform(-10, 10)
+    return F.rotate(img, angle)
+
 def transformData(dataset):
 
-    # Calculate number of images to generate
-    num_to_generate = int(0.2 * len(dataset))
+    rotated_dataset = RotatedDataset(dataset)
+    combined_dataset = torch.utils.data.ConcatDataset([dataset, rotated_dataset])
+    
+    # Remove as duplicatas e cria um novo conjunto de dados
+    image_set = set()
+    unique_images = []
+    for x, y in combined_dataset:
+        if x not in image_set:
+            unique_images.append((x, y))
+            image_set.add(x)
 
-    # Define transforms for data augmentation
-    transform = transforms.Compose([
-        # transforms.RandomRotation(degrees=(-10,10)),
-        transforms.ToTensor(),
-    ])
+        if len(unique_images) == len(dataset):
+            break
 
-    # create new additional dataset rotation the original images with num_to_generate
-    additional_dataset = torch.utils.data.Subset(dataset, np.random.choice(len(dataset), num_to_generate, replace=False))
-    transform = transforms.Compose([
-        transforms.RandomRotation(degrees=(-10,10), fill=(255,255,0)),
-        transforms.ToTensor(),
-    ])
-    # apply transform into the additional dataset
-    additional_dataset.transform = transform
+    return torch.utils.data.TensorDataset(*zip(*unique_images))
 
     # plot all the images in the dataset
     for data in additional_dataset:
