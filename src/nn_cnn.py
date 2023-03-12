@@ -28,6 +28,7 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader, random_split
 from torchsummary import summary
 from torchvision import transforms
+from PIL import Image
 
 torch.cuda.empty_cache()
 
@@ -117,20 +118,46 @@ def transformData(dataset):
 
     # Define transforms for data augmentation
     transform = transforms.Compose([
-        transforms.RandomRotation(degrees=(0,10)),
+        # transforms.RandomRotation(degrees=(-10,10)),
+        transforms.ToTensor(),
     ])
 
-    # Generate new rotated images
-    generated_images = []
-    for i in range(num_to_generate):
-        index = np.random.randint(len(dataset))
-        image, label = dataset['image'], dataset['label']
-        print('image', image)
-        image = transform(image)
-        generated_images.append((image, label))
+    # create new additional dataset rotation the original images with num_to_generate
+    additional_dataset = torch.utils.data.Subset(dataset, np.random.choice(len(dataset), num_to_generate, replace=False))
+    transform = transforms.Compose([
+        transforms.RandomRotation(degrees=(-10,10), fill=(255,255,0)),
+        transforms.ToTensor(),
+    ])
+    # apply transform into the additional dataset
+    additional_dataset.transform = transform
 
-    # create additional dataset with the generated images
-    additional_dataset = torch.utils.data.TensorDataset(*zip(*generated_images))
+    # plot all the images in the dataset
+    for data in additional_dataset:
+        image, label = data['image'], data['labels']
+        print('========= image ==========')
+        image, label = PreProcess.deprocess(image, label)
+        # get the slopes and intercepts
+        m1, m2, b1, b2 = label
+        # get the x and y coordinates of the lines
+        x1 = np.arange(0, 224)
+        y1 = m1*x1 + b1
+        x2 = np.arange(0, 224)
+        y2 = m2*x2 + b2
+        
+        # introduce more 15º rotation to the image
+        # image = np.array(image)
+        # image = Image.fromarray(image)
+        # image = image.rotate(15)
+        # image = np.array(image)
+
+        angle = Image.fromarray(image).info.get('rotate')
+        print('rotation:', angle)
+        # plot the lines
+        plt.plot(x1, y1, color='green')
+        plt.plot(x2, y2, color='green')
+
+        plt.imshow(image)
+        plt.show()
 
     # Combine the original dataset and the additional dataset into a single dataset
     combined_dataset = torch.utils.data.ConcatDataset([dataset, additional_dataset])

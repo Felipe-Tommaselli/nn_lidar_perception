@@ -141,7 +141,6 @@ class PreProcess:
         d1 = (dmax - dmin)*(label[2] + 1)/2 + dmin
         d2 = (dmax - dmin)*(label[3] + 1)/2 + dmin
 
-        print('d1: ', d1)
         label = [m1, m2, d1, d2]
 
         # DEPROCESS THE IMAGE
