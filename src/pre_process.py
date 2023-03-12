@@ -33,7 +33,9 @@ global MAX_WIDTH
 global MAX_HEIGHT
 global MAX_M
 global MIN_M
+
 global CROP_FACTOR
+global DESIRED_SIZE
 global RESIZE_FACTOR
 
 MAX_WIDTH = 540
@@ -42,7 +44,9 @@ MAX_M = 540
 MIN_M = -540 
 CROP_FACTOR_Y = 0.5 #%
 CROP_FACTOR_X = 0.1 #%
-RESIZE_FACTOR = 0.5
+# AlexNet famous input size (224x224 pxs)
+DESIRED_SIZE = 224 #px
+RESIZE_FACTOR = DESIRED_SIZE / MAX_WIDTH
 
 class PreProcess:
 
@@ -73,7 +77,7 @@ class PreProcess:
 
         # Resize the image to a smaller size
         resized_image = cv2.resize(cropped_image, (int(MAX_WIDTH*RESIZE_FACTOR), int(MAX_HEIGHT*RESIZE_FACTOR)))
-
+        
         return resized_image
 
     def process_label(self, labels: list) -> list:
