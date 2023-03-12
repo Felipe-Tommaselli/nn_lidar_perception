@@ -27,6 +27,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader, random_split
 from torchsummary import summary
+from torchvision import transforms
 
 torch.cuda.empty_cache()
 
@@ -103,27 +104,57 @@ class NetworkCNN(nn.Module):
         x = self.layer2(x)
         x = self.layer3(x)
         x = self.avgpool(x)
+        
         x = x.view(x.size(0), -1)
         x = self.fc(x)
 
         return x
 
+def transformData(dataset):
+
+    # Calculate number of images to generate
+    num_to_generate = int(0.2 * len(dataset))
+
+    # Define transforms for data augmentation
+    transform = transforms.Compose([
+        transforms.RandomRotation(degrees=(0,10)),
+    ])
+
+    # Generate new rotated images
+    generated_images = []
+    for i in range(num_to_generate):
+        index = np.random.randint(len(dataset))
+        image, label = dataset['image'], dataset['label']
+        print('image', image)
+        image = transform(image)
+        generated_images.append((image, label))
+
+    # create additional dataset with the generated images
+    additional_dataset = torch.utils.data.TensorDataset(*zip(*generated_images))
+
+    # Combine the original dataset and the additional dataset into a single dataset
+    combined_dataset = torch.utils.data.ConcatDataset([dataset, additional_dataset])
+
+    return combined_dataset
+
 def getData(csv_path, batch_size=5, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     
     dataset = LidarDatasetCNN(csv_path)
-    
-    print('dataset 0;', dataset[0])
-    
-    print('-'*65)
+
+    print(f'dataset size: {len(dataset)}')
+    dataset = transformData(dataset)
+    print(f'dataset size: {len(dataset)}')
+
 
     train_size, val_size = int(0.8*len(dataset)), np.ceil(0.2*len(dataset)).astype('int')
-    print(f'train size: {train_size}, val size: {val_size}')
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
 
     train_data = DataLoader(train_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
     val_data  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
 
+    print('-'*65)
+    print(f'train size: {train_size}, val size: {val_size}')
     _ = input('----------------- Press Enter to continue -----------------')
     return train_data, val_data
 
