@@ -73,6 +73,22 @@ class LidarDatasetCNN(Dataset):
         pre_process = PreProcess(dataset={'labels': labels, 'image': self.image})
         labels, image = pre_process.pre_process()
 
+        # # plot image with labels
+        # image, label = PreProcess.deprocess(image, labels)
+        # # get the slopes and intercepts
+        # m1, m2, b1, b2 = label
+        # # get the x and y coordinates of the lines
+        # x1 = np.arange(0, 224)
+        # y1 = m1*x1 + b1
+        # x2 = np.arange(0, 224)
+        # y2 = m2*x2 + b2
+        # # plot the lines
+        # plt.plot(x1, y1, color='green')
+        # plt.plot(x2, y2, color='green')
+        # plt.imshow(image, cmap='gray')
+        # # title = step of the image
+        # plt.title(f'step: {step}')
+        # plt.show()
 
         return {"labels": labels, "image": image}
 

@@ -183,13 +183,13 @@ def transformData(dataset):
 
     return combined_dataset
 
-def getData(csv_path, batch_size=5, num_workers=0):
+def getData(csv_path, batch_size=6, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     
     dataset = LidarDatasetCNN(csv_path)
 
     print(f'dataset size: {len(dataset)}')
-    dataset = transformData(dataset)
+    #dataset = transformData(dataset)
     print(f'dataset size: {len(dataset)}')
 
 
@@ -232,7 +232,7 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
             # convert to format: tensor([[value1, value2, value3, value4], [value1, value2, value3, value4], ...])
             # this is: labels for each image, "batch" times -> shape: (batch, 4)
             labels = labels.permute(1, 0)    
-
+        
             outputs = model(images)
             loss = criterion(outputs, labels) 
             optimizer.zero_grad()
@@ -318,6 +318,8 @@ def plotResults(results, epochs):
     ax2.set_title("Val Loss")
 
     plt.show()
+    # save the plot in the current folder
+    plt.savefig('losses.png')
 
     # accuracy
     plt.plot(results['accuracy_list'], label='Accuracy')
@@ -342,16 +344,16 @@ if __name__ == '__main__':
 
     # loss function for regression
     criterion = nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.5)
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=9, gamma=0.1)
 
     global epochs
-    epochs = 15
+    epochs = 50
     global batch_size
 
     # network summary with torchsummary
-    #summary(model, (1, 540, 540))
-    #print(model)
+    # summary(model, (1, 224, 224))
+    # print(model)
 
     # Train the model
     results = fit(model=model, criterion=criterion, optimizer=optimizer, scheduler=scheduler, train_loader=train_data, val_loader=val_data, num_epochs=epochs)

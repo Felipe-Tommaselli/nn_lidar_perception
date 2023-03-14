@@ -102,9 +102,9 @@ print('label (deprocessed):', label)
 # get the slopes and intercepts
 m1, m2, b1, b2 = predictions[0]
 # get the x and y coordinates of the lines
-x1 = np.arange(0, 540)
+x1 = np.arange(0, 224)
 y1 = m1*x1 + b1
-x2 = np.arange(0, 540)
+x2 = np.arange(0, 224)
 y2 = m2*x2 + b2
 
 # plot the lines
@@ -114,9 +114,9 @@ plt.plot(x2, y2, color='red')
 # get the slopes and intercepts
 m1, m2, b1, b2 = label
 # get the x and y coordinates of the lines
-x1 = np.arange(0, 540)
+x1 = np.arange(0, 224)
 y1 = m1*x1 + b1
-x2 = np.arange(0, 540)
+x2 = np.arange(0, 224)
 y2 = m2*x2 + b2
 
 # plot the lines
