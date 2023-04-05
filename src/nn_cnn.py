@@ -27,9 +27,10 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 from torchvision.transforms import functional as F
-from torch.utils.data import Dataset, DataLoader, random_split
+from torch.utils.data import Dataset, DataLoader, random_split, ConcatDataset, Subset
 from torchsummary import summary
 from torchvision import transforms
+from torchvision import datasets
 from PIL import Image
 
 torch.cuda.empty_cache()
@@ -113,75 +114,47 @@ class NetworkCNN(nn.Module):
 
         return x
 
-class RotatedDataset(torch.utils.data.Dataset):
-    def __init__(self, dataset, rotate_prob=0.2):
-        self.dataset = dataset
-        self.rotate_prob = rotate_prob
-        self.rotate = rotate_image
-
-    def __getitem__(self, index):
-        x, y = self.dataset[index]
-        if random.random() < self.rotate_prob:
-            x = self.rotate(x)
-        return x, y
-
-    def __len__(self):
-        return len(self.dataset)
-
-def rotate_image(img):
-    angle = random.uniform(-10, 10)
-    return F.rotate(img, angle)
-
-def transformData(dataset):
-
-    rotated_dataset = RotatedDataset(dataset)
-    combined_dataset = torch.utils.data.ConcatDataset([dataset, rotated_dataset])
-    
-    # Remove as duplicatas e cria um novo conjunto de dados
-    image_set = set()
-    unique_images = []
-    for x, y in combined_dataset:
-        if x not in image_set:
-            unique_images.append((x, y))
-            image_set.add(x)
-
-        if len(unique_images) == len(dataset):
-            break
-
-    return torch.utils.data.TensorDataset(*zip(*unique_images))
-
-    # plot all the images in the dataset
-    for data in additional_dataset:
-        image, label = data['image'], data['labels']
-        print('========= image ==========')
-        image, label = PreProcess.deprocess(image, label)
-        # get the slopes and intercepts
-        m1, m2, b1, b2 = label
-        # get the x and y coordinates of the lines
-        x1 = np.arange(0, 224)
-        y1 = m1*x1 + b1
-        x2 = np.arange(0, 224)
-        y2 = m2*x2 + b2
+class RotatedDataset(Subset):
+    def __init__(self, dataset, angles):
+        super().__init__(dataset, np.arange(len(dataset)))
+        self.angles = angles
         
-        # introduce more 15º rotation to the image
-        # image = np.array(image)
-        # image = Image.fromarray(image)
-        # image = image.rotate(15)
-        # image = np.array(image)
+    def __getitem__(self, idx):
+        data = super().__getitem__(idx)
 
-        angle = Image.fromarray(image).info.get('rotate')
-        print('rotation:', angle)
-        # plot the lines
+        image = data['image']
+        label = data['labels']
+        angle = random.choice(self.angles)
+
+        pil_image = Image.fromarray(image)
+        rotated_pil_image = transforms.functional.rotate(pil_image, int(angle), fill=255)
+        rotated_image = np.array(rotated_pil_image)
+
+
+        label =  PreProcess.deprocess(image, label)
+        m1, m2, b1, b2 = label
+        x1 = np.arange(0, image.shape[0])
+        y1 = m1*x1 + b1
+        x2 = np.arange(0, image.shape[0])
+        y2 = m2*x2 + b2
         plt.plot(x1, y1, color='green')
         plt.plot(x2, y2, color='green')
-
-        plt.imshow(image)
+        plt.imshow(rotated_image)
+        plt.title(f'nn_cnn: {idx}, angle: {angle}')
         plt.show()
 
-    # Combine the original dataset and the additional dataset into a single dataset
-    combined_dataset = torch.utils.data.ConcatDataset([dataset, additional_dataset])
+        return {"image": rotated_image, "labels": label, "angle": angle} 
 
-    return combined_dataset
+
+def transformData(dataset):
+    rotate_transform = transforms.Compose([
+        transforms.RandomRotation(degrees=15)
+    ])
+    num_rotated = int(len(dataset) * 0.2)
+    rotated_indices = np.random.choice(len(dataset), num_rotated, replace=False)
+    rotated_dataset = RotatedDataset(Subset(dataset, rotated_indices), angles=np.arange(-15, 15, 1))
+    concat_dataset = ConcatDataset([dataset, rotated_dataset])
+    return concat_dataset
 
 def getData(csv_path, batch_size=6, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
@@ -189,9 +162,8 @@ def getData(csv_path, batch_size=6, num_workers=0):
     dataset = LidarDatasetCNN(csv_path)
 
     print(f'dataset size: {len(dataset)}')
-    #dataset = transformData(dataset)
+    dataset = transformData(dataset)
     print(f'dataset size: {len(dataset)}')
-
 
     train_size, val_size = int(0.8*len(dataset)), np.ceil(0.2*len(dataset)).astype('int')
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
@@ -203,6 +175,7 @@ def getData(csv_path, batch_size=6, num_workers=0):
     print(f'train size: {train_size}, val size: {val_size}')
     _ = input('----------------- Press Enter to continue -----------------')
     return train_data, val_data
+
 
 def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_epochs):
 

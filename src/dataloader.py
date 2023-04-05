@@ -73,8 +73,8 @@ class LidarDatasetCNN(Dataset):
         pre_process = PreProcess(dataset={'labels': labels, 'image': self.image})
         labels, image = pre_process.pre_process()
 
+        return {"labels": labels, "image": image, "angle": 0}
 
-        return {"labels": labels, "image": image}
 
     def getLabels(self, idx):
         ''' Returns the labels of the image. '''

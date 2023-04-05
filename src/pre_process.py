@@ -161,10 +161,8 @@ class PreProcess:
 
         label = [m1, m2, d1, d2]
 
-        # DEPROCESS THE IMAGE
-        image = image 
         
-        return image, label
+        return label
 
     @staticmethod
     def scale_labels(image_size, labels, resize_factor):
@@ -173,7 +171,6 @@ class PreProcess:
         # the image_size without the resize it is the cropped_size
         CROP_FACTOR_Y = image_size / MAX_HEIGHT 
 
-        print('image size: ', image_size)
         m1, m2, b1, b2 = labels
         # note that m = yb - ya / xb - xa
         # where the crop process in y are null and in x this crop
