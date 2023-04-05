@@ -42,9 +42,9 @@ MAX_WIDTH = 540
 MAX_HEIGHT = 540
 MAX_M = 540
 MIN_M = -540 
-CROP_FACTOR_X = 0.1 #% # using this for square image assure
+CROP_FACTOR_X = 0.17 #% # using this for square image assure
 # AlexNet famous input size (224x224 pxs)
-DESIRED_SIZE = 540 #px
+DESIRED_SIZE = 224 #px
 
 class PreProcess:
 
@@ -89,7 +89,6 @@ class PreProcess:
         cropped_size_y = int(MAX_WIDTH - 2 * cropped_size_x) 
 
         cropped_image = image[MAX_HEIGHT - cropped_size_y: MAX_HEIGHT, cropped_size_x:MAX_WIDTH-cropped_size_x]
-        print('iamge coprred size:', cropped_image.shape)
         
         resized_image = cv2.resize(cropped_image, (DESIRED_SIZE, DESIRED_SIZE))
 
@@ -174,6 +173,7 @@ class PreProcess:
         # the image_size without the resize it is the cropped_size
         CROP_FACTOR_Y = image_size / MAX_HEIGHT 
 
+        print('image size: ', image_size)
         m1, m2, b1, b2 = labels
         # note that m = yb - ya / xb - xa
         # where the crop process in y are null and in x this crop
@@ -191,10 +191,7 @@ class PreProcess:
         # DONT FORGET M1 IN b1 CORRECTION (it took me some hours to debbug that)
         m1 = m1 
         m2 = m2 
-        print('crop factor y:', CROP_FACTOR_Y)
-        print('crop factor x:', CROP_FACTOR_X)
 
-        print('m1', m1)
         b1 = resize_factor * (b1 + m1*CROP_FACTOR_X*MAX_WIDTH - (1 - CROP_FACTOR_Y)*MAX_HEIGHT)
         b2 = resize_factor * (b2 + m2*CROP_FACTOR_X*MAX_WIDTH - (1 - CROP_FACTOR_Y)*MAX_HEIGHT)
 
