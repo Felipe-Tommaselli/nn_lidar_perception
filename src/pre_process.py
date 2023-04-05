@@ -34,7 +34,7 @@ global MAX_HEIGHT
 global MAX_M
 global MIN_M
 
-global CROP_FACTOR
+global CROP_FACTOR_X
 global DESIRED_SIZE
 global RESIZE_FACTOR
 
@@ -42,11 +42,9 @@ MAX_WIDTH = 540
 MAX_HEIGHT = 540
 MAX_M = 540
 MIN_M = -540 
-CROP_FACTOR_Y = 0.5 #%
-CROP_FACTOR_X = 0.1 #%
+CROP_FACTOR_X = 0.1 #% # using this for square image assure
 # AlexNet famous input size (224x224 pxs)
-DESIRED_SIZE = 224 #px
-RESIZE_FACTOR = DESIRED_SIZE / MAX_WIDTH
+DESIRED_SIZE = 540 #px
 
 class PreProcess:
 
@@ -56,6 +54,9 @@ class PreProcess:
         self.labels = copy.deepcopy(dataset['labels'])
         self.image = copy.deepcopy(dataset['image'])
         
+        self.resize_factor = DESIRED_SIZE / self.image.shape[0] # FOR NOW 
+        self.cropped_size = self.image.shape[0] # FOR NOW
+
     def pre_process(self) -> list:
         ''' Returns the processed data. '''
 
@@ -71,20 +72,38 @@ class PreProcess:
         MAX_HEIGHT = image.shape[1]
 
         # Crop the image to the region of interest
-        cropped_size_y = int(MAX_HEIGHT * CROP_FACTOR_Y)
-        cropped_size_x = int(MAX_WIDTH * CROP_FACTOR_X)
-        cropped_image = image[-cropped_size_y:, cropped_size_x:-cropped_size_x]
-
-        # Resize the image to a smaller size
-        resized_image = cv2.resize(cropped_image, (int(MAX_WIDTH*RESIZE_FACTOR), int(MAX_HEIGHT*RESIZE_FACTOR)))
+        # x 0,0 
+        # ----------------
+        # |              |
+        # | ------------ |
+        # | |          | |
+        # | |          | |
+        # | |          | |
+        # | |          | |
+        # ----------------
+        # double crop in x from each side (cropped_x is the lost region)
+        # one big crop in y from the top (cropped_y is the remaining region)
         
+        # correcting in y for the image continue to be a square
+        cropped_size_x = int(MAX_WIDTH * CROP_FACTOR_X)
+        cropped_size_y = int(MAX_WIDTH - 2 * cropped_size_x) 
+
+        cropped_image = image[MAX_HEIGHT - cropped_size_y: MAX_HEIGHT, cropped_size_x:MAX_WIDTH-cropped_size_x]
+        print('iamge coprred size:', cropped_image.shape)
+        
+        resized_image = cv2.resize(cropped_image, (DESIRED_SIZE, DESIRED_SIZE))
+
+        #* storage this for later
+        self.resize_factor = DESIRED_SIZE/ int(cropped_image.shape[0])
+        self.cropped_size = int(cropped_image.shape[0])
+
         return resized_image
 
     def process_label(self, labels: list) -> list:
         ''' Returns the processed label. '''
 
         # scale the labels acording to the image size
-        labels = PreProcess.scale_labels(labels)
+        labels = PreProcess.scale_labels(self.cropped_size, labels, self.resize_factor)
 
         # NORMALIZE THE AZIMUTH 1 AND 2 
         m1 = labels[0]
@@ -149,7 +168,12 @@ class PreProcess:
         return image, label
 
     @staticmethod
-    def scale_labels(labels):
+    def scale_labels(image_size, labels, resize_factor):
+
+        # correcting the y crop (without the resize)
+        # the image_size without the resize it is the cropped_size
+        CROP_FACTOR_Y = image_size / MAX_HEIGHT 
+
         m1, m2, b1, b2 = labels
         # note that m = yb - ya / xb - xa
         # where the crop process in y are null and in x this crop
@@ -159,11 +183,19 @@ class PreProcess:
         # so: m_resized = m_cropped
         # -----------------------
         # now, as y = a*x + b -> b = y - a*x
-        # the crop will make: b = b - CROP_FACTOR_X*MAX_WIDTH
-        # and the resize will make: b = RESIZE_FACTOR * (b - CROP_FACTOR_X*MAX_WIDTH)
+        # the crop will make: b = b - m1*CROP_FACTOR_X*MAX_WIDTH + (1 - CROP_FACTOR_Y)*MAX_HEIGHT
+        # and the resize will make: b = RESIZE_FACTOR * (b - ...)
+        # -----------------------
+        # note that this come from the expression y' = y - CROP_FACTOR_Y*MAX_HEIGHT and with 
+        # same for x and x', we can see that the new y and x make this transformations
+        # DONT FORGET M1 IN b1 CORRECTION (it took me some hours to debbug that)
         m1 = m1 
         m2 = m2 
-        b1 = RESIZE_FACTOR * (b1 - CROP_FACTOR_X*MAX_WIDTH)
-        b2 = RESIZE_FACTOR * (b2 - CROP_FACTOR_X*MAX_WIDTH)
+        print('crop factor y:', CROP_FACTOR_Y)
+        print('crop factor x:', CROP_FACTOR_X)
+
+        print('m1', m1)
+        b1 = resize_factor * (b1 + m1*CROP_FACTOR_X*MAX_WIDTH - (1 - CROP_FACTOR_Y)*MAX_HEIGHT)
+        b2 = resize_factor * (b2 + m2*CROP_FACTOR_X*MAX_WIDTH - (1 - CROP_FACTOR_Y)*MAX_HEIGHT)
 
         return [m1, m2, b1, b2]
