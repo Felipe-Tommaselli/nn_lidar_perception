@@ -219,10 +219,10 @@ def transformData(dataset):
     # the lambda function bellow basically remove the 0 angle (no rotation) from the list of angles
     # both the dataset (middle or axis) have the same size but not the same images
     rotated_dataset1 = RotatedDataset(Subset(dataset, rotated_indices), 
-                                    angles = np.array(list(filter(lambda x: x != 0, np.arange(-25, 25, 2)))), 
+                                    angles = np.array(list(filter(lambda x: x != 0, np.arange(-20, 20, 2)))), 
                                     rot_type = 'middle')
     rotated_dataset2 = RotatedDataset(Subset(dataset, rotated_indices), 
-                                    angles = np.array(list(filter(lambda x: x != 0, np.arange(-25, 25, 2)))), 
+                                    angles = np.array(list(filter(lambda x: x != 0, np.arange(-20, 20, 2)))), 
                                     rot_type = 'axis')
     concat_dataset = ConcatDataset([dataset, rotated_dataset1, rotated_dataset2])
     return concat_dataset
