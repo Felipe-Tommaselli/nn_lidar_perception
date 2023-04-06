@@ -124,26 +124,58 @@ class RotatedDataset(Subset):
 
         image = data['image']
         label = data['labels']
-        angle = random.choice(self.angles)
+        angle = random.choice(self.angles) 
+        rot_point = np.array([112, 112])
 
         pil_image = Image.fromarray(image)
         rotated_pil_image = transforms.functional.rotate(pil_image, int(angle), fill=255)
         rotated_image = np.array(rotated_pil_image)
 
+        fig, ax = plt.subplots(1, 2, figsize=(10, 5))
 
-        label =  PreProcess.deprocess(image, label)
+        label =  PreProcess.deprocess(rotated_image, label)
         m1, m2, b1, b2 = label
-        x1 = np.arange(0, image.shape[0])
+        x1 = np.arange(0, rotated_image.shape[0])
+        x2 = np.arange(0, rotated_image.shape[0])
+
         y1 = m1*x1 + b1
-        x2 = np.arange(0, image.shape[0])
         y2 = m2*x2 + b2
-        plt.plot(x1, y1, color='green')
-        plt.plot(x2, y2, color='green')
-        plt.imshow(rotated_image)
+
+        # ROTATION MATRIX
+        rotation_matrix = np.array([[np.cos(np.radians(angle)), np.sin(np.radians(angle)), rot_point[0]*(1-np.cos(np.radians(angle)))-rot_point[1]*np.sin(np.radians(angle))], 
+                                    [-np.sin(np.radians(angle)), np.cos(np.radians(angle)), rot_point[1]*(1-np.cos(np.radians(angle)))+rot_point[0]*np.sin(np.radians(angle))], 
+                                    [0, 0, 1]])
+
+        # add one dim to the points for matrix multiplication
+        points1 = np.stack((x1, y1, np.ones_like(x1)))
+        points2 = np.stack((x2, y2, np.ones_like(x2)))
+
+        # apply transformation
+        transformed_points1 = rotation_matrix @ points1
+        transformed_points2 = rotation_matrix @ points2
+
+        # get the new points
+        x1_rotated = transformed_points1[0]
+        y1_rotated = transformed_points1[1]
+        x2_rotated = transformed_points2[0]
+        y2_rotated = transformed_points2[1]
+
+        # get the new line parameters
+        m1r, b1r = np.polyfit(x1_rotated, y1_rotated, 1)
+        m2r, b2r = np.polyfit(x2_rotated, y2_rotated, 1)
+
+        rotated_label = [m1r, m2r, b1r, b2r]
+
+        ax[0].plot(x1, y1, color='green')
+        ax[0].plot(x2, y2, color='green')
+        ax[0].imshow(image)
         plt.title(f'nn_cnn: {idx}, angle: {angle}')
+        ax[1].plot(x1_rotated, y1_rotated, color='red')
+        ax[1].plot(x2_rotated, y2_rotated, color='red')
+        ax[1].imshow(rotated_image)
         plt.show()
 
-        return {"image": rotated_image, "labels": label, "angle": angle} 
+        return {"image": rotated_image, "labels": rotated_label, "angle": angle} 
 
 
 def transformData(dataset):
@@ -152,9 +184,10 @@ def transformData(dataset):
     ])
     num_rotated = int(len(dataset) * 0.2)
     rotated_indices = np.random.choice(len(dataset), num_rotated, replace=False)
-    rotated_dataset = RotatedDataset(Subset(dataset, rotated_indices), angles=np.arange(-15, 15, 1))
+    rotated_dataset = RotatedDataset(Subset(dataset, rotated_indices), angles=np.arange(-30, 30, 2))
     concat_dataset = ConcatDataset([dataset, rotated_dataset])
     return concat_dataset
+
 
 def getData(csv_path, batch_size=6, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
