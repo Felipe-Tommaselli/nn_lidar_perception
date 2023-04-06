@@ -128,7 +128,16 @@ class RotatedDataset(Subset):
         rot_point = np.array([112, 112])
 
         pil_image = Image.fromarray(image)
-        rotated_pil_image = transforms.functional.rotate(pil_image, int(angle), fill=255)
+
+        rotation_point = (112, 0)
+
+        # Rotate the image around the rotation point
+        rotated_pil_image = pil_image.rotate(angle, resample=Image.BICUBIC, expand=True)
+        offset = (rotation_point[0] - rotated_pil_image.size[0] / 2, rotation_point[1] - rotated_pil_image.size[1] / 2)
+        rotated_pil_image = rotated_pil_image.crop((offset[0], offset[1], offset[0] + pil_image.size[0], offset[1] + pil_image.size[1]))
+
+        # rotated_pil_image = transforms.functional.rotate(pil_image, int(angle), fill=255)
+
         rotated_image = np.array(rotated_pil_image)
 
         fig, ax = plt.subplots(1, 2, figsize=(10, 5))
@@ -184,7 +193,7 @@ def transformData(dataset):
     ])
     num_rotated = int(len(dataset) * 0.2)
     rotated_indices = np.random.choice(len(dataset), num_rotated, replace=False)
-    rotated_dataset = RotatedDataset(Subset(dataset, rotated_indices), angles=np.arange(-30, 30, 2))
+    rotated_dataset = RotatedDataset(Subset(dataset, rotated_indices), angles=np.arange(-3, 3, 1))
     concat_dataset = ConcatDataset([dataset, rotated_dataset])
     return concat_dataset
 
