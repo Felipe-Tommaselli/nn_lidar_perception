@@ -31,6 +31,7 @@ from torch.utils.data import Dataset, DataLoader, random_split, ConcatDataset, S
 from torchsummary import summary
 from torchvision import transforms
 from torchvision import datasets
+import torchvision.models as models
 from PIL import Image
 
 torch.cuda.empty_cache()
@@ -212,17 +213,17 @@ def transformData(dataset):
     '''
     
     # bot datasets have the same size and dont replace the original images
-    num_rotated = int(len(dataset) * 0.5)
+    num_rotated = int(len(dataset) * 1)
     rotated_indices = np.random.choice(len(dataset), num_rotated, replace=False)
     
     # this line create one subset with the indices above for the RotatedDataset class that mount the dataset
     # the lambda function bellow basically remove the 0 angle (no rotation) from the list of angles
     # both the dataset (middle or axis) have the same size but not the same images
     rotated_dataset1 = RotatedDataset(Subset(dataset, rotated_indices), 
-                                    angles = np.array(list(filter(lambda x: x != 0, np.arange(-20, 20, 2)))), 
+                                    angles = np.array(list(filter(lambda x: x != 0, np.arange(-30, 30, 2)))), 
                                     rot_type = 'middle')
     rotated_dataset2 = RotatedDataset(Subset(dataset, rotated_indices), 
-                                    angles = np.array(list(filter(lambda x: x != 0, np.arange(-20, 20, 2)))), 
+                                    angles = np.array(list(filter(lambda x: x != 0, np.arange(-30, 30, 2)))), 
                                     rot_type = 'axis')
     concat_dataset = ConcatDataset([dataset, rotated_dataset1, rotated_dataset2])
     return concat_dataset
@@ -344,7 +345,7 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
     
     return results
 
-def plotResults(results, epochs):
+def plotResults(results, epochs, lr):
     # losses
     # print both losses side by side with subplots (1 row, 2 columns)
     # ax1 for train losses and ax2 for val losses
@@ -361,18 +362,19 @@ def plotResults(results, epochs):
     ax2.set_xlabel("Epoch")
     ax2.set_ylabel("Loss")
     ax2.set_title("Val Loss")
+    ax2.set_title(f"lr = {lr}")
 
     plt.show()
     # save the plot in the current folder
     plt.savefig('losses.png')
 
     # accuracy
-    plt.plot(results['accuracy_list'], label='Accuracy')
-    plt.legend(frameon=False)
-    plt.xlabel("Epoch")
-    plt.ylabel("Accuracy")
-    plt.title("Accuracy")
-    plt.show()
+    # plt.plot(results['accuracy_list'], label='Accuracy')
+    # plt.legend(frameon=False)
+    # plt.xlabel("Epoch")
+    # plt.ylabel("Accuracy")
+    # plt.title("Accuracy")
+    # plt.show()
 
 
 if __name__ == '__main__':
@@ -386,14 +388,26 @@ if __name__ == '__main__':
     train_data, val_data = getData(csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
 
     ############ PARAMETERS ############    
-    epochs = 50
-    lr = 0.01
-    step_size = 10 * len(train_data)
+    epochs = 15
+    lr = 0.9 # TODO: test different learning rates
+    step_size = 8 # TODO: test different step sizes
     gamma = 0.1
 
     ############ MODEL ############
-    model = NetworkCNN(ResidualBlock).to(device)
-    criterion = nn.MSELoss()
+    # model = NetworkCNN(ResidualBlock).to(device)
+    model = models.resnet50(weights=True)
+    model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
+    num_ftrs = model.fc.in_features
+    model.fc = torch.nn.Sequential(
+        # TODO: add more complex layers
+        torch.nn.Linear(num_ftrs, 512),
+        torch.nn.ReLU(),
+        torch.nn.Linear(512, 4)
+    )
+    model = model.to(device)
+
+    ############ NETWORK ############
+    criterion = nn.MSELoss() # TODO: test different loss functions
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=gamma)
 
@@ -405,7 +419,7 @@ if __name__ == '__main__':
     results = fit(model=model, criterion=criterion, optimizer=optimizer, scheduler=scheduler, train_loader=train_data, val_loader=val_data, num_epochs=epochs)
 
     ############ RESULTS ############
-    plotResults(results, epochs)
+    plotResults(results, epochs, lr)
 
     ############ SAVE MODEL ############
     torch.save(model.state_dict(), 'model.pth')
