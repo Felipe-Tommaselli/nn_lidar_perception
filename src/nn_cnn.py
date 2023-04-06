@@ -146,7 +146,6 @@ class RotatedDataset(Subset):
         # convert back to numpy
         rotated_image = np.array(rotated_pil_image)
 
-        fig, ax = plt.subplots(1, 2, figsize=(10, 5))
 
         label =  PreProcess.deprocess(rotated_image, label)
         m1, m2, b1, b2 = label
@@ -181,14 +180,15 @@ class RotatedDataset(Subset):
 
         rotated_label = [m1r, m2r, b1r, b2r]
 
-        ax[0].plot(x1, y1, color='green')
-        ax[0].plot(x2, y2, color='green')
-        ax[0].imshow(image)
-        plt.title(f'nn_cnn: {idx}, angle: {angle}, rot_type: {self.rot_type}')
-        ax[1].plot(x1_rotated, y1_rotated, color='red')
-        ax[1].plot(x2_rotated, y2_rotated, color='red')
-        ax[1].imshow(rotated_image)
-        plt.show()
+        # fig, ax = plt.subplots(1, 2, figsize=(10, 5))
+        # ax[0].plot(x1, y1, color='green')
+        # ax[0].plot(x2, y2, color='green')
+        # ax[0].imshow(image)
+        # plt.title(f'nn_cnn: {idx}, angle: {angle}, rot_type: {self.rot_type}')
+        # ax[1].plot(x1_rotated, y1_rotated, color='red')
+        # ax[1].plot(x2_rotated, y2_rotated, color='red')
+        # ax[1].imshow(rotated_image)
+        # plt.show()
 
         return {"image": rotated_image, "labels": rotated_label, "angle": angle} 
 
@@ -376,36 +376,38 @@ def plotResults(results, epochs):
 
 
 if __name__ == '__main__':
+    ############ START ############
     # Set the device to GPU if available
     global device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('Using {} device'.format(device))
 
-    # Get the data
+    ############ DATA ############
     train_data, val_data = getData(csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
 
-    # Create the model on GPU if available
-    model = NetworkCNN(ResidualBlock).to(device)
-
-    # loss function for regression
-    criterion = nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.1)
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=9, gamma=0.1)
-
-    global epochs
+    ############ PARAMETERS ############    
     epochs = 50
-    global batch_size
+    lr = 0.01
+    step_size = 10 * len(train_data)
+    gamma = 0.1
 
-    # network summary with torchsummary
+    ############ MODEL ############
+    model = NetworkCNN(ResidualBlock).to(device)
+    criterion = nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=gamma)
+
+    ############ DEBBUG ############
     # summary(model, (1, 224, 224))
     # print(model)
 
-    # Train the model
+    ############ TRAINING ############
     results = fit(model=model, criterion=criterion, optimizer=optimizer, scheduler=scheduler, train_loader=train_data, val_loader=val_data, num_epochs=epochs)
 
+    ############ RESULTS ############
     plotResults(results, epochs)
 
-    # Save the model
+    ############ SAVE MODEL ############
     torch.save(model.state_dict(), 'model.pth')
     print('Saved PyTorch Model State to model.pth')
 
