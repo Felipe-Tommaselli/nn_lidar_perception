@@ -123,9 +123,6 @@ y2 = m2*x2 + b2
 plt.plot(x1, y1, color='green')
 plt.plot(x2, y2, color='green')
 
-# plot one point on the image in blue color on 250x250 coordinates
-
-
 # show the image
 plt.imshow(image, cmap='gray')
 plt.show()
