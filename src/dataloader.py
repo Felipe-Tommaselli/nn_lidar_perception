@@ -74,6 +74,10 @@ class LidarDatasetCNN(Dataset):
         labels, image = pre_process.pre_process()
         labels = PreProcess.deprocess(image=image, label=labels)
 
+        # plot image
+        plt.imshow(image, cmap='gray')
+        plt.show()
+
         return {"labels": labels, "image": image, "angle": 0}
 
 
