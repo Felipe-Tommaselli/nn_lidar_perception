@@ -117,7 +117,6 @@ class PreProcess:
         # NORMALIZE THE DISTANCE 1 AND 2
         d1 = labels[2]
         d2 = labels[3]
-        print('labels A 2:', [m1, m2, d1, d2])
 
         # since the data it is compatible to the image size we will relate as:
         # image = IMAGE_WIDTH x IMAGE_HEIGHT

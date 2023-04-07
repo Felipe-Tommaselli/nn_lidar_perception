@@ -390,7 +390,7 @@ if __name__ == '__main__':
     train_data, val_data = getData(csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
 
     ############ PARAMETERS ############    
-    epochs = 15
+    epochs = 25
     lr = 0.9 # TODO: test different learning rates
     step_size = 8 # TODO: test different step sizes
     gamma = 0.1
@@ -399,13 +399,25 @@ if __name__ == '__main__':
     # model = NetworkCNN(ResidualBlock).to(device)
     model = models.resnet50(weights=True)
     model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
+
+    # Freezing all the layers except the last one
+    for param in model.parameters():
+        param.requires_grad = False
+    for param in model.fc.parameters():
+        param.requires_grad = True
+
     num_ftrs = model.fc.in_features
-    model.fc = torch.nn.Sequential(
-        # TODO: add more complex layers
-        torch.nn.Linear(num_ftrs, 512),
-        torch.nn.ReLU(),
-        torch.nn.Linear(512, 4)
+    # Adding batch normalization and an additional convolutional layer
+    model.fc = nn.Sequential(
+        nn.Linear(num_ftrs, 512),
+        nn.BatchNorm1d(512),
+        nn.ReLU(inplace=True),
+        nn.Linear(512, 256),
+        nn.BatchNorm1d(256),
+        nn.ReLU(inplace=True),
+        nn.Linear(256, 4)
     )
+    # Moving the model to the device (GPU/CPU)
     model = model.to(device)
 
     ############ NETWORK ############
