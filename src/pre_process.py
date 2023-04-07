@@ -29,19 +29,15 @@ elif platform == "win32":
     # Windows...
     SLASH = "\\"
 
-global MAX_WIDTH
-global MAX_HEIGHT
+global RAW_SIZE
 global MAX_M
-global MIN_M
 
 global CROP_FACTOR_X
 global DESIRED_SIZE
 global RESIZE_FACTOR
 
-MAX_WIDTH = 540
-MAX_HEIGHT = 540
-MAX_M = 540
-MIN_M = -540 
+RAW_SIZE = 540
+MAX_M = 540 
 CROP_FACTOR_X = 0.17 #% # using this for square image assure
 # AlexNet famous input size (224x224 pxs)
 DESIRED_SIZE = 224 #px
@@ -121,18 +117,24 @@ class PreProcess:
         # NORMALIZE THE DISTANCE 1 AND 2
         d1 = labels[2]
         d2 = labels[3]
+        print('labels A 2:', [m1, m2, d1, d2])
 
         # since the data it is compatible to the image size we will relate as:
         # image = IMAGE_WIDTH x IMAGE_HEIGHT
         # as y = a*x + b -> b = y - a*x
+        # note that for this step we are already working with the cropped image
+        # so we will use DESRIED_SIZE
+        # and, the MAX_M for square cases is = DESIRED_SIZE
+        # -------------------------
         # where the minimum distance is when:
         # y = 0 and x = MAX_WIDTH with m = MAX_M
         # so b = 0 - (MAX_M)*MAX_WIDTH <- minimum distance
-        dmin = - MAX_M * MAX_WIDTH
+        MAX_M = DESIRED_SIZE
+        dmin = - MAX_M * DESIRED_SIZE
         # and the maximum distance is when:
         # y = MAX_HEIGTH and x = MAX_WIDTH with m = MIN_M
         # so b = MAX_HEIGHT - (MIN_M)*MAX_WIDTH <- maximum distance
-        dmax = MAX_HEIGHT - (MIN_M)*MAX_WIDTH
+        dmax = DESIRED_SIZE - (-MAX_M)*DESIRED_SIZE
 
         # normalize the distance (-291600 to 292140) -> (-1 to 1)
         d1 = 2*((d1 - dmin)/(dmax - dmin)) - 1
@@ -152,16 +154,20 @@ class PreProcess:
         m1 = np.tan(np.pi * label[0])
         m2 = np.tan(np.pi * label[1])
 
+        print(f'[1] d1 = {label[2]} and d2 = {label[3]}')
         # distances 1 e 2: image borders normalization
-        dmin = - MAX_M * MAX_WIDTH
-        dmax = MAX_HEIGHT - (MIN_M)*MAX_WIDTH
+        MAX_M = DESIRED_SIZE
+        dmin = - MAX_M * DESIRED_SIZE
+        dmax = DESIRED_SIZE - (-MAX_M)*DESIRED_SIZE
 
-        d1 = (dmax - dmin)*(label[2] + 1)/2 + dmin
-        d2 = (dmax - dmin)*(label[3] + 1)/2 + dmin
+        d1 = (dmax - dmin)*((label[2] + 1)/2) + dmin
+        d2 = (dmax - dmin)*((label[3] + 1)/2) + dmin
+
+        print(f'[3] d1 = {d1} and d2 = {d2}')
+
 
         label = [m1, m2, d1, d2]
 
-        
         return label
 
     @staticmethod
@@ -169,7 +175,7 @@ class PreProcess:
 
         # correcting the y crop (without the resize)
         # the image_size without the resize it is the cropped_size
-        CROP_FACTOR_Y = image_size / MAX_HEIGHT 
+        CROP_FACTOR_Y = image_size / RAW_SIZE 
 
         m1, m2, b1, b2 = labels
         # note that m = yb - ya / xb - xa
@@ -189,7 +195,7 @@ class PreProcess:
         m1 = m1 
         m2 = m2 
 
-        b1 = resize_factor * (b1 + m1*CROP_FACTOR_X*MAX_WIDTH - (1 - CROP_FACTOR_Y)*MAX_HEIGHT)
-        b2 = resize_factor * (b2 + m2*CROP_FACTOR_X*MAX_WIDTH - (1 - CROP_FACTOR_Y)*MAX_HEIGHT)
+        b1 = resize_factor * (b1 + m1*CROP_FACTOR_X*RAW_SIZE - (1 - CROP_FACTOR_Y)*RAW_SIZE)
+        b2 = resize_factor * (b2 + m2*CROP_FACTOR_X*RAW_SIZE - (1 - CROP_FACTOR_Y)*RAW_SIZE)
 
         return [m1, m2, b1, b2]

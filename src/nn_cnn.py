@@ -147,8 +147,10 @@ class RotatedDataset(Subset):
         # convert back to numpy
         rotated_image = np.array(rotated_pil_image)
 
-
-        label =  PreProcess.deprocess(rotated_image, label)
+        
+        #! muito cuidado! se ativar essa linha pra debuggar, tem que lembrar de 
+        #! desativar depois, senão o modelo vai treinar com as labels deprocessadas
+        # label =  PreProcess.deprocess(rotated_image, label)
         m1, m2, b1, b2 = label
         x1 = np.arange(0, rotated_image.shape[0])
         x2 = np.arange(0, rotated_image.shape[0])
