@@ -231,7 +231,7 @@ def transformData(dataset):
     return concat_dataset
 
 
-def getData(csv_path, batch_size=6, num_workers=0):
+def getData(csv_path, batch_size, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     
     dataset = LidarDatasetCNN(csv_path)
@@ -246,7 +246,7 @@ def getData(csv_path, batch_size=6, num_workers=0):
     train_data = DataLoader(train_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
     val_data  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
 
-    print('-'*65)
+    print('-'*59)
     print(f'train size: {train_size}, val size: {val_size}')
     _ = input('----------------- Press Enter to continue -----------------')
     return train_data, val_data
@@ -386,18 +386,19 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('Using {} device'.format(device))
 
-    ############ DATA ############
-    train_data, val_data = getData(csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
-
     ############ PARAMETERS ############    
-    epochs = 25
-    lr = 0.9 # TODO: test different learning rates
+    epochs = 15
+    lr = 0.1 # TODO: test different learning rates
     step_size = 8 # TODO: test different step sizes
     gamma = 0.1
+    batch_size = 8
+
+    ############ DATA ############
+    train_data, val_data = getData(batch_size=batch_size, csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
 
     ############ MODEL ############
     # model = NetworkCNN(ResidualBlock).to(device)
-    model = models.resnet50(weights=True)
+    model = models.resnet18()
     model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
     # Freezing all the layers except the last one
@@ -419,7 +420,6 @@ if __name__ == '__main__':
     )
     # Moving the model to the device (GPU/CPU)
     model = model.to(device)
-
     ############ NETWORK ############
     criterion = nn.MSELoss() # TODO: test different loss functions
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
