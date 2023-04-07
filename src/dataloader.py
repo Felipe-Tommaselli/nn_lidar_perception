@@ -68,14 +68,12 @@ class LidarDatasetCNN(Dataset):
 
         m1, m2, b1, b2 = self.getLabels(idx=idx)
         labels = [m1, m2, b1, b2]
-        print('-'*15)
-        print('labels A:', labels)
+
         # PRE-PROCESSING
         pre_process = PreProcess(dataset={'labels': labels, 'image': self.image})
         labels, image = pre_process.pre_process()
-        print('labels B:', labels)
         labels = PreProcess.deprocess(image=image, label=labels)
-        print('labels C:', labels)
+
         return {"labels": labels, "image": image, "angle": 0}
 
 

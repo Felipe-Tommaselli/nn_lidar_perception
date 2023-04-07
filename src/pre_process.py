@@ -154,7 +154,6 @@ class PreProcess:
         m1 = np.tan(np.pi * label[0])
         m2 = np.tan(np.pi * label[1])
 
-        print(f'[1] d1 = {label[2]} and d2 = {label[3]}')
         # distances 1 e 2: image borders normalization
         MAX_M = DESIRED_SIZE
         dmin = - MAX_M * DESIRED_SIZE
@@ -162,9 +161,6 @@ class PreProcess:
 
         d1 = (dmax - dmin)*((label[2] + 1)/2) + dmin
         d2 = (dmax - dmin)*((label[3] + 1)/2) + dmin
-
-        print(f'[3] d1 = {d1} and d2 = {d2}')
-
 
         label = [m1, m2, d1, d2]
 
