@@ -27,31 +27,34 @@ for point in points:
         #* Bilateral Filter: Espalha menos e mantém a informação do ponto
         #* Blur: Espalha menos e pondera a informação (efeito de chacoalho)
 
-    img_blur = cv2.GaussianBlur(img, (101, 101), sigmaX=0, sigmaY=70, borderType=cv2.BORDER_DEFAULT)
+    # Dilatar a imagem para preencher os buracos
+    img_blur = cv2.blur(img, (15, 15))
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 11)) # kernel retangular
+    img_dilated = cv2.dilate(img_blur, kernel, iterations=1)
+    axs[0, 1].imshow(cv2.bitwise_not(img_dilated), cmap='gray')
+    axs[0, 1].set_title('Imagem Dilatada')
+
+    img_blur = cv2.GaussianBlur(img_dilated, (87, 87), sigmaX=0, sigmaY=60, borderType=cv2.BORDER_DEFAULT)
     # img_blur = cv2.bilateralFilter(img, d=45, sigmaColor=275, sigmaSpace=275)
     # img_blur = cv2.blur(img, (45, 45))
-    axs[0, 1].imshow(cv2.bitwise_not(img_blur), cmap='gray')
-    axs[0, 1].set_title('Imagem suavizada')
+    axs[0, 2].imshow(cv2.bitwise_not(img_blur), cmap='gray')
+    axs[0, 2].set_title('Imagem suavizada')
 
     # Realizar uma erosão para remover pontos isolados e pequenas regiões
-    kernel_erode = cv2.getStructuringElement(cv2.MORPH_RECT, (30, 15))
+    kernel_erode = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 40))
     img_eroded = cv2.erode(img_blur, kernel_erode, iterations=1)
-    axs[0, 2].imshow(cv2.bitwise_not(img_eroded), cmap='gray')
-    axs[0, 2].set_title('Imagem Erodida')
-
-    # Dilatar a imagem para preencher os buracos
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 15)) # kernel retangular
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 5)) # kernel retangular
     img_dilated = cv2.dilate(img_eroded, kernel, iterations=1)
     axs[0, 3].imshow(cv2.bitwise_not(img_dilated), cmap='gray')
-    axs[0, 3].set_title('Imagem Dilatada')
+    axs[0, 3].set_title('Imagem Erodida')
 
     # Realizar uma binarização na imagem
-    ret, thresh = cv2.threshold(img_dilated, 250, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    ret, thresh = cv2.threshold(img_eroded, 200, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     axs[0, 4].imshow(cv2.bitwise_not(thresh), cmap='gray')
     axs[0, 4].set_title('Imagem binarizada')
 
     thresh = cv2.bitwise_not(thresh)
-    axs[1, 0].imshow(thresh, cmap='gray')
+    axs[1, 0].imshow(cv2.bitwise_not(thresh), cmap='gray')
     axs[1, 0].set_title('Imagem binarizada')
 
 

@@ -72,11 +72,18 @@ class LidarDatasetCNN(Dataset):
         # PRE-PROCESSING
         pre_process = PreProcess(dataset={'labels': labels, 'image': self.image})
         labels, image = pre_process.pre_process()
-        labels = PreProcess.deprocess(image=image, label=labels)
 
-        # plot image
-        plt.imshow(image, cmap='gray')
-        plt.show()
+        # labels_dep = PreProcess.deprocess(image=image, label=labels)        
+        # m1, m2, b1, b2 = labels_dep
+        # x1 = np.arange(0, image.shape[0], 1)
+        # x2 = np.arange(0, image.shape[0], 1)
+        # y1 = m1*x1 + b1
+        # y2 = m2*x2 + b2
+
+        # plt.plot(x1, y1, 'r')
+        # plt.plot(x2, y2, 'r')
+        # plt.imshow(image, cmap='gray')
+        # plt.show()
 
         return {"labels": labels, "image": image, "angle": 0}
 
