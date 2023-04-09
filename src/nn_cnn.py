@@ -388,9 +388,9 @@ if __name__ == '__main__':
 
     ############ PARAMETERS ############    
     epochs = 15
-    lr = 0.1 # TODO: test different learning rates
-    step_size = 8 # TODO: test different step sizes
-    gamma = 0.1
+    lr = 0.05 # TODO: test different learning rates
+    step_size = 6 # TODO: test different step sizes
+    gamma = 0.2
     batch_size = 8
 
     ############ DATA ############

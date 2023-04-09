@@ -207,6 +207,7 @@ class PreProcess:
         # inverter a imagem 
         img = cv2.bitwise_not(image)
 
+
         # Plotar a imagem original
         axs[0, 0].imshow(cv2.bitwise_not(img), cmap='gray')
         axs[0, 0].set_title('Imagem original')
@@ -216,29 +217,46 @@ class PreProcess:
             #* Bilateral Filter: Espalha menos e mantém a informação do ponto
             #* Blur: Espalha menos e pondera a informação (efeito de chacoalho)
 
-        # Dilatar a imagem para preencher os buracos
+        
+        ####### DILATAÇÃO ########
         img_blur = cv2.blur(img, (15, 15))
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 11)) # kernel retangular
         img_dilated = cv2.dilate(img_blur, kernel, iterations=1)
         axs[0, 1].imshow(cv2.bitwise_not(img_dilated), cmap='gray')
         axs[0, 1].set_title('Imagem Dilatada')
 
-        img_blur = cv2.GaussianBlur(img_dilated, (77, 77), sigmaX=0, sigmaY=60, borderType=cv2.BORDER_DEFAULT)
-        # img_blur = cv2.bilateralFilter(img, d=45, sigmaColor=275, sigmaSpace=275)
-        # img_blur = cv2.blur(img, (45, 45))
-        axs[0, 2].imshow(cv2.bitwise_not(img_blur), cmap='gray')
+        ####### MASCARA CIRCULAR ########
+        mask = np.zeros((224, 224), dtype=np.uint8)
+        # Criar a máscara circular
+        cv2.ellipse(mask, center=(112, 157), axes=(85, 52), angle=0, startAngle=0, endAngle=360, color=255, thickness=-1)
+
+        ####### SUAVIZAÇÃO ########
+        # Aplicar o desfoque mais leve na região circular
+        img_blur_circle = cv2.GaussianBlur(img_dilated, (41, 41), sigmaX=0, sigmaY=20)
+        img_blur_circle_masked = cv2.bitwise_and(img_blur_circle, img_blur_circle, mask=mask)
+        # Aplicar o desfoque mais forte na imagem original
+        img_blur = cv2.GaussianBlur(img_dilated, (61, 61), sigmaX=0, sigmaY=40, borderType=cv2.BORDER_DEFAULT)
+        # Subtrair a região circular suavizada da imagem original suavizada
+        img_blur_masked = cv2.bitwise_and(img_blur, img_blur, mask=cv2.bitwise_not(mask))
+        img_blur_final = cv2.bitwise_or(img_blur_masked, img_blur_circle_masked)
+        # blur leve na imagem final 
+        # img_blur_final = cv2.GaussianBlur(img_blur_final, (11, 11), sigmaX=0, sigmaY=10)
+
+        axs[0, 2].imshow(cv2.bitwise_not(img_blur_final), cmap='gray')
         axs[0, 2].set_title('Imagem suavizada')
 
-        # Realizar uma erosão para remover pontos isolados e pequenas regiões
-        kernel_erode = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 40))
-        img_eroded = cv2.erode(img_blur, kernel_erode, iterations=1)
-        # kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 5)) # kernel retangular
-        # img_dilated = cv2.dilate(img_eroded, kernel, iterations=1)
+        ####### EROSÃO ########
+        # Erosão fora do circulo (mais forte)
+        kernel_erode = cv2.getStructuringElement(cv2.MORPH_RECT, (18, 34))
+        img_eroded = cv2.erode(img_blur_final, kernel_erode, iterations=1)
+        # blur leve na imagem final 
+        img_eroded = cv2.GaussianBlur(img_eroded, (11, 11), sigmaX=0, sigmaY=0)
+
         axs[0, 3].imshow(cv2.bitwise_not(img_eroded), cmap='gray')
         axs[0, 3].set_title('Imagem Erodida')
 
         # Realizar uma binarização na imagem
-        ret, thresh = cv2.threshold(img_eroded, 160, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        ret, thresh = cv2.threshold(img_eroded, 50, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
         axs[0, 4].imshow(cv2.bitwise_not(thresh), cmap='gray')
         axs[0, 4].set_title('Imagem binarizada')
 
@@ -262,19 +280,16 @@ class PreProcess:
         axs[1, 2].set_title('Contorno de maior área')
 
         # Desenhar o contorno na imagem com blur
-        contourned_img_blur = cv2.drawContours(cv2.bitwise_not(img_blur), [largest_contour], -1, (0, 255, 0), 3)
+        contourned_img_blur = cv2.drawContours(cv2.bitwise_not(img_eroded), [largest_contour], -1, (0, 255, 0), 3)
         axs[1, 3].imshow(contourned_img_blur, cmap='gray')
         axs[1, 3].set_title('Contorno desenhado')
 
         # Desenhar o contorno selecionado na imagem original
-        contourned_img = cv2.drawContours(cv2.bitwise_not(img), [largest_contour], -1, (0, 255, 0), 3)
+        contourned_img = cv2.drawContours(cv2.bitwise_not(img), contours, -1, (0, 255, 0), 3)
         axs[1, 4].imshow(contourned_img, cmap='gray')
         axs[1, 4].set_title('Contorno desenhado')
 
         # Mostrar a figura com subplots
-        # plt.show()
-
-        # plt.imshow(contours_img)
         # plt.show()
 
         # clean plot and figure 
@@ -283,7 +298,7 @@ class PreProcess:
         plt.close()
 
         # criar a máscara das bordas internas
-        border_size = 2
+        border_size = 6
         mask = np.ones_like(contours_img)
         mask[border_size:-border_size, border_size:-border_size] = 0
         # aplicar a máscara na imagem para definir as bordas internas como preto

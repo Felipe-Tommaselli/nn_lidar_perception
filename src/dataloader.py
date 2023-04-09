@@ -85,6 +85,7 @@ class LidarDatasetCNN(Dataset):
         # plt.imshow(image, cmap='gray')
         # plt.show()
 
+
         return {"labels": labels, "image": image, "angle": 0}
 
 
