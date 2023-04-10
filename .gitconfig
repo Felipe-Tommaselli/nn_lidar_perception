@@ -1,0 +1,6 @@
+[http]
+    postBuffer = 524288000
+
+[core]
+    packedGitLimit = 512m
+    packedGitWindowSize = 512m
