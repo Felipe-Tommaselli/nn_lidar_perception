@@ -277,10 +277,11 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
             labels = [label.type(torch.float32).to(device) for label in labels]
             # convert labels to tensor
             labels = torch.stack(labels)
+
             # convert to format: tensor([[value1, value2, value3, value4], [value1, value2, value3, value4], ...])
             # this is: labels for each image, "batch" times -> shape: (batch, 4)
             labels = labels.permute(1, 0)    
-        
+
             outputs = model(images)
             loss = criterion(outputs, labels) 
             optimizer.zero_grad()
@@ -298,7 +299,6 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
 
                 total = 0
                 val_loss = 0
-                correct = 0
 
                 for i, data in enumerate(val_loader):
                     images, labels = data['image'], data['labels']
@@ -318,20 +318,10 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
 
                     # get the predictions to calculate the accuracy
                     _, preds = torch.max(outputs, 1)
-                    #print(f'_: {_}, preds: {preds}, preds shape: {preds.shape}')
-                    # correct += torch.sum(preds == label.data)
-        
-                    # predictions
-                    #print(f'predictions: {predictions}, predictions shape: {predictions.shape}')
-
-                    #correct += (predictions == labels).sum()
-                    #predictions_list.append(predictions)
 
                     val_loss += criterion(outputs, labels).item()
                 val_losses.append(val_loss/len(val_loader))
 
-                #accuracy = correct * 100 / total
-                #accuracy_list.append(accuracy.item())
             pass
         train_losses.append(running_loss/len(train_loader))
         val_losses.append(running_loss/len(val_loader))
@@ -342,7 +332,6 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
     results = {
         'train_losses': train_losses,
         'val_losses': val_losses,
-        'accuracy_list': accuracy_list
     }
     
     return results
@@ -370,13 +359,6 @@ def plotResults(results, epochs, lr):
     # save the plot in the current folder
     plt.savefig('losses.png')
 
-    # accuracy
-    # plt.plot(results['accuracy_list'], label='Accuracy')
-    # plt.legend(frameon=False)
-    # plt.xlabel("Epoch")
-    # plt.ylabel("Accuracy")
-    # plt.title("Accuracy")
-    # plt.show()
 
 
 if __name__ == '__main__':
@@ -394,7 +376,6 @@ if __name__ == '__main__':
     batch_size = 8
 
     ############ DATA ############
-    # back 1 dir, then go to assets/tags
     train_data, val_data = getData(batch_size=batch_size, csv_path="../assets/tags/Label_Data.csv")
 
     ############ MODEL ############
@@ -402,11 +383,11 @@ if __name__ == '__main__':
     model = models.resnet18()
     model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
-    # Freezing all the layers except the last one
-    for param in model.parameters():
-        param.requires_grad = False
-    for param in model.fc.parameters():
-        param.requires_grad = True
+    # # Freezing all the layers except the last one
+    # for param in model.parameters():
+    #     param.requires_grad = False
+    # for param in model.fc.parameters():
+    #     param.requires_grad = True
 
     num_ftrs = model.fc.in_features
     # Adding batch normalization and an additional convolutional layer
