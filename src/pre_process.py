@@ -55,7 +55,7 @@ class PreProcess:
 
     def pre_process(self) -> list:
         ''' Returns the processed data. '''
-
+        print('[3] pre_process')
         self.image = self.process_image(self.image, self.labels)
         self.labels = self.process_label(self.labels)
 
