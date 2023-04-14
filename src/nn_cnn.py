@@ -264,9 +264,7 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
     for epoch in range(num_epochs):
         model.train()
         running_loss = 0
-        print('[1] epoch fit')
         for i, data in enumerate(train_loader):
-            print('[2] i data label')
             
             images, labels = data['image'], data['labels']
             
