@@ -3,3 +3,6 @@ datasets/
 assets/tags/Lidar_Data.csv
 
 src/lidar_tag.py
+
+venv/
+myenv/
