@@ -5,3 +5,20 @@ The use of a 2D LiDAR (Light Detection and Ranging) emerges as a resource to ove
 
 That said, this Scientific Initiation project proposes the use of a Convolutional Neural Network in data from a 2D LiDAR sensor for navigation on the TerraSentia platform. Thus, it is proposed the creation of 2 systems (Pre Neural Network data processing and the Neural Network itself). Therefore, TerraSentia performance is expected to increase in under canopy experiments, compared to the state of the art through algorithms using only the heuristic
 instead of the Neural Network.
+
+## Installation
+
+### Dependencies
+
+``` shell
+sudo apt install python3.8
+sudo apt install python3-pip
+```
+
+``` shell
+pip install customtkinter==5.1.2 matplotlib==3.7.1 numpy==1.24.2 pandas==2.0.0 Pillow==9.5.0 scikit_learn==1.2.2 scipy==1.10.1 torch==2.0.0 torchsummary==1.5.1 torchvision==0.15.1
+```
+
+``` shell
+pip install opencv-contrib-python>=4.7.0
+```
