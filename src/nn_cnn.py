@@ -146,7 +146,6 @@ class RotatedDataset(Subset):
 
         # convert back to numpy
         rotated_image = np.array(rotated_pil_image)
-
         
         #! muito cuidado! se ativar essa linha pra debuggar, tem que lembrar de 
         #! desativar depois, senão o modelo vai treinar com as labels deprocessadas
@@ -242,11 +241,11 @@ def getData(csv_path, batch_size, num_workers=0):
 
     train_size, val_size = int(0.8*len(dataset)), np.ceil(0.2*len(dataset)).astype('int')
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
-
+    
+    print('batch_size: ', batch_size)
     train_data = DataLoader(train_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
     val_data  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
 
-    print('-'*59)
     print(f'train size: {train_size}, val size: {val_size}')
     _ = input('----------------- Press Enter to continue -----------------')
     return train_data, val_data
@@ -257,17 +256,18 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
     train_losses = []
     val_losses = []
 
-    accuracy_list = [0]
     predictions_list = []
     labels_list = []
 
     for epoch in range(num_epochs):
         model.train()
-        running_loss = 0
+        running_loss = 0.0
+
         for i, data in enumerate(train_loader):
-            
+            print(f'epoch: {epoch}, batch: {i}, loss: {running_loss}')
+
             images, labels = data['image'], data['labels']
-            
+
             # convert to float32 and send it to the device
             # image dimension: (batch, channels, height, width)
             images = images.type(torch.float32).to(device)
@@ -277,10 +277,11 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
             labels = [label.type(torch.float32).to(device) for label in labels]
             # convert labels to tensor
             labels = torch.stack(labels)
+
             # convert to format: tensor([[value1, value2, value3, value4], [value1, value2, value3, value4], ...])
             # this is: labels for each image, "batch" times -> shape: (batch, 4)
             labels = labels.permute(1, 0)    
-        
+
             outputs = model(images)
             loss = criterion(outputs, labels) 
             optimizer.zero_grad()
@@ -298,7 +299,6 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
 
                 total = 0
                 val_loss = 0
-                correct = 0
 
                 for i, data in enumerate(val_loader):
                     images, labels = data['image'], data['labels']
@@ -318,20 +318,10 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
 
                     # get the predictions to calculate the accuracy
                     _, preds = torch.max(outputs, 1)
-                    #print(f'_: {_}, preds: {preds}, preds shape: {preds.shape}')
-                    # correct += torch.sum(preds == label.data)
-        
-                    # predictions
-                    #print(f'predictions: {predictions}, predictions shape: {predictions.shape}')
-
-                    #correct += (predictions == labels).sum()
-                    #predictions_list.append(predictions)
 
                     val_loss += criterion(outputs, labels).item()
                 val_losses.append(val_loss/len(val_loader))
 
-                #accuracy = correct * 100 / total
-                #accuracy_list.append(accuracy.item())
             pass
         train_losses.append(running_loss/len(train_loader))
         val_losses.append(running_loss/len(val_loader))
@@ -342,7 +332,6 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
     results = {
         'train_losses': train_losses,
         'val_losses': val_losses,
-        'accuracy_list': accuracy_list
     }
     
     return results
@@ -393,7 +382,6 @@ if __name__ == '__main__':
     batch_size = 8
 
     ############ DATA ############
-    # back 1 dir, then go to assets/tags
     train_data, val_data = getData(batch_size=batch_size, csv_path="../assets/tags/Label_Data.csv")
 
     ############ MODEL ############
@@ -401,11 +389,11 @@ if __name__ == '__main__':
     model = models.resnet18()
     model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
-    # Freezing all the layers except the last one
-    for param in model.parameters():
-        param.requires_grad = False
-    for param in model.fc.parameters():
-        param.requires_grad = True
+    # # Freezing all the layers except the last one
+    # for param in model.parameters():
+    #     param.requires_grad = False
+    # for param in model.fc.parameters():
+    #     param.requires_grad = True
 
     num_ftrs = model.fc.in_features
     # Adding batch normalization and an additional convolutional layer

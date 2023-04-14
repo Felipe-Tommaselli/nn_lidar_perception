@@ -15,6 +15,10 @@ sudo apt install python3.8
 sudo apt install python3-pip
 ```
 
+```
+pip install --upgrade setuptools
+```
+
 ``` shell
 pip install customtkinter==5.1.2 matplotlib==3.7.1 numpy==1.24.2 pandas==2.0.0 Pillow==9.5.0 scikit_learn==1.2.2 scipy==1.10.1 torch==2.0.0 torchsummary==1.5.1 torchvision==0.15.1
 ```
