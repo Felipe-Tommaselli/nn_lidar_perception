@@ -146,7 +146,6 @@ class RotatedDataset(Subset):
 
         # convert back to numpy
         rotated_image = np.array(rotated_pil_image)
-
         
         #! muito cuidado! se ativar essa linha pra debuggar, tem que lembrar de 
         #! desativar depois, senão o modelo vai treinar com as labels deprocessadas
@@ -242,11 +241,11 @@ def getData(csv_path, batch_size, num_workers=0):
 
     train_size, val_size = int(0.8*len(dataset)), np.ceil(0.2*len(dataset)).astype('int')
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
-
+    
+    print('batch_size: ', batch_size)
     train_data = DataLoader(train_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
     val_data  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
 
-    print('-'*59)
     print(f'train size: {train_size}, val size: {val_size}')
     _ = input('----------------- Press Enter to continue -----------------')
     return train_data, val_data
@@ -257,17 +256,18 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
     train_losses = []
     val_losses = []
 
-    accuracy_list = [0]
     predictions_list = []
     labels_list = []
 
     for epoch in range(num_epochs):
         model.train()
-        running_loss = 0
+        running_loss = 0.0
+
         for i, data in enumerate(train_loader):
-            
+            print(f'epoch: {epoch}, batch: {i}, loss: {running_loss}')
+
             images, labels = data['image'], data['labels']
-            
+
             # convert to float32 and send it to the device
             # image dimension: (batch, channels, height, width)
             images = images.type(torch.float32).to(device)
@@ -358,7 +358,6 @@ def plotResults(results, epochs, lr):
     plt.show()
     # save the plot in the current folder
     plt.savefig('losses.png')
-
 
 
 if __name__ == '__main__':

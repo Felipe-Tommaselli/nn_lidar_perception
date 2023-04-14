@@ -38,7 +38,6 @@ class LidarDatasetCNN(Dataset):
         ''' Constructor of the class. '''
         self.labels = pd.read_csv(csv_path)
 
-
     def __len__(self) -> int:
         ''' Returns the length of the dataset (based on the labels). '''
         
@@ -85,7 +84,6 @@ class LidarDatasetCNN(Dataset):
         # plt.imshow(image, cmap='gray')
         # plt.show()
 
-
         return {"labels": labels, "image": image, "angle": 0}
 
 
@@ -121,6 +119,3 @@ class LidarDatasetCNN(Dataset):
         # slope1, slope2, intersec1, intersec2
         # angles in radians (slope1, slope2) and meters (intersec1, intersec2)
         return m1, m2, b1, b2
-
-if __name__ == '__main__':
-    pass
