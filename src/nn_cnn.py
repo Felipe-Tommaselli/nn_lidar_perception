@@ -368,8 +368,7 @@ def plotResults(results, epochs, lr):
 
     plt.show()
     # save the plot in the current folder
-    plt.savefig('losses.png')
-
+    fig.savefig(f'losses_lr={lr}.png')
     # accuracy
     # plt.plot(results['accuracy_list'], label='Accuracy')
     # plt.legend(frameon=False)
