@@ -394,7 +394,8 @@ if __name__ == '__main__':
     batch_size = 8
 
     ############ DATA ############
-    train_data, val_data = getData(batch_size=batch_size, csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
+    # back 1 dir, then go to assets/tags
+    train_data, val_data = getData(batch_size=batch_size, csv_path="../assets/tags/Label_Data.csv")
 
     ############ MODEL ############
     # model = NetworkCNN(ResidualBlock).to(device)
