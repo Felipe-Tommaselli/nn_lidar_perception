@@ -427,8 +427,8 @@ if __name__ == '__main__':
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=gamma)
 
     ############ DEBBUG ############
-    # summary(model, (1, 224, 224))
-    # print(model)
+    summary(model, (1, 224, 224))
+    print(model)
 
     ############ TRAINING ############
     results = fit(model=model, criterion=criterion, optimizer=optimizer, scheduler=scheduler, train_loader=train_data, val_loader=val_data, num_epochs=epochs)
