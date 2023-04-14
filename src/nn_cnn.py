@@ -235,14 +235,13 @@ def getData(csv_path, batch_size, num_workers=0):
     
     dataset = LidarDatasetCNN(csv_path)
 
-    print(f'dataset size: {len(dataset)}')
+    print(f'dataset size (no augmentation): {len(dataset)}')
     dataset = transformData(dataset)
-    print(f'dataset size: {len(dataset)}')
+    print(f'dataset size (w/ augmentation): {len(dataset)}')
 
     train_size, val_size = int(0.8*len(dataset)), np.ceil(0.2*len(dataset)).astype('int')
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
     
-    print('batch_size: ', batch_size)
     train_data = DataLoader(train_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
     val_data  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
 
@@ -264,7 +263,6 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
         running_loss = 0.0
 
         for i, data in enumerate(train_loader):
-            print(f'epoch: {epoch}, batch: {i}, loss: {running_loss}')
 
             images, labels = data['image'], data['labels']
 
