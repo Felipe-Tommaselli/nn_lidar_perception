@@ -65,8 +65,6 @@ class RotatedDataset(Subset):
         # convert back to numpy
         rotated_image = np.array(rotated_pil_image)
         
-        #! muito cuidado! se ativar essa linha pra debuggar, tem que lembrar de 
-        #! desativar depois, senão o modelo vai treinar com as labels deprocessadas
         # label =  PreProcess.deprocess(rotated_image, label)
         m1, m2, b1, b2 = label
         x1 = np.arange(0, rotated_image.shape[0])
@@ -132,7 +130,7 @@ def transformData(dataset):
     '''
     
     # both datasets have the same size and dont replace the original images
-    num_rotated = int(len(dataset) * 0.1)
+    num_rotated = int(len(dataset) * 0.8)
     rotated_indices = np.random.choice(len(dataset), num_rotated, replace=False)
     
     # this line create one subset with the indices above for the RotatedDataset class that mount the dataset
@@ -291,11 +289,11 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     ############ PARAMETERS ############    
-    epochs = 15
-    lr = 0.05 # TODO: test different learning rates
-    step_size = 6 # TODO: test different step sizes
+    epochs = 50
+    lr = 0.01 # TODO: test different learning rates
+    step_size = 10 # TODO: test different step sizes
     gamma = 0.2
-    batch_size = 8
+    batch_size = 64
 
     ############ DATA ############
     train_data, val_data = getData(batch_size=batch_size, csv_path="../assets/tags/Label_Data.csv")
