@@ -242,7 +242,7 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
         train_losses.append(running_loss/len(train_loader))
         val_losses.append(running_loss/len(val_loader))
 
-        print(f'[{epoch+1}/{num_epochs}] .. Train Loss: {train_losses[-1]:.5f} .. val Loss: {val_losses[-1]:.5f} .. val Accuracy: {accuracy_list[-1]:.3f}%')
+        print(f'[{epoch+1}/{num_epochs}] .. Train Loss: {train_losses[-1]:.5f} .. val Loss: {val_losses[-1]:.5f}')
 
 
     results = {
