@@ -19,7 +19,6 @@ import math
 from scipy.special import logsumexp
 import matplotlib.pyplot as plt
 import torch
-from sklearn.preprocessing import MinMaxScaler
 
 global SLASH
 if platform == "linux" or platform == "linux2":
@@ -199,30 +198,19 @@ class PreProcess:
     @staticmethod
     def contours_image(image):
         ''' Returns the image with the contours. '''
-            
-        # Criar a figura com subplots
-        fig, axs = plt.subplots(2, 5, figsize=(15, 6))
 
         # inverter a imagem 
         img = cv2.bitwise_not(image)
-
-
-        # Plotar a imagem original
-        axs[0, 0].imshow(cv2.bitwise_not(img), cmap='gray')
-        axs[0, 0].set_title('Imagem original')
 
         #* Aplicar um filtro de suavização na imagem para remover ruído
             #* Gaussian Blur: Espalha mais e perde a informaçõa do ponto 
             #* Bilateral Filter: Espalha menos e mantém a informação do ponto
             #* Blur: Espalha menos e pondera a informação (efeito de chacoalho)
-
         
         ####### DILATAÇÃO ########
         img_blur = cv2.blur(img, (15, 15))
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 11)) # kernel retangular
         img_dilated = cv2.dilate(img_blur, kernel, iterations=1)
-        axs[0, 1].imshow(cv2.bitwise_not(img_dilated), cmap='gray')
-        axs[0, 1].set_title('Imagem Dilatada')
 
         ####### MASCARA CIRCULAR ########
         mask = np.zeros((224, 224), dtype=np.uint8)
@@ -241,9 +229,6 @@ class PreProcess:
         # blur leve na imagem final 
         # img_blur_final = cv2.GaussianBlur(img_blur_final, (11, 11), sigmaX=0, sigmaY=10)
 
-        axs[0, 2].imshow(cv2.bitwise_not(img_blur_final), cmap='gray')
-        axs[0, 2].set_title('Imagem suavizada')
-
         ####### EROSÃO ########
         # Erosão fora do circulo (mais forte)
         kernel_erode = cv2.getStructuringElement(cv2.MORPH_RECT, (18, 34))
@@ -251,50 +236,56 @@ class PreProcess:
         # blur leve na imagem final 
         img_eroded = cv2.GaussianBlur(img_eroded, (11, 11), sigmaX=0, sigmaY=0)
 
-        axs[0, 3].imshow(cv2.bitwise_not(img_eroded), cmap='gray')
-        axs[0, 3].set_title('Imagem Erodida')
-
+        ####### BINARIZAÇÃO ########
         # Realizar uma binarização na imagem
         ret, thresh = cv2.threshold(img_eroded, 50, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-        axs[0, 4].imshow(cv2.bitwise_not(thresh), cmap='gray')
-        axs[0, 4].set_title('Imagem binarizada')
-
         thresh = cv2.bitwise_not(thresh)
-        axs[1, 0].imshow(cv2.bitwise_not(thresh), cmap='gray')
-        axs[1, 0].set_title('Imagem binarizada')
 
-
+        ####### CONTORNOS ########
         # Encontrar todos os contornos presentes na imagem
         contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         contours_img = np.zeros_like(img)
         cv2.drawContours(contours_img, contours, -1, (255, 255, 255), 2)
-        axs[1, 1].imshow(contours_img, cmap='gray')
-        axs[1, 1].set_title('Contornos')
 
+        ####### SELECIONAR O MAIOR CONTORNO ########
         # Selecionar o contorno de maior área
         largest_contour = max(contours, key=cv2.contourArea)
         largest_contour_img = np.zeros_like(img)
         cv2.drawContours(largest_contour_img, [largest_contour], -1, (255, 255, 255), 2)
-        axs[1, 2].imshow(largest_contour_img, cmap='gray')
-        axs[1, 2].set_title('Contorno de maior área')
 
+        ####### DESENHAR O CONTORNO NA IMAGEM ########
         # Desenhar o contorno na imagem com blur
         contourned_img_blur = cv2.drawContours(cv2.bitwise_not(img_eroded), [largest_contour], -1, (0, 255, 0), 3)
-        axs[1, 3].imshow(contourned_img_blur, cmap='gray')
-        axs[1, 3].set_title('Contorno desenhado')
 
+        ####### DESENHAR O CONTORNO NA IMAGEM ORIGINAL ########
         # Desenhar o contorno selecionado na imagem original
         contourned_img = cv2.drawContours(cv2.bitwise_not(img), contours, -1, (0, 255, 0), 3)
-        axs[1, 4].imshow(contourned_img, cmap='gray')
-        axs[1, 4].set_title('Contorno desenhado')
 
-        # Mostrar a figura com subplots
+        ####### MOSTRAR AS IMAGENS ########
+        # fig, axs = plt.subplots(2, 5, figsize=(15, 6))
+        # axs[0, 0].imshow(cv2.bitwise_not(img), cmap='gray')
+        # axs[0, 0].set_title('Imagem original')
+        # axs[0, 1].imshow(cv2.bitwise_not(img_dilated), cmap='gray')
+        # axs[0, 1].set_title('Imagem Dilatada')
+        # axs[0, 2].imshow(cv2.bitwise_not(img_blur_final), cmap='gray')
+        # axs[0, 2].set_title('Imagem suavizada')
+        # axs[0, 3].imshow(cv2.bitwise_not(img_eroded), cmap='gray')
+        # axs[0, 3].set_title('Imagem Erodida')
+        # axs[0, 4].imshow(cv2.bitwise_not(thresh), cmap='gray')
+        # axs[0, 4].set_title('Imagem binarizada')
+        # axs[1, 0].imshow(cv2.bitwise_not(thresh), cmap='gray')
+        # axs[1, 0].set_title('Imagem binarizada')
+        # axs[1, 1].imshow(contours_img, cmap='gray')
+        # axs[1, 1].set_title('Contornos')
+        # axs[1, 2].imshow(largest_contour_img, cmap='gray')
+        # axs[1, 2].set_title('Contorno de maior área')
+        # axs[1, 3].imshow(contourned_img_blur, cmap='gray')
+        # axs[1, 3].set_title('Contorno desenhado')
+        # axs[1, 4].imshow(contourned_img, cmap='gray')
+        # axs[1, 4].set_title('Contorno desenhado')
         # plt.show()
-
-        # clean plot and figure 
-        plt.cla()
-        # close the window
-        plt.close()
+        # plt.cla()
+        # plt.close()
 
         # criar a máscara das bordas internas
         border_size = 6
