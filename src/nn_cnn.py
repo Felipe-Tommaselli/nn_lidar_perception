@@ -131,8 +131,8 @@ def transformData(dataset):
     for training and also garantee that the Data Augmentation occurs.
     '''
     
-    # bot datasets have the same size and dont replace the original images
-    num_rotated = int(len(dataset) * 1)
+    # both datasets have the same size and dont replace the original images
+    num_rotated = int(len(dataset) * 0.1)
     rotated_indices = np.random.choice(len(dataset), num_rotated, replace=False)
     
     # this line create one subset with the indices above for the RotatedDataset class that mount the dataset
