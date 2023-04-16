@@ -289,11 +289,11 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     ############ PARAMETERS ############    
-    epochs = 50
-    lr = 0.01 # TODO: test different learning rates
+    epochs = 30
+    lr = 0.0005 # TODO: test different learning rates
     step_size = 10 # TODO: test different step sizes
-    gamma = 0.2
-    batch_size = 64
+    gamma = 0.1
+    batch_size = 96
 
     ############ DATA ############
     train_data, val_data = getData(batch_size=batch_size, csv_path="../assets/tags/Label_Data.csv")
