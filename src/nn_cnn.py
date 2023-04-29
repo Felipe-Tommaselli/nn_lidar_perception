@@ -296,7 +296,9 @@ if __name__ == '__main__':
     batch_size = 96
 
     ############ DATA ############
-    train_data, val_data = getData(batch_size=batch_size, csv_path="../assets/tags/Label_Data.csv")
+    fid = 2 
+    csv_path = "../data/tags/Label_Data" + str(fid) + ".csv"
+    train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path)
 
     ############ MODEL ############
     # model = NetworkCNN(ResidualBlock).to(device)

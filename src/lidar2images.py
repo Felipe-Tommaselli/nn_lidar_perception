@@ -36,6 +36,8 @@ import numpy as np
 import os
 import cv2
 
+global fid
+fid = 2
 
 global SLASH
 if platform == "linux" or platform == "linux2":
@@ -47,8 +49,8 @@ elif platform == "win32":
 
 global filename 
 global folder
-filename = "Lidar_Data.csv"
-folder = "assets" + SLASH + "tags"
+filename = "Lidar_Data" + str(fid) + ".csv"
+folder = "datasets"
 
 ''' There are other options:
 folder = Dataset:
@@ -77,7 +79,7 @@ class lidar2images:
 
     @staticmethod
     def getData(name: str, folder: str) -> list:
-        """ This function gets the data from the "syncro_data.csv" or the "filter_syncro_data_valitation" file. """
+        """ This function gets the data from the.csv file. """
         # move from root (\src) to \assets\tags or \datasets
         if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..') 

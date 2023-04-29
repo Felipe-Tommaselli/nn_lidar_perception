@@ -20,8 +20,10 @@ def laserscan_messages_to_csv(messages, output_filename):
             writer.writerow(row)
 
 if __name__ == "__main__":
-    bag_filename = "../datasets/ts_lidar_camera.bag"
-    output_filename = "../data/tags/Label_Data_2.csv"
+    fid = 2
+    bag_filename = "../ROSBags/ts_lidar_camera.bag"
+    
+    output_filename = "../datasets/Lidar_Data" + fid + ".csv"
     messages_laser = extract_topic_messages(bag_filename)
 
     laserscan_messages_to_csv(messages_laser, output_filename)

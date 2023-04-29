@@ -39,8 +39,10 @@ import tkinter
 import tkinter.ttk as ttk
 import customtkinter as ctk
 
-
 from lidar2images import *
+
+global fid
+fid = 2
 
 global POINT_WIDTH
 global PIXEL_OFFSET
@@ -168,10 +170,10 @@ class lidar_tag:
         # copy the image on the step to the folder of the images that are already classified
         if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..') 
-        folder_class = os.getcwd() + SLASH + 'assets' + SLASH + 'train' + SLASH
+        folder_class = os.getcwd() + SLASH + 'assets' + SLASH + 'train' + str(fid) + SLASH
 
         if not os.path.exists(folder):
-            os.makedirs(os.getcwd() + 'train')
+            os.makedirs(os.getcwd() + 'train' + str(fid))
         # sabe matplotlib plot on folder_class
         self.fig_holding.savefig(folder_class + 'image' + str(self.step) + '.png')
 
@@ -330,7 +332,8 @@ class lidar_tag:
 
 
 if __name__ == '__main__':
-    lt = lidar_tag(lidar_name='Lidar_Data.csv', label_name='Label_Data.csv', folder=''.join(['assets', SLASH, 'tags']))
+    label_name = 'Label_Data' + str(fid) + '.csv'
+    lt = lidar_tag(lidar_name='Lidar_Data.csv', label_name=label_name, folder=''.join(['assets', SLASH, 'tags']))
     root, InputStep, Bnext, Bprev, Bgo, Bcln, Bsave = lt.createWindow()
 
     Bprev.place(x=680, y = 100)
