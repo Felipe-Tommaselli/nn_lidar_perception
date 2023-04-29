@@ -25,6 +25,7 @@ The script is executed by running the following command in the terminal:
 """
 
 import os
+import sys
 from sys import platform
 import shutil
 import copy
@@ -42,7 +43,7 @@ import customtkinter as ctk
 from lidar2images import *
 
 global fid
-fid = 2
+# fid = 2
 
 global POINT_WIDTH
 global PIXEL_OFFSET
@@ -60,14 +61,14 @@ elif platform == "win32":
 
 class lidar_tag:
     """ Class that make avaiable the UI to tags the lidar data for the Neural Network. """
-    def __init__(self, lidar_name:str, label_name:str, folder:str) -> None:
+    def __init__(self, lidar_name:str, label_name:str, folders:list) -> None:
         self.lidar_name = lidar_name
         self.label_name = label_name
-        self.folder = folder
+        self.folders = folders
         # raw_lidar_data == lidar_data
-        self.lidar_data = lidar2images.getData(name=self.lidar_name, folder=self.folder)
+        self.lidar_data = lidar2images.getData(name=self.lidar_name, folder=self.folders[0])
         # raw_lidar_data != lidar_data, it requires a treatment
-        raw_label_data = lidar2images.getData(name=self.label_name, folder=self.folder)
+        raw_label_data = lidar2images.getData(name=self.label_name, folder=self.folders[1])
         self.label_data = self.getLabel(raw=raw_label_data, data=self.lidar_data)
 
         self.step = 0
@@ -155,7 +156,7 @@ class lidar_tag:
         """ Function that save the points on click of the button "Save". """
         if  os.getcwd().split(SLASH)[-1] != 'IC_NN_Lidar':
             os.chdir('..')
-        path = os.getcwd() + SLASH + str(self.folder) + SLASH
+        path = os.getcwd() + SLASH + str(self.folders[1]) + SLASH
         label_file_path = os.path.join(path, self.label_name) 
 
         label_file = open(label_file_path, 'r')
@@ -170,10 +171,10 @@ class lidar_tag:
         # copy the image on the step to the folder of the images that are already classified
         if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..') 
-        folder_class = os.getcwd() + SLASH + 'assets' + SLASH + 'train' + str(fid) + SLASH
+        folder_class = os.getcwd() + SLASH + 'data' + SLASH + 'train' + str(fid) + SLASH
 
-        if not os.path.exists(folder):
-            os.makedirs(os.getcwd() + 'train' + str(fid))
+        if not os.path.exists(folder_class):
+            os.makedirs(folder_class)
         # sabe matplotlib plot on folder_class
         self.fig_holding.savefig(folder_class + 'image' + str(self.step) + '.png')
 
@@ -311,7 +312,7 @@ class lidar_tag:
         """ Function that create the window of the application. """
         self.root = ctk.CTk()
         self.root.geometry('850x670')
-        self.root.title('Lidar Labeling Tool')
+        self.root.title(f'Lidar Labeling Tool ({fid})')
         ctk.set_appearance_mode("dark")
         
         # configure and customise all custom tkinter buttons with configure
@@ -332,8 +333,10 @@ class lidar_tag:
 
 
 if __name__ == '__main__':
+    fid = sys.argv[1]
+    lidar_name = 'Lidar_Data' + str(fid) + '.csv'
     label_name = 'Label_Data' + str(fid) + '.csv'
-    lt = lidar_tag(lidar_name='Lidar_Data.csv', label_name=label_name, folder=''.join(['assets', SLASH, 'tags']))
+    lt = lidar_tag(lidar_name=lidar_name, label_name=label_name, folders=['datasets', ''.join(['data', SLASH, 'tags'])])
     root, InputStep, Bnext, Bprev, Bgo, Bcln, Bsave = lt.createWindow()
 
     Bprev.place(x=680, y = 100)

@@ -93,7 +93,7 @@ class lidar2images:
             print('[SUCESS]')
         else:
             print("[ERROR]\nFile not found, we are going to create a new one")
-            filedata = open(path,"w+")
+            filedata = open(data_file_name,"w+")
 
         data = filedata.readlines()
         filedata.close()
@@ -164,7 +164,7 @@ class lidar2images:
         print(f'[{t}]')
         if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..')
-        path = ''. join([os.getcwd(), SLASH, 'assets', SLASH, 'images', SLASH])
+        path = ''. join([os.getcwd(), SLASH, 'data', SLASH, 'images', SLASH])
         plt.savefig(path + 'image'+str(t))
 
 

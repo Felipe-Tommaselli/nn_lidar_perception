@@ -2,6 +2,9 @@ import rosbag
 import csv
 from sensor_msgs.msg import LaserScan, Image
 
+global fid 
+fid = 5
+
 def extract_topic_messages(bag_filename):
     bag = rosbag.Bag(bag_filename, "r")
     messages_laser = []
@@ -20,10 +23,9 @@ def laserscan_messages_to_csv(messages, output_filename):
             writer.writerow(row)
 
 if __name__ == "__main__":
-    fid = 2
-    bag_filename = "../ROSBags/ts_lidar_camera.bag"
+    bag_filename = "../ROSBags/ts_lidar_camera" + str(fid) + ".bag"
     
-    output_filename = "../datasets/Lidar_Data" + fid + ".csv"
+    output_filename = "../datasets/Lidar_Data" + str(fid) + ".csv"
     messages_laser = extract_topic_messages(bag_filename)
 
     laserscan_messages_to_csv(messages_laser, output_filename)
