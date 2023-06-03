@@ -35,14 +35,22 @@ for _ in range(25):
     y_coords.append(y)
 
 # Gerar pontos entre os 20 primeiros pixels e os 40 primeiros pixels
-for _ in range(35):
+for _ in range(30):
     x = np.random.choice([np.random.randint(x1-40, x1-15), np.random.randint(x2+15, x2+40)])
-    y = np.random.randint(0, image_size//2)
+    y = np.random.randint(0, image_size//3)
     x_coords.append(x)
     y_coords.append(y)
 
+# Gerar pontos entre os pixels nos pontos mais distantes das retas
+for _ in range(20):
+    x = np.random.choice([np.random.randint(0, 30), np.random.randint(image_size - 30, image_size)])
+    y = np.random.randint(0, image_size//2)
+    x_coords.append(x)
+    y_coords.append(y)
+    
+
 # Gerar pontos aleatórios ao longo da imagem
-for _ in range(10):
+for _ in range(5):
     x = np.random.randint(0, image_size)
     y = np.random.randint(0, image_size)
     x_coords.append(x)
