@@ -25,7 +25,7 @@ x_coords = []
 y_coords = []
 
 # rotacionar as retas
-for angle in range(-30, 30, 9):
+for angle in range(-50, 45, 7):
 
     # Gerar coordenadas aleatórias para os pontos
     x_coords = []
@@ -139,7 +139,7 @@ for angle in range(-30, 30, 9):
             y_coords.append(y)
 
     # Gerar pontos entre os dois boundarys
-    for _ in range(40):
+    for _ in range(35):
         boundary1 = 15
         boundary2 = 30
         # escolher um y aleatorio entre 0 e 224
@@ -153,19 +153,21 @@ for angle in range(-30, 30, 9):
         y_coords.append(y)
 
     # Gerar pontos entre os dois boundarys
-    for _ in range(30):
-        boundary1 = 30
-        boundary2 = 40
+    for _ in range(15):
+        boundary1 = 25
+        boundary2 = 55
         # escolher um y aleatorio entre 0 e 224
-        y = np.random.randint(0, image_size//3)
+        y = np.random.randint(0, (2*image_size)//3)
         # achar o limiar da reta de boundary para aquele x e da reta normal
         x1_boundary = (y - b1r) / m1r
         x2_boundary = (y - b2r) / m2r
         # fit do x1 e x2 com os boundarys
-        if angle < 15:
+        if angle < -15:
             x = np.random.randint(x2_boundary + boundary1, x2_boundary + boundary2)
-        if angle > 15:
+        elif angle > 15:
             x = np.random.randint(x1_boundary - boundary2, x1_boundary - boundary1)
+        else: 
+            x = np.random.choice([np.random.randint(x1_boundary - boundary2, x1_boundary - boundary1), np.random.randint(x2_boundary + boundary1, x2_boundary + boundary2)])        
         x_coords.append(x)
         y_coords.append(y)
 
@@ -183,7 +185,7 @@ for angle in range(-30, 30, 9):
         y_coords.append(y)
 
     # Gerar pontos entre os pixels nos pontos mais distantes das retas
-    for _ in range(8):
+    for _ in range(5):
         if angle < 10:
             x = np.random.randint(image_size - 40, image_size)
         elif angle > 10:
