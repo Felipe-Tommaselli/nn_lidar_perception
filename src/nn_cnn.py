@@ -296,7 +296,7 @@ if __name__ == '__main__':
     batch_size = 96
 
     ############ DATA ############
-    fid = 2 
+    fid = 1 
     csv_path = "../data/tags/Label_Data" + str(fid) + ".csv"
     train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path)
 

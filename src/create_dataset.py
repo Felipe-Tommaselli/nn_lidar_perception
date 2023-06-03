@@ -3,7 +3,7 @@ import csv
 from sensor_msgs.msg import LaserScan, Image
 
 global fid 
-fid = 5
+fid = 2
 
 def extract_topic_messages(bag_filename):
     bag = rosbag.Bag(bag_filename, "r")
