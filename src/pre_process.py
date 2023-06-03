@@ -90,9 +90,9 @@ class PreProcess:
         self.resize_factor = DESIRED_SIZE/ int(cropped_image.shape[0])
         self.cropped_size = int(cropped_image.shape[0])
 
-        contoured_image = PreProcess.contours_image(resized_image)
+        #contoured_image = PreProcess.contours_image(resized_image)
 
-        return contoured_image
+        return resized_image
 
     def process_label(self, labels: list) -> list:
         ''' Returns the processed label. '''

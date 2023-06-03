@@ -31,12 +31,15 @@ elif platform == "win32":
     # Windows...
     SLASH = "\\"
 
+############ fid ############
+fid = 1 #! atualizar no main
+
 class LidarDatasetCNN(Dataset):
     ''' Dataset class for the lidar data with images. '''
     
     def __init__(self, csv_path):
         ''' Constructor of the class. '''
-        self.labels = pd.read_csv(csv_path, "rb")
+        self.labels = pd.read_csv(csv_path)
 
     def __len__(self) -> int:
         ''' Returns the length of the dataset (based on the labels). '''
@@ -54,7 +57,7 @@ class LidarDatasetCNN(Dataset):
         step = self.labels.iloc[idx, 0]
 
         # get the path of the image
-        path = os.getcwd() + SLASH + 'assets' + SLASH + 'train' + SLASH
+        path = os.getcwd() + SLASH + 'data' + SLASH + 'train' + str(fid) + SLASH
         full_path = os.path.join(path, 'image'+str(step)+'.png') # merge path and filename
 
         # TODO: IMPORT IMAGE WITH PIL
