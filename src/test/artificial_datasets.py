@@ -4,21 +4,6 @@ import math
 
 # Configurações
 image_size = 224  # Tamanho da imagem
-divider = 80  # Espaçamento entre as retas
-pivot = (112, 0)
-
-# Equação da reta para as retas paralelas VERTICAIS (m = y2 - y1, sendo x2 - x1 = 1 forçado)
-# 
-x1 = image_size // 2 - divider // 2  # Coordenada x para a primeira reta (vertical)
-x2 = image_size // 2 + divider // 2  # Coordenada x para a segunda reta (vertical)
-
-# equação reta vertical (angle = 0): y = mx + b => m = y2 - y1 e b = y1 - (y2 - y1)*x1
-y1_1, y2_1 = 0, 0
-y1_2, y2_2 = image_size, image_size
-m1 = (y1_2 - y1_1)
-m2 = (y2_2 - y2_1)
-b1 = y1_2 - (y1_2 - y1_1)*x1
-b2 = y2_2 - (y2_2 - y2_1)*x2
 
 # Gerar coordenadas aleatórias para os pontos
 y_coords = []
@@ -26,6 +11,37 @@ x_coords = []
 
 # rotacionar as retas
 for angle in range(-50, 45, 7):
+
+    #* ################ DEFINITION ################
+
+    pivot = (np.random.randint(82, 142), 0)
+    if pivot[0] < 97 or pivot[0] > 127:
+        divider = np.random.randint(70, 90)  # Espaçamento entre as retas
+    else: 
+        divider = np.random.randint(70, 110)
+
+    # prevent problems with the angle
+    if angle < -35 or angle > 35:
+        divider -= 10
+    
+    # prevent problem with zero division
+    if angle == 0:
+        angle += 1
+    
+    #* ################ CREATE LINES ################
+
+    # Equação da reta para as retas paralelas VERTICAIS (m = y2 - y1, sendo x2 - x1 = 1 forçado)
+    # 
+    x1 = image_size // 2 - divider // 2  # Coordenada x para a primeira reta (vertical)
+    x2 = image_size // 2 + divider // 2  # Coordenada x para a segunda reta (vertical)
+
+    # equação reta vertical (angle = 0): y = mx + b => m = y2 - y1 e b = y1 - (y2 - y1)*x1
+    y1_1, y2_1 = 0, 0
+    y1_2, y2_2 = image_size, image_size
+    m1 = (y1_2 - y1_1)
+    m2 = (y2_2 - y2_1)
+    b1 = y1_2 - (y1_2 - y1_1)*x1
+    b2 = y2_2 - (y2_2 - y2_1)*x2
 
     # Gerar coordenadas aleatórias para os pontos
     x_coords = []
@@ -77,7 +93,11 @@ for angle in range(-50, 45, 7):
     #################### Dentro Baixo ####################
 
     # Gerar pontos entre as retas
-    for _ in range(20):
+    if divider > 100:
+        d = np.random.randint(30, 40)
+    else: 
+        d = np.random.randint(15, 22)
+    for _ in range(d):
         boundary = 10
         # escolher um y aleatorio entre 0 e 224
         y = np.random.randint(0, (2*image_size)//3)
@@ -91,7 +111,7 @@ for angle in range(-50, 45, 7):
 
     #################### Dentro Topo ####################
 
-    num_clusters = 8  # Número de subconjuntos
+    num_clusters = np.random.randint(6, 9)  # Número de subconjuntos
     # Gerar pontos com aglomeração em subconjuntos #! parte de cima (obstrução do lidar)
     for _ in range(num_clusters):
         points_per_cluster = 5  # Número de pontos por subconjunto
@@ -119,7 +139,7 @@ for angle in range(-50, 45, 7):
 
     #################### Fora 1 ####################
 
-    num_clusters = 25  # Número de subconjuntos
+    num_clusters = np.random.randint(20, 28)  # Número de subconjuntos
     # Gerar pontos com aglomeração em subconjuntos #! pontos de fora das retas
     for cluster in range(num_clusters):
         points_per_cluster = 10  # Número de pontos por subconjunto
@@ -150,7 +170,7 @@ for angle in range(-50, 45, 7):
 
     #################### Fora 2 ####################
 
-    num_clusters = 10 # Número de subconjuntos
+    num_clusters = np.random.randint(7, 12) # Número de subconjuntos
     # Gerar pontos com aglomeração em subconjuntos
     for cluster in range(num_clusters):
         points_per_cluster = 10  # Número de pontos por subconjunto
@@ -183,7 +203,7 @@ for angle in range(-50, 45, 7):
     # #################### Fora 3 ####################
 
     # Gerar pontos entre os dois boundarys
-    for _ in range(15):
+    for _ in range(np.random.randint(11, 20)):
         boundary1 = 25
         boundary2 = 55
         # escolher um y aleatorio entre 0 e 224
@@ -204,7 +224,7 @@ for angle in range(-50, 45, 7):
     #################### Fora Cima ####################
 
     # Gerar pontos nos primeiros pixels de fora de cada reta (altura de cima)
-    for _ in range(25):
+    for _ in range(np.random.randint(20, 28)):
         boundary = 10
         # escolher um y aleatorio entre 0 e 224
         y = np.random.randint(image_size//2, image_size)
@@ -219,7 +239,7 @@ for angle in range(-50, 45, 7):
     #################### Borda ####################
 
     # Gerar pontos entre os pixels nos pontos mais distantes das retas
-    for _ in range(5):
+    for _ in range(np.random.randint(3, 10)):
         if angle < 10:
             x = np.random.randint(image_size - 40, image_size)
         elif angle > 10:
@@ -234,7 +254,7 @@ for angle in range(-50, 45, 7):
     #################### Random ####################
 
     # Gerar pontos aleatórios ao longo da imagem
-    for _ in range(6):
+    for _ in range(np.random.randint(2, 10)):
         x = np.random.randint(0, image_size)
         y = np.random.randint(0, image_size)
         x_coords.append(x)
