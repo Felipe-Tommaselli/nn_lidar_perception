@@ -178,6 +178,7 @@ class lidar_tag:
         # sabe matplotlib plot on folder_class
         self.fig_holding.savefig(folder_class + 'image' + str(self.step) + '.png')
 
+
     def PlotFunction(self, i):
         """ Function that plot the image that is going to be classified."""
         self.n_p = 0
