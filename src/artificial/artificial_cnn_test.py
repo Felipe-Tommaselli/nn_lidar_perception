@@ -12,7 +12,8 @@ from torchsummary import summary
 
 torch.cuda.empty_cache()
 
-from dataloader import *
+from artificial_dataloader import *
+sys.path.append('../')
 from pre_process import *
 
 # set the device
@@ -22,7 +23,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 def getData(csv_path, batch_size=7, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     
-    dataset = LidarDatasetCNN(csv_path)
+    dataset = ArtificialLidarDatasetCNN(csv_path)
 
     train_size, val_size = int(0.8*len(dataset)), np.ceil(0.2*len(dataset)).astype('int')
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
@@ -35,10 +36,14 @@ def getData(csv_path, batch_size=7, num_workers=0):
         print(f'images shape: {data["image"].shape}')
         break
     print('-'*65)
+
+    print(f'train size: {train_size}, val size: {val_size}')
+    _ = input('----------------- Press Enter to continue -----------------')
     return train_data, val_data
 
 # Get the data
-train_data, val_data = getData(csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
+csv_path = "../../artificial_data/tags/Artificial_Label_Data.csv"
+train_data, val_data = getData(csv_path=csv_path)
 
 # test the model with the validation data for one random image
 # showing the image and the predicted and real labels
@@ -60,8 +65,30 @@ labels = torch.stack(labels)
 # this is: labels for each image, "batch" times -> shape: (batch, 4)
 labels = labels.permute(1, 0)
 
+############ MODEL ############
 # load the model from the saved file
-model = NetworkCNN(ResidualBlock)
+# model = NetworkCNN(ResidualBlock).to(device)
+model = models.resnet18()
+model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
+
+# # Freezing all the layers except the last one
+# for param in model.parameters():
+#     param.requires_grad = False
+# for param in model.fc.parameters():
+#     param.requires_grad = True
+
+num_ftrs = model.fc.in_features
+# Adding batch normalization and an additional convolutional layer
+model.fc = nn.Sequential(
+    nn.Linear(num_ftrs, 512),
+    nn.BatchNorm1d(512),
+    nn.ReLU(inplace=True),
+    nn.Linear(512, 256),
+    nn.BatchNorm1d(256),
+    nn.ReLU(inplace=True),
+    nn.Linear(256, 4)
+)
+# Moving the model to the device (GPU/CPU)
 model = model.to(device)
 model.load_state_dict(torch.load(os.getcwd() + '/model.pth'))
 model.eval()
@@ -87,7 +114,11 @@ image = image.to('cpu').cpu().detach().numpy()
 # image it is shape (1, 1, 507, 507), we need to remove the first dimension
 image = image[0][0]
 
-image, label = PreProcess.deprocess(image, label[0])
+print('>>> image shape:', image.shape)
+print('>>> label :', label[0])
+print('type labels', type(label[0]))
+
+label = PreProcess.deprocess(image=image, label=label[0].tolist())
 
 print('label (deprocessed):', label)
 

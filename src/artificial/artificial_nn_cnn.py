@@ -298,7 +298,7 @@ if __name__ == '__main__':
     lr = 0.0005 # TODO: test different learning rates
     step_size = 10 # TODO: test different step sizes
     gamma = 0.1
-    batch_size = 96
+    batch_size = 64
 
     ############ DATA ############
     csv_path = "../../artificial_data/tags/Artificial_Label_Data.csv"
