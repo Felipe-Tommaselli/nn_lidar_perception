@@ -92,6 +92,9 @@ class PreProcess:
 
         #contoured_image = PreProcess.contours_image(resized_image)
 
+        # normalize the image (0 to 255) -> (0 to 1)
+        # resized_image = resized_image / 255 #! does not work well 
+
         return resized_image
 
     def process_label(self, labels: list) -> list:

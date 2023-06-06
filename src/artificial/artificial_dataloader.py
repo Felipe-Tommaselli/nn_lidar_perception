@@ -12,6 +12,7 @@ Class that loads the dataset for the neural network.
 """ 
 
 from sys import platform
+import sys
 import os
 import cv2
 import numpy as np
@@ -26,6 +27,9 @@ from torchvision.transforms import functional as F
 from torch.utils.data import Dataset, DataLoader, random_split, ConcatDataset, Subset
 from torchvision import datasets
 import torchvision.models as models
+
+sys.path.append('../')
+from pre_process import *
 
 global SLASH
 if platform == "linux" or platform == "linux2":
@@ -69,34 +73,31 @@ class ArtificialLidarDatasetCNN(Dataset):
         self.image = cv2.imread(full_path, -1)
         self.image = cv2.resize(self.image, (224, 224), interpolation=cv2.INTER_LINEAR)
         self.image = self.image[:, :, 1] # only green channel
-        print('image shape:', self.image.shape)
         # to understand the crop, see the image in the assets folder and the lidar_tag.py file
 
         labels = self.labels.iloc[idx, 1:] # take step out of labels
 
         # labels = [m1, m2, b1, b2]
-        print('labels:', labels)
         m1, m2, b1, b2 = labels
 
+        # correcting matplotlib and opencv axis problem
         m1 = -m1
         m2 = -m2
         b1 = 224 - b1
         b2 = 224 - b2
+        labels = [m1, m2, b1, b2]
 
-        print('labels 3:', b2)
         # PRE-PROCESSING
-        # pre_process = PreProcess(dataset={'labels': labels, 'image': self.image})
-        # labels, image = pre_process.pre_process()
-
-        # labels_dep = PreProcess.deprocess(image=image, label=labels)        
-        labels_dep = [m1, m2, b1, b2] # just for now
         image = self.image # just for now
+
+        labels = self.process_label(labels)
+        
+        labels_dep = PreProcess.deprocess(image=self.image, label=labels)        
         m1, m2, b1, b2 = labels_dep
         x1 = np.arange(0, image.shape[0], 1)
         x2 = np.arange(0, image.shape[0], 1)
         y1 = m1*x1 + b1
         y2 = m2*x2 + b2
-
         plt.plot(x1, y1, 'r')
         plt.plot(x2, y2, 'r')
         plt.title(f'step={step}, i={i}, j={j}')
@@ -104,5 +105,52 @@ class ArtificialLidarDatasetCNN(Dataset):
         plt.show()
 
         return {"labels": labels, "image": image, "angle": 0}
+
+
+    def process_label(self, labels):
+        ''' Process the labels to be used in the network. Normalize azimuth and distance intersection.'''
+        DESIRED_SIZE = 224 #px
+        MAX_M = 224 
+
+        # NORMALIZE THE AZIMUTH 1 AND 2 
+        m1 = labels[0]
+        m2 = labels[1]
+
+        # convert m1 to azimuth to angles
+        # y = m*x + b
+        # azimuth it is the angle of m1 in radians with atan 
+        azimuth1 = np.arctan(m1)
+        azimuth2 = np.arctan(m2)
+
+        # normalize the azimuth (-pi to pi) -> (-1 to 1)
+        azimuth1 = azimuth1 / np.pi
+        azimuth2 = azimuth2 / np.pi
+
+        # NORMALIZE THE DISTANCE 1 AND 2
+        d1 = labels[2]
+        d2 = labels[3]
+
+        # since the data it is compatible to the image size we will relate as:
+        # image = IMAGE_WIDTH x IMAGE_HEIGHT
+        # as y = a*x + b -> b = y - a*x
+        # note that for this step we are already working with the cropped image
+        # so we will use DESRIED_SIZE
+        # and, the MAX_M for square cases is = DESIRED_SIZE
+        # -------------------------
+        # where the minimum distance is when:
+        # y = 0 and x = MAX_WIDTH with m = MAX_M
+        # so b = 0 - (MAX_M)*MAX_WIDTH <- minimum distance
+        MAX_M = DESIRED_SIZE
+        dmin = - MAX_M * DESIRED_SIZE
+        # and the maximum distance is when:
+        # y = MAX_HEIGTH and x = MAX_WIDTH with m = MIN_M
+        # so b = MAX_HEIGHT - (MIN_M)*MAX_WIDTH <- maximum distance
+        dmax = DESIRED_SIZE - (-MAX_M)*DESIRED_SIZE
+
+        # normalize the distance (-291600 to 292140) -> (-1 to 1)
+        d1 = 2*((d1 - dmin)/(dmax - dmin)) - 1
+        d2 = 2*((d2 - dmin)/(dmax - dmin)) - 1
+
+        return [azimuth1, azimuth2, d1, d2]
 
 

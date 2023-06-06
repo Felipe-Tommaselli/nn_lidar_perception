@@ -75,6 +75,9 @@ class LidarDatasetCNN(Dataset):
         pre_process = PreProcess(dataset={'labels': labels, 'image': self.image})
         labels, image = pre_process.pre_process()
 
+        # print image to see if it is between 0 and 1 or 0 and 255
+        # print('max:', np.max(image))
+
         labels_dep = PreProcess.deprocess(image=image, label=labels)        
         m1, m2, b1, b2 = labels_dep
         x1 = np.arange(0, image.shape[0], 1)
