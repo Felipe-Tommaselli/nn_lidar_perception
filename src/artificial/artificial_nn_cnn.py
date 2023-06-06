@@ -67,7 +67,7 @@ class RotatedDataset(Subset):
         # convert back to numpy
         rotated_image = np.array(rotated_pil_image)
         
-        # label =  PreProcess.deprocess(rotated_image, label)
+        label =  PreProcess.deprocess(rotated_image, label)
         m1, m2, b1, b2 = label
         x1 = np.arange(0, rotated_image.shape[0])
         x2 = np.arange(0, rotated_image.shape[0])
@@ -110,6 +110,9 @@ class RotatedDataset(Subset):
         # ax[1].imshow(rotated_image)
         # plt.show()
 
+        # normalize
+        rotated_label = ArtificialLidarDatasetCNN.process_label(rotated_label)
+
         return {"image": rotated_image, "labels": rotated_label, "angle": angle} 
 
 
@@ -132,7 +135,7 @@ def transformData(dataset):
     '''
     
     # both datasets have the same size and dont replace the original images
-    num_rotated = int(len(dataset) * 0.3)
+    num_rotated = int(len(dataset) * 0.2)
     rotated_indices = np.random.choice(len(dataset), num_rotated, replace=False)
     
     # this line create one subset with the indices above for the RotatedDataset class that mount the dataset
