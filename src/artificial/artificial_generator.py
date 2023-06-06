@@ -310,7 +310,7 @@ for angle in range(-45, 45, 1):
         #* ################ PLOT ################
 
         # Criar a figura e o eixo
-        fig, ax = plt.subplots(figsize=(5, 5))
+        fig, ax = plt.subplots(figsize=(5, 5), dpi=58)
         ax.set_xlim(0, image_size)
         ax.set_ylim(0, image_size)
         # ax.set_title(f'Step: {str(i)}_{str(j)}')
@@ -352,7 +352,6 @@ for angle in range(-45, 45, 1):
         label_file = open(label_file_path, 'a')
         label_file.write('\n' + labels)
         label_file.close()
-        print('File saved: ', step)
 
         # copy the image on the step to the folder of the images that are already classified
         if os.getcwd().split(SLASH)[-1] == 'src':
@@ -363,7 +362,8 @@ for angle in range(-45, 45, 1):
             os.makedirs(folder_class)
         # sabe matplotlib plot on folder_class
         img_name = folder_class + 'image' + str(i) + '_' + str(j) + '.png'
-        plt.savefig(img_name, bbox_inches='tight', pad_inches=0, dpi=300)
+        plt.savefig(img_name, bbox_inches='tight', pad_inches=0)
+        print('File saved: ', step)
         
         # Mostrar a imagem na tela
         # plt.show()

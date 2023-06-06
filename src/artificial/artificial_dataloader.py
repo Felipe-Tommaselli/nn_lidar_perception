@@ -56,29 +56,40 @@ class ArtificialLidarDatasetCNN(Dataset):
 
         # get the step number by the index
         step = self.labels.iloc[idx, 0]
+        # step = 300*(i - 1) + j
+        j = step % 300 + 1
+        i = int((step - j) / 300 + 1) + 1
+
+        print(f'step={step}, i={i}, j={j}')
 
         # get the path of the image
         path = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train' + SLASH
-        full_path = os.path.join(path, 'image'+str(step)+'.png') # merge path and filename
+        full_path = os.path.join(path, 'image'+str(i)+ '_' + str(j) +'.png') # merge path and filename
 
         # TODO: IMPORT IMAGE WITH PIL
         # image treatment (only green channel)
         self.image = cv2.imread(full_path, -1)
+        self.image = cv2.resize(self.image, (224, 224), interpolation=cv2.INTER_LINEAR)
+        self.image = self.image[:, :, 1] # only green channel
+        print('image shape:', self.image.shape)
         # to understand the crop, see the image in the assets folder and the lidar_tag.py file
 
         labels = self.labels.iloc[idx, 1:] # take step out of labels
 
         # labels = [m1, m2, b1, b2]
         print('labels:', labels)
-        print('labels 3:', labels[3])
         m1, m2, b1, b2 = labels
 
+        b1 -= 224
+        b2 -= 224
+
+        print('labels 3:', b2)
         # PRE-PROCESSING
         # pre_process = PreProcess(dataset={'labels': labels, 'image': self.image})
         # labels, image = pre_process.pre_process()
 
         # labels_dep = PreProcess.deprocess(image=image, label=labels)        
-        labels_dep = labels # just for now
+        labels_dep = [m1, m2, b1, b2] # just for now
         image = self.image # just for now
         m1, m2, b1, b2 = labels_dep
         x1 = np.arange(0, image.shape[0], 1)
@@ -88,6 +99,7 @@ class ArtificialLidarDatasetCNN(Dataset):
 
         plt.plot(x1, y1, 'r')
         plt.plot(x2, y2, 'r')
+        plt.title(f'step={step}, i={i}, j={j}')
         plt.imshow(image, cmap='gray')
         plt.show()
 
