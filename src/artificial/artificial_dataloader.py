@@ -56,9 +56,9 @@ class ArtificialLidarDatasetCNN(Dataset):
 
         # get the step number by the index
         step = self.labels.iloc[idx, 0]
-        # step = 300*(i - 1) + j
-        j = step % 300 + 1
-        i = int((step - j) / 300 + 1) + 1
+        # step = 300*(i - 1) + j, with i and j starting in 1
+        i = int((step - 1) / 300) + 1
+        j = (step - 1) % 300 + 1
 
         print(f'step={step}, i={i}, j={j}')
 
@@ -80,8 +80,11 @@ class ArtificialLidarDatasetCNN(Dataset):
         print('labels:', labels)
         m1, m2, b1, b2 = labels
 
-        b1 -= 224
-        b2 -= 224
+        m1 *= -1
+        m2 *= -1
+        b1 += 224
+        b2 += 224
+    
 
         print('labels 3:', b2)
         # PRE-PROCESSING
