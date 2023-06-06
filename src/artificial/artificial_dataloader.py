@@ -19,8 +19,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import torch
 
-from torch.utils.data import Dataset
-
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+from torchvision.transforms import functional as F
+from torch.utils.data import Dataset, DataLoader, random_split, ConcatDataset, Subset
+from torchvision import datasets
+import torchvision.models as models
 
 global SLASH
 if platform == "linux" or platform == "linux2":
@@ -29,8 +34,6 @@ if platform == "linux" or platform == "linux2":
 elif platform == "win32":
     # Windows...
     SLASH = "\\"
-
-
 
 class ArtificialLidarDatasetCNN(Dataset):
     ''' Dataset class for the lidar data with images. '''
@@ -48,7 +51,7 @@ class ArtificialLidarDatasetCNN(Dataset):
         ''' Returns the sample image of the dataset. '''
 
         # move from root (\src) to \assets\images
-        if os.getcwd().split(SLASH)[-1] == 'src':
+        if os.getcwd().split(SLASH)[-1] == 'artificial':
             os.chdir('../..') 
 
         # get the step number by the index
@@ -66,6 +69,8 @@ class ArtificialLidarDatasetCNN(Dataset):
         labels = self.labels.iloc[idx, 1:] # take step out of labels
 
         # labels = [m1, m2, b1, b2]
+        print('labels:', labels)
+        print('labels 3:', labels[3])
         m1, m2, b1, b2 = labels
 
         # PRE-PROCESSING
@@ -74,6 +79,7 @@ class ArtificialLidarDatasetCNN(Dataset):
 
         # labels_dep = PreProcess.deprocess(image=image, label=labels)        
         labels_dep = labels # just for now
+        image = self.image # just for now
         m1, m2, b1, b2 = labels_dep
         x1 = np.arange(0, image.shape[0], 1)
         x2 = np.arange(0, image.shape[0], 1)
@@ -88,9 +94,3 @@ class ArtificialLidarDatasetCNN(Dataset):
         return {"labels": labels, "image": image, "angle": 0}
 
 
-
-############ DATA ############
-batch_size = 96
-csv_path = "../../artificial_data/tags/Artificial_Label_Data.csv"
-
-dataset = ArtificialLidarDatasetCNN(csv_path)

@@ -307,43 +307,13 @@ for angle in range(-45, 45, 1):
             x_coords.append(x)
             y_coords.append(y)
 
-        #* ################ SAVE LABELS ################
-
-        step = 300*(i-1) + j
-        labels = f'{str(step)}, {m1r}, {m2r}, {b1r}, {b2r}'
-
-        if  os.getcwd().split(SLASH)[-1] != 'IC_NN_Lidar':
-            os.chdir('../..') #! TROCAR ISSO DEPOIS QUE SAIR DO TEST
-        path = os.getcwd() + SLASH + str(''.join(['artificial_data', SLASH, 'tags'])) + SLASH
-        label_file_path = os.path.join(path, 'Artificial_Label_Data.csv') 
-
-        label_file = open(label_file_path, 'r')
-        text = label_file.readlines()
-        label_file.close()
-
-        label_file = open(label_file_path, 'a')
-        label_file.write('\n' + labels)
-        label_file.close()
-        print('File saved: ', label_file_path)
-
-        # copy the image on the step to the folder of the images that are already classified
-        if os.getcwd().split(SLASH)[-1] == 'src':
-            os.chdir('..') 
-        folder_class = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train' + SLASH
-
-        if not os.path.exists(folder_class):
-            os.makedirs(folder_class)
-        # sabe matplotlib plot on folder_class
-        img_name = folder_class + 'image' + str(i) + '_' + str(j) + '.png'
-        plt.savefig(img_name, bbox_inches='tight', pad_inches=0, dpi=300)
-
         #* ################ PLOT ################
 
         # Criar a figura e o eixo
         fig, ax = plt.subplots(figsize=(5, 5))
         ax.set_xlim(0, image_size)
         ax.set_ylim(0, image_size)
-        ax.set_title(f'Step: {str(i)}_{str(j)}')
+        # ax.set_title(f'Step: {str(i)}_{str(j)}')
         
         # Desenhar as retas rotacionadas (com pontos de início e fim)
         # ax.plot(x_line, y1_line_rotated, 'r')
@@ -365,7 +335,35 @@ for angle in range(-45, 45, 1):
         ax.set_yticks([])
         ax.axis('off')
         
-        # Salvar a imagem
+        #* ################ SAVE LABELS ################
+
+        step = 300*(i-1) + j
+        labels = f'{str(step)}, {m1r}, {m2r}, {b1r}, {b2r}'
+
+        if  os.getcwd().split(SLASH)[-1] != 'IC_NN_Lidar':
+            os.chdir('../..') #! TROCAR ISSO DEPOIS QUE SAIR DO TEST
+        path = os.getcwd() + SLASH + str(''.join(['artificial_data', SLASH, 'tags'])) + SLASH
+        label_file_path = os.path.join(path, 'Artificial_Label_Data.csv') 
+
+        label_file = open(label_file_path, 'r')
+        text = label_file.readlines()
+        label_file.close()
+
+        label_file = open(label_file_path, 'a')
+        label_file.write('\n' + labels)
+        label_file.close()
+        print('File saved: ', step)
+
+        # copy the image on the step to the folder of the images that are already classified
+        if os.getcwd().split(SLASH)[-1] == 'src':
+            os.chdir('..') 
+        folder_class = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train' + SLASH
+
+        if not os.path.exists(folder_class):
+            os.makedirs(folder_class)
+        # sabe matplotlib plot on folder_class
+        img_name = folder_class + 'image' + str(i) + '_' + str(j) + '.png'
+        plt.savefig(img_name, bbox_inches='tight', pad_inches=0, dpi=300)
         
         # Mostrar a imagem na tela
         # plt.show()
