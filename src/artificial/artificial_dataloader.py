@@ -60,8 +60,6 @@ class ArtificialLidarDatasetCNN(Dataset):
         i = int((step - 1) / 300) + 1
         j = (step - 1) % 300 + 1
 
-        print(f'step={step}, i={i}, j={j}')
-
         # get the path of the image
         path = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train' + SLASH
         full_path = os.path.join(path, 'image'+str(i)+ '_' + str(j) +'.png') # merge path and filename
@@ -80,11 +78,10 @@ class ArtificialLidarDatasetCNN(Dataset):
         print('labels:', labels)
         m1, m2, b1, b2 = labels
 
-        m1 *= -1
-        m2 *= -1
-        b1 += 224
-        b2 += 224
-    
+        m1 = -m1
+        m2 = -m2
+        b1 = 224 - b1
+        b2 = 224 - b2
 
         print('labels 3:', b2)
         # PRE-PROCESSING
