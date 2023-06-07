@@ -274,9 +274,10 @@ def plotResults(results, epochs, lr):
     ax2.set_title("Val Loss")
     ax2.set_title(f"lr = {lr}")
 
-    plt.show()
     # save the plot in the current folder
     fig.savefig(f'losses_lr={lr}.png')
+    
+    # plt.show()
     # accuracy
     # plt.plot(results['accuracy_list'], label='Accuracy')
     # plt.legend(frameon=False)
@@ -294,9 +295,9 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     ############ PARAMETERS ############    
-    epochs = 30
-    lr = 0.0005 # TODO: test different learning rates
-    step_size = 10 # TODO: test different step sizes
+    epochs = 100
+    lr = 0.05 # TODO: test different learning rates
+    step_size = 15 # TODO: test different step sizes
     gamma = 0.1
     batch_size = 64
 
