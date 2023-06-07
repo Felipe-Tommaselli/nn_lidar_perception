@@ -10,6 +10,8 @@ Class that loads the dataset for the neural network.
 
 @author: Felipe-Tommaselli
 """ 
+import warnings
+warnings.filterwarnings("ignore")
 
 from sys import platform
 import sys
