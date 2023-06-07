@@ -3,7 +3,7 @@ datasets/
 assets/tags/Lidar_Data.csv
 
 artificial_data/train/
-
+zip/
 ROSBags/
 
 venv/
