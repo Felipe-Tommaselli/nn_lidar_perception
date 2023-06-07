@@ -363,7 +363,8 @@ for angle in range(-45, 45, 1):
         # sabe matplotlib plot on folder_class
         img_name = folder_class + 'image' + str(i) + '_' + str(j) + '.png'
         plt.savefig(img_name, bbox_inches='tight', pad_inches=0)
-        print('File saved: ', step)
+        if step % 100 == 0:
+            print('File saved: ', step)
         
         # Mostrar a imagem na tela
         # plt.show()

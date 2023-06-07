@@ -1,0 +1,3 @@
+run AWS instance
+
+sudo ssh -i nn-lidar.pem ubuntu@ [ip]
