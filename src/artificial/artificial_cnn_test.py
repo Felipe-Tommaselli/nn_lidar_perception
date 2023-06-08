@@ -131,17 +131,29 @@ print('predictions (deprocessed):', predictions)
 # the lines are the borders of the road
 # the image is 540x540 pixels
 
+# plot
+fig, ax = plt.subplots()
+
 # get the slopes and intercepts
-m1, m2, b1, b2 = predictions
+m1p, m2p, b1p, b2p = predictions
 # get the x and y coordinates of the lines
 x1 = np.arange(0, 224)
-y1 = m1*x1 + b1
+y1p = m1p*x1 + b1p
 x2 = np.arange(0, 224)
-y2 = m2*x2 + b2
+y2p = m2p*x2 + b2p
 
 # plot the lines
-plt.plot(x1, y1, color='red')
-plt.plot(x2, y2, color='red')
+ax.plot(x1, y1p, color='red')
+ax.plot(x2, y2p, color='red')
+
+# add text labels
+y_value = 50 # fix the y value
+# calculate the corresponding x values using the inverse equation of the line
+x1_value = (y_value - b1p) / m1p
+x2_value = (y_value - b2p) / m2p
+# add text labels
+ax.text(x1_value, y_value, '1', color='red', fontsize=12, verticalalignment='bottom')
+ax.text(x2_value, y_value, '2', color='red', fontsize=12, verticalalignment='bottom')
 
 # get the slopes and intercepts
 m1, m2, b1, b2 = label
@@ -152,9 +164,9 @@ x2 = np.arange(0, 224)
 y2 = m2*x2 + b2
 
 # plot the lines
-plt.plot(x1, y1, color='green')
-plt.plot(x2, y2, color='green')
+ax.plot(x1, y1, color='green')
+ax.plot(x2, y2, color='green')
 
 # show the image
-plt.imshow(image, cmap='gray')
+ax.imshow(image, cmap='gray')
 plt.show()
