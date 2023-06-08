@@ -16,6 +16,8 @@ import torch
 import numpy as np
 import random
 import matplotlib.pyplot as plt
+import datetime
+
 
 import torch.nn as nn
 import torch.optim as optim
@@ -345,6 +347,8 @@ if __name__ == '__main__':
     plotResults(results, epochs, lr)
 
     ############ SAVE MODEL ############
-    torch.save(model.state_dict(), 'model.pth')
+    # get day for the name of the file
+    day = datetime.now().strftime("%d-%m-%Y")
+    torch.save(model.state_dict(), 'model' + str(lr) + str(day) + '.pth')
     print('Saved PyTorch Model State to model.pth')
 
