@@ -121,8 +121,11 @@ class ArtificialLidarDatasetCNN(Dataset):
         # convert m1 to azimuth to angles
         # y = m*x + b
         # azimuth it is the angle of m1 in radians with atan 
+        print('-'*20)
+        print('m1:', m1)
         azimuth1 = np.arctan(m1)
         azimuth2 = np.arctan(m2)
+        print('azimuth1:', azimuth1)
 
         # normalize the azimuth (-pi to pi) -> (-1 to 1)
         azimuth1 = azimuth1 / np.pi
