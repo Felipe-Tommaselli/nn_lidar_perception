@@ -11,7 +11,9 @@ Class that loads the dataset for the neural network.
 @author: Felipe-Tommaselli
 """ 
 import warnings
-warnings.filterwarnings("ignore")
+# warnings.filterwarnings("ignore")
+import logging
+log = logging.getLogger('my.module.logger')
 
 from sys import platform
 import sys
@@ -94,6 +96,11 @@ class ArtificialLidarDatasetCNN(Dataset):
 
         labels = ArtificialLidarDatasetCNN.process_label(labels)
         
+        try:
+            return self._engine.get_loc(key)
+        except UnicodeWarning:
+            log.exception('A log message of your choosing')
+
         # labels_dep = PreProcess.deprocess(image=self.image, label=labels)        
         # m1, m2, b1, b2 = labels_dep
         # x1 = np.arange(0, image.shape[0], 1)
@@ -121,11 +128,11 @@ class ArtificialLidarDatasetCNN(Dataset):
         # convert m1 to azimuth to angles
         # y = m*x + b
         # azimuth it is the angle of m1 in radians with atan 
-        print('-'*20)
-        print('m1:', m1)
+#         print('-'*20)
+        # print('m1:', m1)
         azimuth1 = np.arctan(m1)
         azimuth2 = np.arctan(m2)
-        print('azimuth1:', azimuth1)
+        # print('azimuth1:', azimuth1)
 
         # normalize the azimuth (-pi to pi) -> (-1 to 1)
         azimuth1 = azimuth1 / np.pi
