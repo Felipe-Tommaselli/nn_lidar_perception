@@ -152,9 +152,13 @@ class PreProcess:
 
         # DEPROCESS THE LABEL
 
+        #TODO: Find some way to normalize the azimuth without the atan problem
         # azimuths 1 e 2: tangent of the azimuth
-        m1 = np.tan(np.pi * label[0])
-        m2 = np.tan(np.pi * label[1])
+        # m1 = np.tan(np.pi * label[0])
+        # m2 = np.tan(np.pi * label[1])
+
+        m1 = label[0]*DESIRED_SIZE
+        m2 = label[1]*DESIRED_SIZE
 
         # distances 1 e 2: image borders normalization
         MAX_M = DESIRED_SIZE

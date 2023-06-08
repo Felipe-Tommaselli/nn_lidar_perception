@@ -124,7 +124,7 @@ class ArtificialLidarDatasetCNN(Dataset):
         # print('-'*20)
         # print('m1:', m1)
 
-        #! testing                
+        #TODO: Find some way to normalize the azimuth without the atan problem             
         # azimuth1 = np.arctan(m1)
         # azimuth2 = np.arctan(m2)
         # # print('azimuth1:', azimuth1)
@@ -133,8 +133,8 @@ class ArtificialLidarDatasetCNN(Dataset):
         # azimuth1 = azimuth1 / np.pi
         # azimuth2 = azimuth2 / np.pi        
 
-        azimuth1 = m1/60
-        azimuth2 = m2/60
+        azimuth1 = m1/DESIRED_SIZE  
+        azimuth2 = m2/DESIRED_SIZE
 
         # NORMALIZE THE DISTANCE 1 AND 2
         d1 = labels[2]
