@@ -107,15 +107,19 @@ class PreProcess:
         m1 = labels[0]
         m2 = labels[1]
 
-        # convert m1 to azimuth to angles
-        # y = m*x + b
-        # azimuth it is the angle of m1 in radians with atan 
-        azimuth1 = np.arctan(m1)
-        azimuth2 = np.arctan(m2)
+        #TODO: Find some way to normalize the azimuth without the atan problem
+        # # convert m1 to azimuth to angles
+        # # y = m*x + b
+        # # azimuth it is the angle of m1 in radians with atan 
+        # azimuth1 = np.arctan(m1)
+        # azimuth2 = np.arctan(m2)
 
-        # normalize the azimuth (-pi to pi) -> (-1 to 1)
-        azimuth1 = azimuth1 / np.pi
-        azimuth2 = azimuth2 / np.pi
+        # # normalize the azimuth (-pi to pi) -> (-1 to 1)
+        # azimuth1 = azimuth1 / np.pi
+        # azimuth2 = azimuth2 / np.pi
+
+        m1 = label[0]/DESIRED_SIZE
+        m2 = label[1]/DESIRED_SIZE
 
         # NORMALIZE THE DISTANCE 1 AND 2
         d1 = labels[2]

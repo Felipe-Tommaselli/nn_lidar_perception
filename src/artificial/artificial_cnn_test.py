@@ -119,8 +119,10 @@ print('>>> label :', label[0])
 print('type labels', type(label[0]))
 
 label = PreProcess.deprocess(image=image, label=label[0].tolist())
+predictions = PreProcess.deprocess(image=image, label=predictions[0].tolist())
 
 print('label (deprocessed):', label)
+print('predictions (deprocessed):', predictions)
 
 # plot the labels and the predictions on the image
 # note that labels and predicts are an array of 4 values
@@ -130,7 +132,7 @@ print('label (deprocessed):', label)
 # the image is 540x540 pixels
 
 # get the slopes and intercepts
-m1, m2, b1, b2 = predictions[0]
+m1, m2, b1, b2 = predictions
 # get the x and y coordinates of the lines
 x1 = np.arange(0, 224)
 y1 = m1*x1 + b1

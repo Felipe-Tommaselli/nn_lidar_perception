@@ -88,6 +88,7 @@ image = image.to('cpu').cpu().detach().numpy()
 image = image[0][0]
 
 image, label = PreProcess.deprocess(image, label[0])
+#TODO: deporcess predictions
 
 print('label (deprocessed):', label)
 
