@@ -121,24 +121,20 @@ class ArtificialLidarDatasetCNN(Dataset):
         # convert m1 to azimuth to angles
         # y = m*x + b
         # azimuth it is the angle of m1 in radians with atan 
-#         print('-'*20)
+        # print('-'*20)
         # print('m1:', m1)
-        
-        with warnings.catch_warnings(record=True) as w:
-        
-            azimuth1 = np.arctan(m1)
-            azimuth2 = np.arctan(m2)
-            # print('azimuth1:', azimuth1)
 
-            # normalize the azimuth (-pi to pi) -> (-1 to 1)
-            azimuth1 = azimuth1 / np.pi
-            azimuth2 = azimuth2 / np.pi        
+        #! testing                
+        # azimuth1 = np.arctan(m1)
+        # azimuth2 = np.arctan(m2)
+        # # print('azimuth1:', azimuth1)
 
-        if w:
-            for warning in w:
-                print("Warning:", warning.message)
-                print("Localização:", warning.filename, warning.lineno)
+        # # normalize the azimuth (-pi to pi) -> (-1 to 1)
+        # azimuth1 = azimuth1 / np.pi
+        # azimuth2 = azimuth2 / np.pi        
 
+        azimuth1 = m1/60
+        azimuth2 = m2/60
 
         # NORMALIZE THE DISTANCE 1 AND 2
         d1 = labels[2]
