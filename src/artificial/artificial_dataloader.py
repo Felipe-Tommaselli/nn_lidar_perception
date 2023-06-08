@@ -11,7 +11,7 @@ Class that loads the dataset for the neural network.
 @author: Felipe-Tommaselli
 """ 
 import warnings
-# warnings.filterwarnings("ignore")
+warnings.filterwarnings("ignore")
 
 from sys import platform
 import sys
@@ -133,8 +133,8 @@ class ArtificialLidarDatasetCNN(Dataset):
         # azimuth1 = azimuth1 / np.pi
         # azimuth2 = azimuth2 / np.pi        
 
-        azimuth1 = m1/60  
-        azimuth2 = m2/60
+        azimuth1 = m1/DESIRED_SIZE  
+        azimuth2 = m2/DESIRED_SIZE
 
         # NORMALIZE THE DISTANCE 1 AND 2
         d1 = labels[2]
