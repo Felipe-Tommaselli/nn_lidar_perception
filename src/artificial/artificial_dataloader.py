@@ -133,8 +133,8 @@ class ArtificialLidarDatasetCNN(Dataset):
         # azimuth1 = azimuth1 / np.pi
         # azimuth2 = azimuth2 / np.pi        
 
-        azimuth1 = 3*m1/DESIRED_SIZE  
-        azimuth2 = 3*m2/DESIRED_SIZE
+        azimuth1 = m1/60  
+        azimuth2 = m2/60
 
         # NORMALIZE THE DISTANCE 1 AND 2
         d1 = labels[2]
