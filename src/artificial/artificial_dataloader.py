@@ -94,17 +94,17 @@ class ArtificialLidarDatasetCNN(Dataset):
 
         labels = ArtificialLidarDatasetCNN.process_label(labels)
         
-        labels_dep = PreProcess.deprocess(image=self.image, label=labels)        
-        m1, m2, b1, b2 = labels_dep
-        x1 = np.arange(0, image.shape[0], 1)
-        x2 = np.arange(0, image.shape[0], 1)
-        y1 = m1*x1 + b1
-        y2 = m2*x2 + b2
-        plt.plot(x1, y1, 'r')
-        plt.plot(x2, y2, 'r')
-        plt.title(f'step={step}, i={i}, j={j}')
-        plt.imshow(image, cmap='gray')
-        plt.show()
+        # labels_dep = PreProcess.deprocess(image=self.image, label=labels)        
+        # m1, m2, b1, b2 = labels_dep
+        # x1 = np.arange(0, image.shape[0], 1)
+        # x2 = np.arange(0, image.shape[0], 1)
+        # y1 = m1*x1 + b1
+        # y2 = m2*x2 + b2
+        # plt.plot(x1, y1, 'r')
+        # plt.plot(x2, y2, 'r')
+        # plt.title(f'step={step}, i={i}, j={j}')
+        # plt.imshow(image, cmap='gray')
+        # plt.show()
 
         return {"labels": labels, "image": image, "angle": 0}
 

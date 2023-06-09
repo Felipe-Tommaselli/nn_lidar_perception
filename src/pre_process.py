@@ -182,7 +182,7 @@ class PreProcess:
         q1 = q1*DESIRED_SIZE
         q2 = q2*DESIRED_SIZE
 
-        print(f'labels w1={w1}, w2={w2}, q1={q1}, q2={q2}')
+        # print(f'labels w1={w1}, w2={w2}, q1={q1}, q2={q2}')
         m1, m2, b1, b2 = PreProcess.extract_label([w1, w2, q1, q2])
 
         b1 = b1 + 224
