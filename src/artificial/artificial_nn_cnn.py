@@ -297,9 +297,9 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     ############ PARAMETERS ############    
-    epochs = 50
-    lr = 0.05 # TODO: test different learning rates
-    step_size = 15 # TODO: test different step sizes
+    epochs = 20
+    lr = 0.1 # TODO: test different learning rates
+    step_size = 10 # TODO: test different step sizes
     gamma = 0.1
     batch_size = 96
 
