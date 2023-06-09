@@ -113,10 +113,7 @@ class RotatedDataset(Subset):
         # plt.show()
 
         # normalize
-        print('-'*15)
-        print(f'rotated_label: {rotated_label}')
         rotated_label = ArtificialLidarDatasetCNN.process_label(rotated_label)
-        print(f'rotated_label process: {rotated_label}')
 
         return {"image": rotated_image, "labels": rotated_label, "angle": angle} 
 

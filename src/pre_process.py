@@ -183,9 +183,7 @@ class PreProcess:
         q2 = q2*DESIRED_SIZE
         w1 = w1*DESIRED_SIZE
         w2 = w2*DESIRED_SIZE
-        
-        print('-'*20)
-        print('wq -> mb')
+
         # print(f'labels w1={w1}, w2={w2}, q1={q1}, q2={q2}')
         m1, m2, b1, b2 = PreProcess.extract_label([w1, w2, q1, q2])
 
@@ -212,12 +210,10 @@ class PreProcess:
         # the y = 0 line. For that we can simply change the parametrization to:
         # x = w*y + q (where w = 1/m and q = -b/m). For now, it is better 
 
-        print(f'label: m1={m1}, m2={m2}, b1={b1}, b2={b2}')
         w1 = 1/m1
         w2 = 1/m2
         q1 = -b1/m1
         q2 = -b2/m2
-        print(f'labels after: w1={w1}, w2={w2}, q1={q1}, q2={q2}')
 
         # note that the in (process) and the out (deprocess) are the same operations
         # we are using the same operations for process and deprocess :)

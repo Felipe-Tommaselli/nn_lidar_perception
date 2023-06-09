@@ -125,7 +125,6 @@ class ArtificialLidarDatasetCNN(Dataset):
         b1 = labels[2]
         b2 = labels[3]
 
-        print('sanity test: ', m1, m2, b1, b2)
         #! NORMALIZATION WITH m1, m2, b1, b2
         # # convert m1 to azimuth to angles
         # # y = m*x + b
@@ -175,9 +174,6 @@ class ArtificialLidarDatasetCNN(Dataset):
         b1 = b1 - 224 # matplotlib 0 its in the top
         b2 = b2 - 224
         
-        print('-'*20)
-        print('mb -> wq')
-        print(f'process label: m1={m1}, m2={m2}, b1={b1}, b2={b2}')
         w1, w2, q1, q2 = PreProcess.extract_label([m1, m2, b1, b2])
 
         q1 = q1/DESIRED_SIZE
