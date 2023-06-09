@@ -91,6 +91,9 @@ class ArtificialLidarDatasetCNN(Dataset):
 
         # PRE-PROCESSING
         image = self.image # just for now
+        
+        print('-'*30)
+        print(f'step={step}, i={i}, j={j}')
 
         labels = ArtificialLidarDatasetCNN.process_label(labels)
         
