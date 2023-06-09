@@ -158,7 +158,8 @@ def getData(csv_path, batch_size, num_workers=0):
     dataset = ArtificialLidarDatasetCNN(csv_path)
 
     print(f'dataset size (no augmentation): {len(dataset)}')
-    dataset = transformData(dataset)
+    #! artificial não se beneficia muito disso
+    # dataset = transformData(dataset)
     print(f'dataset size (w/ augmentation): {len(dataset)}')
 
     train_size, val_size = int(0.8*len(dataset)), np.ceil(0.2*len(dataset)).astype('int')
