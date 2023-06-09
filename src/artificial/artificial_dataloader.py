@@ -184,6 +184,8 @@ class ArtificialLidarDatasetCNN(Dataset):
         b1 = b1 - 224 # matplotlib 0 its in the top
         b2 = b2 - 224
         
+        print('-'*20)
+        print('mb -> wq')
         w1, w2, q1, q2 = PreProcess.extract_label([m1, m2, b1, b2])
 
         q1 = q1/DESIRED_SIZE
