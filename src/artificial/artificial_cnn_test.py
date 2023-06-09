@@ -90,7 +90,7 @@ model.fc = nn.Sequential(
 )
 # Moving the model to the device (GPU/CPU)
 model = model.to(device)
-model.load_state_dict(torch.load(os.getcwd() + '/model.pth'))
+model.load_state_dict(torch.load(os.getcwd() + '/model0.109-06-2023.pth'))
 model.eval()
 
 # image it is the first image from the images batch
@@ -116,7 +116,7 @@ image = image[0][0]
 
 print('>>> image shape:', image.shape)
 print('>>> label :', label[0])
-print('type labels', type(label[0]))
+print('>>> predictions:', predictions[0])
 
 label = PreProcess.deprocess(image=image, label=label[0].tolist())
 predictions = PreProcess.deprocess(image=image, label=predictions[0].tolist())
