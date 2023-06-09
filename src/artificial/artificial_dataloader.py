@@ -125,6 +125,7 @@ class ArtificialLidarDatasetCNN(Dataset):
         b1 = labels[2]
         b2 = labels[3]
 
+        print('sanity test: ', m1, m2, b1, b2)
         #! NORMALIZATION WITH m1, m2, b1, b2
         # # convert m1 to azimuth to angles
         # # y = m*x + b
@@ -169,19 +170,6 @@ class ArtificialLidarDatasetCNN(Dataset):
         # return [azimuth1, azimuth2, b1, b2]
 
         #! NORMALIZATION WITH w1, w2, q1, q2
-
-        # check with abs(m1) its <1, that will get us some problems
-        if abs(m1) < 1:
-            # round to 1: -0.999.. -> -1 and 0.999.. -> 1
-            m1 = round(m1)
-        elif m1 == 0:
-            m1 = 0.0001 # just to be safe
-
-        if abs(m2) < 1:
-            # round to 1: -0.999.. -> -1 and 0.999.. -> 1
-            m2 = round(m2)
-        elif m2 == 0:
-            m2 = 0.0001
         
         # now we can normalize:
         b1 = b1 - 224 # matplotlib 0 its in the top
@@ -194,6 +182,8 @@ class ArtificialLidarDatasetCNN(Dataset):
 
         q1 = q1/DESIRED_SIZE
         q2 = q2/DESIRED_SIZE
+        w1 = w1/DESIRED_SIZE
+        w2 = w2/DESIRED_SIZE
 
         return [w1, w2, q1, q2]
 

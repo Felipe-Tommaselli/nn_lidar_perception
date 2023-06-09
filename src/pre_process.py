@@ -181,7 +181,9 @@ class PreProcess:
         
         q1 = q1*DESIRED_SIZE
         q2 = q2*DESIRED_SIZE
-
+        w1 = w1*DESIRED_SIZE
+        w2 = w2*DESIRED_SIZE
+        
         print('-'*20)
         print('wq -> mb')
         # print(f'labels w1={w1}, w2={w2}, q1={q1}, q2={q2}')
