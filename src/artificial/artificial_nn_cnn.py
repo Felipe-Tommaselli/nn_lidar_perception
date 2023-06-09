@@ -16,8 +16,7 @@ import torch
 import numpy as np
 import random
 import matplotlib.pyplot as plt
-import datetime
-
+from datetime import datetime 
 
 import torch.nn as nn
 import torch.optim as optim
@@ -299,7 +298,7 @@ if __name__ == '__main__':
     ############ PARAMETERS ############    
     epochs = 20
     lr = 0.1 # TODO: test different learning rates
-    step_size = 10 # TODO: test different step sizes
+    step_size = 6 # TODO: test different step sizes
     gamma = 0.1
     batch_size = 96
 
