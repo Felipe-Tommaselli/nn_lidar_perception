@@ -94,17 +94,17 @@ class ArtificialLidarDatasetCNN(Dataset):
 
         labels = ArtificialLidarDatasetCNN.process_label(labels)
         
-        # labels_dep = PreProcess.deprocess(image=self.image, label=labels)        
-        # m1, m2, b1, b2 = labels_dep
-        # x1 = np.arange(0, image.shape[0], 1)
-        # x2 = np.arange(0, image.shape[0], 1)
-        # y1 = m1*x1 + b1
-        # y2 = m2*x2 + b2
-        # plt.plot(x1, y1, 'r')
-        # plt.plot(x2, y2, 'r')
-        # plt.title(f'step={step}, i={i}, j={j}')
-        # plt.imshow(image, cmap='gray')
-        # plt.show()
+        labels_dep = PreProcess.deprocess(image=self.image, label=labels)        
+        m1, m2, b1, b2 = labels_dep
+        x1 = np.arange(0, image.shape[0], 1)
+        x2 = np.arange(0, image.shape[0], 1)
+        y1 = m1*x1 + b1
+        y2 = m2*x2 + b2
+        plt.plot(x1, y1, 'r')
+        plt.plot(x2, y2, 'r')
+        plt.title(f'step={step}, i={i}, j={j}')
+        plt.imshow(image, cmap='gray')
+        plt.show()
 
         return {"labels": labels, "image": image, "angle": 0}
 
@@ -118,49 +118,78 @@ class ArtificialLidarDatasetCNN(Dataset):
         m1 = labels[0]
         m2 = labels[1]
 
-        # convert m1 to azimuth to angles
-        # y = m*x + b
-        # azimuth it is the angle of m1 in radians with atan 
-        # print('-'*20)
-        # print('m1:', m1)
-
-        #TODO: Find some way to normalize the azimuth without the atan problem             
-        # azimuth1 = np.arctan(m1)
-        # azimuth2 = np.arctan(m2)
-        # # print('azimuth1:', azimuth1)
-
-        # # normalize the azimuth (-pi to pi) -> (-1 to 1)
-        # azimuth1 = azimuth1 / np.pi
-        # azimuth2 = azimuth2 / np.pi        
-
-        azimuth1 = m1/DESIRED_SIZE  
-        azimuth2 = m2/DESIRED_SIZE
-
         # NORMALIZE THE DISTANCE 1 AND 2
-        d1 = labels[2]
-        d2 = labels[3]
+        b1 = labels[2]
+        b2 = labels[3]
 
-        # since the data it is compatible to the image size we will relate as:
-        # image = IMAGE_WIDTH x IMAGE_HEIGHT
-        # as y = a*x + b -> b = y - a*x
-        # note that for this step we are already working with the cropped image
-        # so we will use DESRIED_SIZE
-        # and, the MAX_M for square cases is = DESIRED_SIZE
-        # -------------------------
-        # where the minimum distance is when:
-        # y = 0 and x = MAX_WIDTH with m = MAX_M
-        # so b = 0 - (MAX_M)*MAX_WIDTH <- minimum distance
-        MAX_M = DESIRED_SIZE
-        dmin = - MAX_M * DESIRED_SIZE
-        # and the maximum distance is when:
-        # y = MAX_HEIGTH and x = MAX_WIDTH with m = MIN_M
-        # so b = MAX_HEIGHT - (MIN_M)*MAX_WIDTH <- maximum distance
-        dmax = DESIRED_SIZE - (-MAX_M)*DESIRED_SIZE
+        #! NORMALIZATION WITH m1, m2, b1, b2
+        # # convert m1 to azimuth to angles
+        # # y = m*x + b
+        # # azimuth it is the angle of m1 in radians with atan 
+        # # print('-'*20)
+        # # print('m1:', m1)
 
-        # normalize the distance (-291600 to 292140) -> (-1 to 1)
-        d1 = 2*((d1 - dmin)/(dmax - dmin)) - 1
-        d2 = 2*((d2 - dmin)/(dmax - dmin)) - 1
+        # #TODO: Find some way to normalize the azimuth without the atan problem             
+        # # azimuth1 = np.arctan(m1)
+        # # azimuth2 = np.arctan(m2)
+        # # # print('azimuth1:', azimuth1)
 
-        return [azimuth1, azimuth2, d1, d2]
+        # # # normalize the azimuth (-pi to pi) -> (-1 to 1)
+        # # azimuth1 = azimuth1 / np.pi
+        # # azimuth2 = azimuth2 / np.pi        
+
+        #* alternative without atan
+        # azimuth1 = m1/DESIRED_SIZE  
+        # azimuth2 = m2/DESIRED_SIZE
+
+        # # since the data it is compatible to the image size we will relate as:
+        # # image = IMAGE_WIDTH x IMAGE_HEIGHT
+        # # as y = a*x + b -> b = y - a*x
+        # # note that for this step we are already working with the cropped image
+        # # so we will use DESRIED_SIZE
+        # # and, the MAX_M for square cases is = DESIRED_SIZE
+        # # -------------------------
+        # # where the minimum distance is when:
+        # # y = 0 and x = MAX_WIDTH with m = MAX_M
+        # # so b = 0 - (MAX_M)*MAX_WIDTH <- minimum distance
+        # MAX_M = DESIRED_SIZE
+        # dmin = - MAX_M * DESIRED_SIZE
+        # # and the maximum distance is when:
+        # # y = MAX_HEIGTH and x = MAX_WIDTH with m = MIN_M
+        # # so b = MAX_HEIGHT - (MIN_M)*MAX_WIDTH <- maximum distance
+        # dmax = DESIRED_SIZE - (-MAX_M)*DESIRED_SIZE
+
+        # # normalize the distance (-291600 to 292140) -> (-1 to 1)
+        # b1 = 2*((b1 - dmin)/(dmax - dmin)) - 1
+        # b2 = 2*((b2 - dmin)/(dmax - dmin)) - 1
+
+        # return [azimuth1, azimuth2, b1, b2]
+
+        #! NORMALIZATION WITH w1, w2, q1, q2
+
+        # check with abs(m1) its <1, that will get us some problems
+        if abs(m1) < 1:
+            # round to 1: -0.999.. -> -1 and 0.999.. -> 1
+            m1 = round(m1)
+        elif m1 == 0:
+            m1 = 0.0001 # just to be safe
+
+        if abs(m2) < 1:
+            # round to 1: -0.999.. -> -1 and 0.999.. -> 1
+            m2 = round(m2)
+        elif m2 == 0:
+            m2 = 0.0001
+        
+        # now we can normalize:
+        b1 = b1 - 224 # matplotlib 0 its in the top
+        b2 = b2 - 224
+        
+        w1, w2, q1, q2 = PreProcess.extract_label([m1, m2, b1, b2])
+
+        q1 = q1/DESIRED_SIZE
+        q2 = q2/DESIRED_SIZE
+
+        return [w1, w2, q1, q2]
+
 
 

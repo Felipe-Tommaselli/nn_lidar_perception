@@ -155,26 +155,69 @@ class PreProcess:
         ''' Returns the deprocessed image and label. '''
 
         # DEPROCESS THE LABEL
+        
+        #! NORMALIZATION WITH m1, m2, b1, b2
+        # #TODO: Find some way to normalize the azimuth without the atan problem
+        # # azimuths 1 e 2: tangent of the azimuth
+        # # m1 = np.tan(np.pi * label[0])
+        # # m2 = np.tan(np.pi * label[1])
 
-        #TODO: Find some way to normalize the azimuth without the atan problem
-        # azimuths 1 e 2: tangent of the azimuth
-        # m1 = np.tan(np.pi * label[0])
-        # m2 = np.tan(np.pi * label[1])
+        # m1 = label[0]*DESIRED_SIZE
+        # m2 = label[1]*DESIRED_SIZE
 
-        m1 = label[0]*DESIRED_SIZE
-        m2 = label[1]*DESIRED_SIZE
+        # # distances 1 e 2: image borders normalization
+        # MAX_M = DESIRED_SIZE
+        # dmin = - MAX_M * DESIRED_SIZE
+        # dmax = DESIRED_SIZE - (-MAX_M)*DESIRED_SIZE
 
-        # distances 1 e 2: image borders normalization
-        MAX_M = DESIRED_SIZE
-        dmin = - MAX_M * DESIRED_SIZE
-        dmax = DESIRED_SIZE - (-MAX_M)*DESIRED_SIZE
+        # d1 = (dmax - dmin)*((label[2] + 1)/2) + dmin
+        # d2 = (dmax - dmin)*((label[3] + 1)/2) + dmin
+        # label = [m1, m2, d1, d2]
 
-        d1 = (dmax - dmin)*((label[2] + 1)/2) + dmin
-        d2 = (dmax - dmin)*((label[3] + 1)/2) + dmin
+        #! NORMALIZATION WITH w1, w2, q1, q2
+        # extract_label reverse
+        
+        w1, w2, q1, q2 = label
+        
+        q1 = q1*DESIRED_SIZE
+        q2 = q2*DESIRED_SIZE
 
-        label = [m1, m2, d1, d2]
+        print(f'labels w1={w1}, w2={w2}, q1={q1}, q2={q2}')
+        m1, m2, b1, b2 = PreProcess.extract_label([w1, w2, q1, q2])
+
+        b1 = b1 + 224
+        b2 = b2 + 224
+
+        label = [m1, m2, b1, b2]
 
         return label
+
+
+    @staticmethod
+    def extract_label(labels):
+        ''' This function aims to extract infos more relevants for the neural network. 
+        For now, the only thing that gave performance to the cnn was "b" intersection in 
+        a differente parametrization. '''
+
+        m1, m2, b1, b2 = labels
+
+        # imagine: y = m*x + b, but we dont want b that crosses the x = 0 line
+        # why? because he can be -291600 to 292140, with that, the network will have to
+        # learn a lot of things that are not relevant for the problem. 
+        # we can parametrize the line as: y = m*x + b, but we want b that crosses
+        # the y = 0 line. For that we can simply change the parametrization to:
+        # x = w*y + q (where w = 1/m and q = -b/m). For now, it is better 
+
+        w1 = 1/m1
+        w2 = 1/m2
+        q1 = -b1/m1
+        q2 = -b2/m2
+
+        # note that the in (process) and the out (deprocess) are the same operations
+        # we are using the same operations for process and deprocess :)
+
+        return [w1, w2, q1, q2]
+
 
     @staticmethod
     def scale_labels(image_size, labels, resize_factor):
