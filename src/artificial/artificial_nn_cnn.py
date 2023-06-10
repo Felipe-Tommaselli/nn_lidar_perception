@@ -336,14 +336,14 @@ if __name__ == '__main__':
     num_features = model.head.in_features
 
     # Substitua '1' pelo número de canais de entrada desejado
-    model.patch_embed.conv = nn.Conv2d(1, model.patch_embed.conv.out_channels, 
-                                    kernel_size=model.patch_embed.conv.kernel_size, 
-                                    stride=model.patch_embed.conv.stride, 
-                                    padding=model.patch_embed.conv.padding, 
-                                    bias=model.patch_embed.conv.bias)
+    model.patch_embed.proj = nn.Conv2d(1, model.patch_embed.proj.out_channels, 
+                                    kernel_size=model.patch_embed.proj.kernel_size, 
+                                    stride=model.patch_embed.proj.stride, 
+                                    padding=model.patch_embed.proj.padding, 
+                                    bias=model.patch_embed.proj.bias)
 
     # Adicione o Batch Normalization após a primeira camada convolucional
-    model.patch_embed.norm = nn.BatchNorm2d(model.patch_embed.conv.out_channels)
+    model.patch_embed.norm = nn.BatchNorm2d(model.patch_embed.proj.out_channels)
 
     # Substitua '4' pelo número de classes de saída desejado
     model.head = nn.Linear(num_features, 4)
