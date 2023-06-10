@@ -339,15 +339,14 @@ if __name__ == '__main__':
     model.patch_embed.proj = nn.Conv2d(1, model.patch_embed.proj.out_channels, 
                                     kernel_size=model.patch_embed.proj.kernel_size, 
                                     stride=model.patch_embed.proj.stride, 
-                                    padding=model.patch_embed.proj.padding, 
-                                    bias=model.patch_embed.proj.bias)
+                                    padding=model.patch_embed.proj.padding)
 
     # Adicione o Batch Normalization após a primeira camada convolucional
     model.patch_embed.norm = nn.BatchNorm2d(model.patch_embed.proj.out_channels)
 
     # Substitua '4' pelo número de classes de saída desejado
     model.head = nn.Linear(num_features, 4)
-
+    
     # Moving the model to the device (GPU/CPU)
     model = model.to(device)
     ############ NETWORK ############
