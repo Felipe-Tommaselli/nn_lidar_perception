@@ -332,7 +332,7 @@ if __name__ == '__main__':
     #     nn.Linear(256, 4)
     # )
 
-    model = timm.create_model('vit_large_patch16_384', pretrained=True)
+    model = timm.create_model('vit_base_patch16_224', pretrained=True)
     num_features = model.head.in_features
 
     # Substitua '1' pelo número de canais de entrada desejado
@@ -346,7 +346,6 @@ if __name__ == '__main__':
 
     # Substitua '4' pelo número de classes de saída desejado
     model.head = nn.Linear(num_features, 4)
-    
     # Moving the model to the device (GPU/CPU)
     model = model.to(device)
     ############ NETWORK ############
