@@ -311,34 +311,34 @@ if __name__ == '__main__':
 
     ############ MODEL ############
     # model = NetworkCNN(ResidualBlock).to(device)
-    # model = models.resnet18()
-    # model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
+    model = models.resnet152(pretrained=True)
+    model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
-    # num_ftrs = model.fc.in_features
-    # # Adding batch normalization and an additional convolutional layer
-    # model.fc = nn.Sequential(
-    #     nn.Linear(num_ftrs, 512),
-    #     nn.BatchNorm1d(512),
-    #     nn.ReLU(inplace=True),
-    #     nn.Linear(512, 256),
-    #     nn.BatchNorm1d(256),
-    #     nn.ReLU(inplace=True),
-    #     nn.Linear(256, 4)
-    # )
+    num_ftrs = model.fc.in_features
+    # Adding batch normalization and an additional convolutional layer
+    model.fc = nn.Sequential(
+        nn.Linear(num_ftrs, 512),
+        nn.BatchNorm1d(512),
+        nn.ReLU(inplace=True),
+        nn.Linear(512, 256),
+        nn.BatchNorm1d(256),
+        nn.ReLU(inplace=True),
+        nn.Linear(256, 4)
+    )
 
     # Carregar o modelo ViT-Base com pesos pré-treinados
-# Carregar o modelo DeiT-Small pré-treinado
-    model = models.resnet152(pretrained=True)
-    
-    # Substituir a primeira camada convolucional para acomodar imagens de um canal de cor
-    model.patch_embed.conv = nn.Conv2d(1, model.patch_embed.conv.out_channels, 
-                                    kernel_size=model.patch_embed.conv.kernel_size,
-                                    stride=model.patch_embed.conv.stride,
-                                    padding=model.patch_embed.conv.padding)
+# # Carregar o modelo DeiT-Small pré-treinado
+#     model = models.deit_small(pretrained=True)
 
-    # Definir a camada linear de saída para a sua tarefa específica
-    num_features = model.head.in_features
-    model.head = nn.Linear(num_features, 4)
+#     # Substituir a primeira camada convolucional para acomodar imagens de um canal de cor
+#     model.patch_embed.conv = nn.Conv2d(1, model.patch_embed.conv.out_channels, 
+#                                     kernel_size=model.patch_embed.conv.kernel_size,
+#                                     stride=model.patch_embed.conv.stride,
+#                                     padding=model.patch_embed.conv.padding)
+
+#     # Definir a camada linear de saída para a sua tarefa específica
+#     num_features = model.head.in_features
+#     model.head = nn.Linear(num_features, 4)
 
     # Moving the model to the device (GPU/CPU)
     model = model.to(device)
