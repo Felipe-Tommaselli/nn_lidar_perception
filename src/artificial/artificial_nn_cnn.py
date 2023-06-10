@@ -314,12 +314,6 @@ if __name__ == '__main__':
     # model = models.resnet18()
     # model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
-    # # # Freezing all the layers except the last one
-    # # for param in model.parameters():
-    # #     param.requires_grad = False
-    # # for param in model.fc.parameters():
-    # #     param.requires_grad = True
-
     # num_ftrs = model.fc.in_features
     # # Adding batch normalization and an additional convolutional layer
     # model.fc = nn.Sequential(
@@ -332,19 +326,18 @@ if __name__ == '__main__':
     #     nn.Linear(256, 4)
     # )
 
-    model = timm.create_model('vit_base_patch16_224', pretrained=True)
-    num_features = model.head.in_features
 
-    # Replace '3' with '1' to indicate a single-channel input
-    model.patch_embed.proj = nn.Conv2d(1, model.patch_embed.proj.out_channels,
-                                    kernel_size=model.patch_embed.proj.kernel_size,
-                                    stride=model.patch_embed.proj.stride,
+    # Carregar o modelo DeiT com pesos pré-treinados
+    model = timm.create_model('deit_base_patch16_224', pretrained=True)
+
+    # Modificar a primeira camada convolucional para aceitar 1 canal de cor
+    model.patch_embed.proj = nn.Conv2d(1, model.patch_embed.proj.out_channels, 
+                                    kernel_size=model.patch_embed.proj.kernel_size, 
+                                    stride=model.patch_embed.proj.stride, 
                                     padding=model.patch_embed.proj.padding)
 
-    # Add Batch Normalization after the first convolutional layer
-    model.patch_embed.norm = nn.BatchNorm2d(model.patch_embed.proj.out_channels)
-
-    # Replace '4' with the desired number of output classes
+    # Modificar a camada de classificação para se adequar ao número de classes desejado (4 no seu caso)
+    num_features = model.head.in_features
     model.head = nn.Linear(num_features, 4)
 
     # Moving the model to the device (GPU/CPU)
