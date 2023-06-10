@@ -315,6 +315,7 @@ if __name__ == '__main__':
     # model = models.resnet18()
 
     model = timm.create_model('vit_large_patch16_224', pretrained=True)
+    num_features = model.pre_logits.in_features
     model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
     # # Freezing all the layers except the last one
