@@ -335,17 +335,18 @@ if __name__ == '__main__':
     model = timm.create_model('vit_base_patch16_224', pretrained=True)
     num_features = model.head.in_features
 
-    # Substitua '1' pelo número de canais de entrada desejado
-    model.patch_embed.proj = nn.Conv2d(1, model.patch_embed.proj.out_channels, 
-                                    kernel_size=model.patch_embed.proj.kernel_size, 
-                                    stride=model.patch_embed.proj.stride, 
+    # Replace '3' with '1' to indicate a single-channel input
+    model.patch_embed.proj = nn.Conv2d(1, model.patch_embed.proj.out_channels,
+                                    kernel_size=model.patch_embed.proj.kernel_size,
+                                    stride=model.patch_embed.proj.stride,
                                     padding=model.patch_embed.proj.padding)
 
-    # Adicione o Batch Normalization após a primeira camada convolucional
+    # Add Batch Normalization after the first convolutional layer
     model.patch_embed.norm = nn.BatchNorm2d(model.patch_embed.proj.out_channels)
 
-    # Substitua '4' pelo número de classes de saída desejado
+    # Replace '4' with the desired number of output classes
     model.head = nn.Linear(num_features, 4)
+
     # Moving the model to the device (GPU/CPU)
     model = model.to(device)
     ############ NETWORK ############
