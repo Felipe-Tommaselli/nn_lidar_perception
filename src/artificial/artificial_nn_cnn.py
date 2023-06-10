@@ -25,6 +25,7 @@ from torchvision.transforms import functional as F
 from torch.utils.data import Dataset, DataLoader, random_split, ConcatDataset, Subset
 from torchsummary import summary
 from torchvision import transforms
+import torchvision.transforms as transforms
 from torchvision import datasets
 import torchvision.models as models
 from PIL import Image
@@ -298,7 +299,7 @@ if __name__ == '__main__':
 
     ############ PARAMETERS ############    
     epochs = 25
-    lr = 0.1 # TODO: test different learning rates
+    lr = 0.01 # TODO: test different learning rates
     step_size = 5 # TODO: test different step sizes
     gamma = 0.05
     batch_size = 128
@@ -309,7 +310,8 @@ if __name__ == '__main__':
 
     ############ MODEL ############
     # model = NetworkCNN(ResidualBlock).to(device)
-    model = models.resnet18()
+    # model = models.resnet18()
+    model = models.vit_large_patch16_224(pretrained=True)
     model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
     # # Freezing all the layers except the last one
