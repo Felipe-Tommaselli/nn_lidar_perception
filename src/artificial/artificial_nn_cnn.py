@@ -25,12 +25,9 @@ from torchvision.transforms import functional as F
 from torch.utils.data import Dataset, DataLoader, random_split, ConcatDataset, Subset
 from torchsummary import summary
 from torchvision import transforms
-import torchvision.transforms as transforms
 from torchvision import datasets
 import torchvision.models as models
 from PIL import Image
-
-import timm
 
 torch.cuda.empty_cache()
 
@@ -313,28 +310,42 @@ if __name__ == '__main__':
     ############ MODEL ############
     # model = NetworkCNN(ResidualBlock).to(device)
     # model = models.resnet18()
+    # model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
-    model = timm.create_model('vit_large_patch16_224', pretrained=True)
-    num_features = model.pre_logits.in_features
-    model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
+    # # # Freezing all the layers except the last one
+    # # for param in model.parameters():
+    # #     param.requires_grad = False
+    # # for param in model.fc.parameters():
+    # #     param.requires_grad = True
 
-    # # Freezing all the layers except the last one
-    # for param in model.parameters():
-    #     param.requires_grad = False
-    # for param in model.fc.parameters():
-    #     param.requires_grad = True
+    # num_ftrs = model.fc.in_features
+    # # Adding batch normalization and an additional convolutional layer
+    # model.fc = nn.Sequential(
+    #     nn.Linear(num_ftrs, 512),
+    #     nn.BatchNorm1d(512),
+    #     nn.ReLU(inplace=True),
+    #     nn.Linear(512, 256),
+    #     nn.BatchNorm1d(256),
+    #     nn.ReLU(inplace=True),
+    #     nn.Linear(256, 4)
+    # )
 
-    num_ftrs = model.fc.in_features
-    # Adding batch normalization and an additional convolutional layer
-    model.fc = nn.Sequential(
-        nn.Linear(num_ftrs, 512),
-        nn.BatchNorm1d(512),
-        nn.ReLU(inplace=True),
-        nn.Linear(512, 256),
-        nn.BatchNorm1d(256),
-        nn.ReLU(inplace=True),
-        nn.Linear(256, 4)
-    )
+    model = timm.create_model('vit_large_patch16_384', pretrained=True)
+    num_features = model.head.in_features
+
+    # Substitua '1' pelo número de canais de entrada desejado
+    model.patch_embed.conv = nn.Conv2d(1, model.patch_embed.conv.out_channels, 
+                                    kernel_size=model.patch_embed.conv.kernel_size, 
+                                    stride=model.patch_embed.conv.stride, 
+                                    padding=model.patch_embed.conv.padding, 
+                                    bias=model.patch_embed.conv.bias)
+
+    # Adicione o Batch Normalization após a primeira camada convolucional
+    model.patch_embed.norm = nn.BatchNorm2d(model.patch_embed.conv.out_channels)
+
+    # Substitua '4' pelo número de classes de saída desejado
+    model.head = nn.Linear(num_features, 4)
+
     # Moving the model to the device (GPU/CPU)
     model = model.to(device)
     ############ NETWORK ############
