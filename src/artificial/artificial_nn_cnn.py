@@ -328,8 +328,8 @@ if __name__ == '__main__':
 
     # Carregar o modelo ViT-Base com pesos pré-treinados
 # Carregar o modelo DeiT-Small pré-treinado
-    model = models.deit_small(pretrained=True)
-
+    model = models.resnet152(pretrained=True)
+    
     # Substituir a primeira camada convolucional para acomodar imagens de um canal de cor
     model.patch_embed.conv = nn.Conv2d(1, model.patch_embed.conv.out_channels, 
                                     kernel_size=model.patch_embed.conv.kernel_size,
