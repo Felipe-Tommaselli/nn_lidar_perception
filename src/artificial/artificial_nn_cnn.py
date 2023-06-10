@@ -326,8 +326,8 @@ if __name__ == '__main__':
     #     nn.Linear(256, 4)
     # )
 
-    # Carregar o modelo ViT-Lite com pesos pré-treinados
-    model = timm.create_model('vit_lite_patch16_224', pretrained=True)
+    # Carregar o modelo ViT-Base com pesos pré-treinados
+    model = timm.create_model('vit_base_patch16_224', pretrained=True)
 
     # Modificar a primeira camada convolucional para aceitar 1 canal de cor
     model.patch_embed.proj = nn.Conv2d(1, model.patch_embed.proj.out_channels,
