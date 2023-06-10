@@ -303,7 +303,7 @@ if __name__ == '__main__':
     lr = 0.01 # TODO: test different learning rates
     step_size = 5 # TODO: test different step sizes
     gamma = 0.05
-    batch_size = 64
+    batch_size = 96
 
     ############ DATA ############
     csv_path = "../../artificial_data/tags/Artificial_Label_Data.csv"
@@ -327,13 +327,13 @@ if __name__ == '__main__':
     # )
 
 
-    # Carregar o modelo DeiT com pesos pré-treinados
-    model = timm.create_model('deit_base_patch16_224', pretrained=True)
+    # Carregar o modelo ViT-Lite com pesos pré-treinados
+    model = vits.vit_lite_patch16_224(pretrained=True)
 
     # Modificar a primeira camada convolucional para aceitar 1 canal de cor
-    model.patch_embed.proj = nn.Conv2d(1, model.patch_embed.proj.out_channels, 
-                                    kernel_size=model.patch_embed.proj.kernel_size, 
-                                    stride=model.patch_embed.proj.stride, 
+    model.patch_embed.proj = nn.Conv2d(1, model.patch_embed.proj.out_channels,
+                                    kernel_size=model.patch_embed.proj.kernel_size,
+                                    stride=model.patch_embed.proj.stride,
                                     padding=model.patch_embed.proj.padding)
 
     # Modificar a camada de classificação para se adequar ao número de classes desejado (4 no seu caso)
