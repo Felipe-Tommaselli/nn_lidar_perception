@@ -297,11 +297,11 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     ############ PARAMETERS ############    
-    epochs = 20
+    epochs = 25
     lr = 0.1 # TODO: test different learning rates
-    step_size = 6 # TODO: test different step sizes
-    gamma = 0.1
-    batch_size = 96
+    step_size = 5 # TODO: test different step sizes
+    gamma = 0.05
+    batch_size = 128
 
     ############ DATA ############
     csv_path = "../../artificial_data/tags/Artificial_Label_Data.csv"
@@ -332,7 +332,7 @@ if __name__ == '__main__':
     # Moving the model to the device (GPU/CPU)
     model = model.to(device)
     ############ NETWORK ############
-    criterion = nn.MSELoss() # TODO: test different loss functions
+    criterion = nn.L1Loss() # TODO: test different loss functions
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=gamma)
 
