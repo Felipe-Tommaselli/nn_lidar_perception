@@ -30,6 +30,8 @@ from torchvision import datasets
 import torchvision.models as models
 from PIL import Image
 
+import timm
+
 torch.cuda.empty_cache()
 
 from artificial_dataloader import *
@@ -311,7 +313,8 @@ if __name__ == '__main__':
     ############ MODEL ############
     # model = NetworkCNN(ResidualBlock).to(device)
     # model = models.resnet18()
-    model = models.vit_large_patch16_224(pretrained=True)
+
+    model = timm.create_model('vit_large_patch16_224', pretrained=True)
     model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
     # # Freezing all the layers except the last one
