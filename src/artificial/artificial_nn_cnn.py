@@ -29,6 +29,8 @@ from torchvision import datasets
 import torchvision.models as models
 from PIL import Image
 
+import timm
+
 torch.cuda.empty_cache()
 
 from artificial_dataloader import *
