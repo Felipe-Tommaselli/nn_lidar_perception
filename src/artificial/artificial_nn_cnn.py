@@ -303,7 +303,7 @@ if __name__ == '__main__':
     lr = 0.01 # TODO: test different learning rates
     step_size = 5 # TODO: test different step sizes
     gamma = 0.05
-    batch_size = 64
+    batch_size = 96
 
     ############ DATA ############
     csv_path = "../../artificial_data/tags/Artificial_Label_Data.csv"
@@ -311,7 +311,7 @@ if __name__ == '__main__':
 
     ############ MODEL ############
     # model = NetworkCNN(ResidualBlock).to(device)
-    model = models.resnet101(pretrained=True)
+    model = models.resnet50(pretrained=True)
     model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
     num_ftrs = model.fc.in_features
