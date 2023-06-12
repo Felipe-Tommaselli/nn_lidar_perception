@@ -106,6 +106,10 @@ class ArtificialLidarDatasetCNN(Dataset):
         # plt.imshow(image, cmap='gray')
         # plt.show()
 
+        #! suppose m1 = m2
+        w1, w2, q1, q2 = labels
+        labels = [w1, q1, q2] # removing w2
+
         return {"labels": labels, "image": image, "angle": 0}
 
     @staticmethod

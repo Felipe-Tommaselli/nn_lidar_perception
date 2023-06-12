@@ -154,6 +154,15 @@ class PreProcess:
     def deprocess(image, label):
         ''' Returns the deprocessed image and label. '''
 
+        if len(label) == 3:
+            # we suppose m1 = m2, so we can use the same deprocess
+            print('supposing m1 = m2')   
+            w1, q1, q2 = label
+            w2 = w1
+        elif len(label) == 4:
+            print('not supposing m1 = m2')        
+            w1, w2, q1, q2 = label
+
         # DEPROCESS THE LABEL
         
         #! NORMALIZATION WITH m1, m2, b1, b2
@@ -176,8 +185,6 @@ class PreProcess:
 
         #! NORMALIZATION WITH w1, w2, q1, q2
         # extract_label reverse
-        
-        w1, w2, q1, q2 = label
         
         q1 = q1*DESIRED_SIZE
         q2 = q2*DESIRED_SIZE

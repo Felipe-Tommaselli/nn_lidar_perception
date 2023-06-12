@@ -53,6 +53,16 @@ class RotatedDataset(Subset):
         label = data['labels']
         angle = random.choice(self.angles) 
         
+        key = len(label)
+        if key == 3:
+            # we suppose m1 = m2, so we can use the same deprocess
+            m1, b1, b2 = label
+            m2 = m1
+            label = [m1, m2, b1, b2]
+        elif key == 4:
+            m1, m2, b1, b2 = label
+            label = [m1, m2, b1, b2]
+
         # select the rotation point from the middle or the axis
         if self.rot_type == 'middle': 
             rot_point_np = np.array([112, 112])
@@ -101,7 +111,10 @@ class RotatedDataset(Subset):
         m1r, b1r = np.polyfit(x1_rotated, y1_rotated, 1)
         m2r, b2r = np.polyfit(x2_rotated, y2_rotated, 1)
 
-        rotated_label = [m1r, m2r, b1r, b2r]
+        if key == 3: 
+            rotated_label = [m1r, b1r, b2r]
+        elif key == 4:
+            rotated_label = [m1r, m2r, b1r, b2r]
 
         # fig, ax = plt.subplots(1, 2, figsize=(10, 5))
         # ax[0].plot(x1, y1, color='green')
@@ -323,7 +336,7 @@ if __name__ == '__main__':
         nn.Linear(512, 256),
         nn.BatchNorm1d(256),
         nn.ReLU(inplace=True),
-        nn.Linear(256, 4)
+        nn.Linear(256, 3)
     )
 
     # Carregar o modelo ViT-Base com pesos pré-treinados
