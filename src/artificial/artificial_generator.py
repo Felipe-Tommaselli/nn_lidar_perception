@@ -25,6 +25,7 @@ x_coords = []
 
 # counting the steps
 i, j = 0, 0
+count_step = 0
 
 # rotacionar as retas
 for angle in range(-30, 30, 1):
@@ -36,6 +37,7 @@ for angle in range(-30, 30, 1):
         bound = 1000
     print('bound: ', bound)
     while j < bound:
+        count_step += 1
         j += 1
         #* ################ DEFINITION ################
 
@@ -342,8 +344,8 @@ for angle in range(-30, 30, 1):
         
         #* ################ SAVE LABELS ################
 
-        step = 300*(i-1) + j
-        labels = f'{str(step)}, {m1r}, {m2r}, {b1r}, {b2r}'
+        # step = 300*(i-1) + j
+        labels = f'{str(count_step)}, {m1r}, {m2r}, {b1r}, {b2r}'
 
         if  os.getcwd().split(SLASH)[-1] != 'IC_NN_Lidar':
             os.chdir('../..') #! TROCAR ISSO DEPOIS QUE SAIR DO TEST
@@ -366,10 +368,11 @@ for angle in range(-30, 30, 1):
         if not os.path.exists(folder_class):
             os.makedirs(folder_class)
         # sabe matplotlib plot on folder_class
-        img_name = folder_class + 'image' + str(i) + '_' + str(j) + '.png'
+        # img_name = folder_class + 'image' + str(i) + '_' + str(j) + '.png'
+        img_name = folder_class + 'image' + str(count_step) + '.png'
         plt.savefig(img_name, bbox_inches='tight', pad_inches=0)
-        if step % 100 == 0:
-            print('File saved: ', step)
+        if count_step % 100 == 0:
+            print('File saved: ', count_step)
         
         # Mostrar a imagem na tela
         # plt.show()
