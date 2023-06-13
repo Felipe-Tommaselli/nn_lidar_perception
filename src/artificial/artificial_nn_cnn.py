@@ -324,7 +324,7 @@ if __name__ == '__main__':
 
     ############ MODEL ############
     # model = NetworkCNN(ResidualBlock).to(device)
-    model = models.resnet50(pretrained=True)
+    model = models.resnet34(pretrained=True)
     model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
     num_ftrs = model.fc.in_features
