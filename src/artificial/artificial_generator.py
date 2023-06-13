@@ -348,7 +348,7 @@ for angle in range(-30, 30, 1):
         if  os.getcwd().split(SLASH)[-1] != 'IC_NN_Lidar':
             os.chdir('../..') #! TROCAR ISSO DEPOIS QUE SAIR DO TEST
         path = os.getcwd() + SLASH + str(''.join(['artificial_data', SLASH, 'tags'])) + SLASH
-        label_file_path = os.path.join(path, 'Artificial_Label_Data.csv') 
+        label_file_path = os.path.join(path, 'Artificial_Label_Data2.csv') 
 
         label_file = open(label_file_path, 'r')
         text = label_file.readlines()
