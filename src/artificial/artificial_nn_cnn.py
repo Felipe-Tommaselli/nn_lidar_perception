@@ -319,7 +319,7 @@ if __name__ == '__main__':
     batch_size = 96
 
     ############ DATA ############
-    csv_path = "../../artificial_data/tags/Artificial_Label_Data.csv"
+    csv_path = "../../artificial_data/tags/Artificial_Label_Data2.csv"
     train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path)
 
     ############ MODEL ############
