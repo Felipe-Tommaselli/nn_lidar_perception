@@ -27,10 +27,14 @@ x_coords = []
 i, j = 0, 0
 
 # rotacionar as retas
-for angle in range(-45, 45, 1):
+for angle in range(-30, 30, 1):
     i+=1
     j = 0
-    while j < 300:
+    if angle < -15 or angle > 15:
+        bound = 500
+    else: 
+        bound = 1000
+    while j < bound:
         j += 1
         #* ################ DEFINITION ################
 
@@ -356,7 +360,7 @@ for angle in range(-45, 45, 1):
         # copy the image on the step to the folder of the images that are already classified
         if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..') 
-        folder_class = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train' + SLASH
+        folder_class = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train2' + SLASH
 
         if not os.path.exists(folder_class):
             os.makedirs(folder_class)
