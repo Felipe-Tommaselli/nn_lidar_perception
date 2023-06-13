@@ -34,6 +34,7 @@ for angle in range(-30, 30, 1):
         bound = 500
     else: 
         bound = 1000
+    print('bound: ', bound)
     while j < bound:
         j += 1
         #* ################ DEFINITION ################
