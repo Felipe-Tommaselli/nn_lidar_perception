@@ -205,7 +205,6 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
             images, labels = data['image'], data['labels']
 
             print('labels:', labels)
-            print('labels shpae:', labels.shape)
             # convert to float32 and send it to the device
             # image dimension: (batch, channels, height, width)
             images = images.type(torch.float32).to(device)
@@ -219,7 +218,7 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
             # convert to format: tensor([[value1, value2, value3, value4], [value1, value2, value3, value4], ...])
             # this is: labels for each image, "batch" times -> shape: (batch, 4)
             labels = labels.permute(1, 0)    
-
+            print('labels permute:', labels)
             outputs = model(images)
             loss = criterion(outputs, labels) 
             optimizer.zero_grad()
