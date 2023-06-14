@@ -34,6 +34,7 @@ def getData(csv_path, batch_size=7, num_workers=0):
     # get one image shape from the train_data
     for i, data in enumerate(train_data):
         print(f'images shape: {data["image"].shape}')
+        print(f'label length: {len(data["labels"])}')
         break
     print('-'*65)
 
@@ -70,12 +71,6 @@ labels = labels.permute(1, 0)
 model = models.resnet18()
 model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
-# # Freezing all the layers except the last one
-# for param in model.parameters():
-#     param.requires_grad = False
-# for param in model.fc.parameters():
-#     param.requires_grad = True
-
 num_ftrs = model.fc.in_features
 # Adding batch normalization and an additional convolutional layer
 model.fc = nn.Sequential(
@@ -85,11 +80,13 @@ model.fc = nn.Sequential(
     nn.Linear(512, 256),
     nn.BatchNorm1d(256),
     nn.ReLU(inplace=True),
-    nn.Linear(256, 3)
+    nn.Linear(256, 4)  # Alterado para 3 valores de saída
 )
+
 # Moving the model to the device (GPU/CPU)
 model = model.to(device)
-model.load_state_dict(torch.load(os.getcwd() + '/model0.109-06-2023.pth'))
+path = os.getcwd() + '/models/' + '/model0.109-06-2023.pth'
+model.load_state_dict(torch.load(path))
 model.eval()
 
 # image it is the first image from the images batch
@@ -134,8 +131,10 @@ print('predictions (deprocessed):', predictions)
 fig, ax = plt.subplots()
 
 # get the slopes and intercepts
-m1p, b1p, b2p = predictions
-m2 = m1p
+m1p, m2p, b1p, b2p = predictions
+m2p = m1p
+m1p = 10*m1p
+m2p = 10*m2p
 # get the x and y coordinates of the lines
 x1 = np.arange(0, 224)
 y1p = m1p*x1 + b1p
@@ -156,7 +155,7 @@ ax.text(x1_value, y_value, '1', color='red', fontsize=12, verticalalignment='bot
 ax.text(x2_value, y_value, '2', color='red', fontsize=12, verticalalignment='bottom')
 
 # get the slopes and intercepts
-m1, b1, b2 = label
+m1, m2, b1, b2 = label
 m2 = m1
 # get the x and y coordinates of the lines
 x1 = np.arange(0, 224)
