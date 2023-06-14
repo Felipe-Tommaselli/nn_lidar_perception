@@ -373,6 +373,6 @@ if __name__ == '__main__':
     ############ SAVE MODEL ############
     # get day for the name of the file
     day = datetime.now().strftime("%d-%m-%Y")
-    torch.save(model.state_dict(), 'model' + str(lr) + str(day) + '.pth')
+    torch.save(model.state_dict(), 'model' + '_' + str(lr) + '_' + str(day) + '.pth')
     print('Saved PyTorch Model State to model.pth')
 
