@@ -312,7 +312,7 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     ############ PARAMETERS ############    
-    epochs = 2
+    epochs = 1
     lr = 0.01 # TODO: test different learning rates
     step_size = 5 # TODO: test different step sizes
     gamma = 0.05
@@ -374,6 +374,7 @@ if __name__ == '__main__':
     # get day for the name of the file
     day = datetime.now().strftime("%d-%m-%Y")
     path = '/models/' + 'model' + '_' + str(lr).split('.')[1] + '_' + str(day) + '.pth'
+    print(path)
     torch.save(model.state_dict(), path)
     print('Saved PyTorch Model State to model.pth')
 
