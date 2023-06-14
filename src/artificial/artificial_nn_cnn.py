@@ -201,9 +201,11 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
         running_loss = 0.0
 
         for i, data in enumerate(train_loader):
-
+            
             images, labels = data['image'], data['labels']
 
+            print('labels:', labels)
+            print('labels shpae:', labels.shape)
             # convert to float32 and send it to the device
             # image dimension: (batch, channels, height, width)
             images = images.type(torch.float32).to(device)

@@ -64,7 +64,6 @@ labels = torch.stack(labels)
 # convert to format: tensor([[value1, value2, value3, value4], [value1, value2, value3, value4], ...])
 # this is: labels for each image, "batch" times -> shape: (batch, 4)
 labels = labels.permute(1, 0)
-
 ############ MODEL ############
 # load the model from the saved file
 # model = NetworkCNN(ResidualBlock).to(device)
@@ -86,7 +85,7 @@ model.fc = nn.Sequential(
     nn.Linear(512, 256),
     nn.BatchNorm1d(256),
     nn.ReLU(inplace=True),
-    nn.Linear(256, 4)
+    nn.Linear(256, 3)
 )
 # Moving the model to the device (GPU/CPU)
 model = model.to(device)
@@ -135,7 +134,8 @@ print('predictions (deprocessed):', predictions)
 fig, ax = plt.subplots()
 
 # get the slopes and intercepts
-m1p, m2p, b1p, b2p = predictions
+m1p, b1p, b2p = predictions
+m2 = m1p
 # get the x and y coordinates of the lines
 x1 = np.arange(0, 224)
 y1p = m1p*x1 + b1p
@@ -156,7 +156,8 @@ ax.text(x1_value, y_value, '1', color='red', fontsize=12, verticalalignment='bot
 ax.text(x2_value, y_value, '2', color='red', fontsize=12, verticalalignment='bottom')
 
 # get the slopes and intercepts
-m1, m2, b1, b2 = label
+m1, b1, b2 = label
+m2 = m1
 # get the x and y coordinates of the lines
 x1 = np.arange(0, 224)
 y1 = m1*x1 + b1

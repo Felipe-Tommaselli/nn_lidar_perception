@@ -63,7 +63,7 @@ labels = labels.permute(1, 0)
 # load the model from the saved file
 model = NetworkCNN(ResidualBlock)
 model = model.to(device)
-model.load_state_dict(torch.load(os.getcwd() + '/model.pth'))
+model.load_state_dict(torch.load(os.getcwd() + '/model0.0113-06-2023.pth'))
 model.eval()
 
 # image it is the first image from the images batch
