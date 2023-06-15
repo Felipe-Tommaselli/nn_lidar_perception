@@ -142,8 +142,8 @@ x2 = np.arange(0, 224)
 y2p = m2p*x2 + b2p
 
 # plot the lines
-ax.plot(x1, y1p, color='red')
-ax.plot(x2, y2p, color='red')
+# ax.plot(x1, y1p, color='red')
+# ax.plot(x2, y2p, color='red')
 
 # add text labels
 y_value = 50 # fix the y value
@@ -151,8 +151,8 @@ y_value = 50 # fix the y value
 x1_value = (y_value - b1p) / m1p
 x2_value = (y_value - b2p) / m2p
 # add text labels
-ax.text(x1_value, y_value, '1', color='red', fontsize=12, verticalalignment='bottom')
-ax.text(x2_value, y_value, '2', color='red', fontsize=12, verticalalignment='bottom')
+# ax.text(x1_value, y_value, '1', color='red', fontsize=12, verticalalignment='bottom')
+# ax.text(x2_value, y_value, '2', color='red', fontsize=12, verticalalignment='bottom')
 
 # get the slopes and intercepts
 m1, m2, b1, b2 = label
@@ -164,8 +164,8 @@ x2 = np.arange(0, 224)
 y2 = m2*x2 + b2
 
 # plot the lines
-ax.plot(x1, y1, color='green')
-ax.plot(x2, y2, color='green')
+ax.plot(x1, y1, color='red')
+ax.plot(x2, y2, color='red')
 
 # show the image
 ax.imshow(image, cmap='gray')
