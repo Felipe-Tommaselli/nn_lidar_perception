@@ -9,6 +9,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader, random_split
 from torchsummary import summary
+from sklearn.metrics import roc_curve, auc
 
 torch.cuda.empty_cache()
 
