@@ -45,7 +45,7 @@ def getData(csv_path, batch_size=7, num_workers=0):
     return train_data, val_data
 
 # Get the data
-csv_path = "../../artificial_data/tags/Artificial_Label_Data.csv"
+csv_path = "../../artificial_data/tags/Artificial_Label_Data2.csv"
 train_data, val_data = getData(csv_path=csv_path)
 
 # test the model with the validation data for one random image
