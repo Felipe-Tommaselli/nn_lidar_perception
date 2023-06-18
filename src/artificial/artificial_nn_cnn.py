@@ -312,11 +312,11 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     ############ PARAMETERS ############    
-    epochs = 50
+    epochs = 25
     lr = 0.01 # TODO: test different learning rates
-    step_size = 5 # TODO: test different step sizes
+    step_size = 15 # TODO: test different step sizes
     gamma = 0.05
-    batch_size = 110
+    batch_size = 160
 
     ############ DATA ############
     csv_path = "../../artificial_data/tags/Artificial_Label_Data2.csv"
