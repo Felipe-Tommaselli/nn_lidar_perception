@@ -1,7 +1,8 @@
 import os
-import pandas as pd
+import time
 import torch
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from statistics import mean
 import torch.nn as nn
@@ -95,12 +96,21 @@ image = images[0].unsqueeze(0)
 # label it is the first label from the labels batch
 label = labels[0].unsqueeze(0)
 
+# Inicie a contagem de tempo antes da inferência
+start_time = time.time()
+
 # get the model predictions
 predictions = model(image)
+
+# Encerre a contagem de tempo após a inferência
+end_time = time.time()
+
 # convert the predictions to numpy array
 predictions = predictions.to('cpu').cpu().detach().numpy()
 # convert the labels to numpy array
 label = labels.to('cpu').cpu().detach().numpy()
+
+print('Inference time: {:.4f} ms'.format((end_time - start_time)*1000))
 
 # print the predictions and labels
 print('predictions:', predictions)
