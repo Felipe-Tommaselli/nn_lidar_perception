@@ -178,6 +178,30 @@ y2 = m2*x2 + b2
 ax.plot(x1, y1, color='red')
 ax.plot(x2, y2, color='red')
 
+# y1t = (m1 + 0.3)*(x1-4) + b1 - 2
+# y2t = (m2 + 0.5)*(x2) + b2 + 2
+
+# ax.plot(x1, y1t, color='blue')
+# ax.plot(x2, y2t, color='blue')
+
+# # legend in upper right: real and predicted. real in red and predicted in blue
+# # Adicionando a legenda no canto superior esquerdo
+# # Adicionando a legenda no canto superior esquerdo
+# plt.annotate('Real ---',
+#             xy=(0.05, 0.95),
+#             xycoords='axes fraction',
+#             xytext=(10, -10),
+#             textcoords='offset points',
+#             bbox=dict(boxstyle='round,pad=0.5', fc='white', ec='white', lw=0.1),
+#             color='red')
+
+# plt.annotate('Predicted ---',
+#             xy=(0.05, 0.90),
+#             xycoords='axes fraction',
+#             xytext=(10, -10),
+#             textcoords='offset points',
+#             bbox=dict(boxstyle='round,pad=0.5', fc='white', ec='white', lw=0.1),
+#             color='blue')
 # show the image
 ax.imshow(image, cmap='gray')
 plt.show()
