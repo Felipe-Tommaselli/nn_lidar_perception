@@ -118,8 +118,8 @@ class PreProcess:
         # azimuth1 = azimuth1 / np.pi
         # azimuth2 = azimuth2 / np.pi
 
-        m1 = label[0]/DESIRED_SIZE
-        m2 = label[1]/DESIRED_SIZE
+        m1 = labels[0]/DESIRED_SIZE
+        m2 = labels[1]/DESIRED_SIZE
 
         # NORMALIZE THE DISTANCE 1 AND 2
         d1 = labels[2]
@@ -146,7 +146,7 @@ class PreProcess:
         d1 = 2*((d1 - dmin)/(dmax - dmin)) - 1
         d2 = 2*((d2 - dmin)/(dmax - dmin)) - 1
 
-        return [azimuth1, azimuth2, d1, d2]
+        return [m1, m2, d1, d2]
 
     # UTILITIES FUNCTIONS FOR DEPROCESSING AND ROUTINE OPERATIONS
 

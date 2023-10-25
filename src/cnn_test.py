@@ -38,7 +38,7 @@ def getData(csv_path, batch_size=7, num_workers=0):
     return train_data, val_data
 
 # Get the data
-train_data, val_data = getData(csv_path="~/Documents/IC_NN_Lidar/assets/tags/Label_Data.csv")
+train_data, val_data = getData(csv_path="/home/tommaselli/Documents/IC_NN_Lidar/data/tags/Label_Data1.csv")
 
 # test the model with the validation data for one random image
 # showing the image and the predicted and real labels
