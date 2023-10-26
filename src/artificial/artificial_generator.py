@@ -28,13 +28,13 @@ i, j = 0, 0
 count_step = 0
 
 # rotacionar as retas
-for angle in range(-30, 30, 1):
+for angle in range(-30, 31, 1):
     i+=1
     j = 0
     if angle < -15 or angle > 15:
-        bound = 500
+        bound = 3
     else: 
-        bound = 1000
+        bound = 5
     print('bound: ', bound)
     while j < bound:
         count_step += 1
@@ -350,7 +350,7 @@ for angle in range(-30, 30, 1):
         if  os.getcwd().split(SLASH)[-1] != 'IC_NN_Lidar':
             os.chdir('../..') #! TROCAR ISSO DEPOIS QUE SAIR DO TEST
         path = os.getcwd() + SLASH + str(''.join(['artificial_data', SLASH, 'tags'])) + SLASH
-        label_file_path = os.path.join(path, 'Artificial_Label_Data2.csv') 
+        label_file_path = os.path.join(path, 'Artificial_Label_Data3.csv') 
 
         label_file = open(label_file_path, 'r')
         text = label_file.readlines()
@@ -363,7 +363,7 @@ for angle in range(-30, 30, 1):
         # copy the image on the step to the folder of the images that are already classified
         if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..') 
-        folder_class = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train2' + SLASH
+        folder_class = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train3' + SLASH
 
         if not os.path.exists(folder_class):
             os.makedirs(folder_class)
