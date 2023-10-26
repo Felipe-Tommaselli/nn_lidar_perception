@@ -129,49 +129,6 @@ class ArtificialLidarDatasetCNN(Dataset):
         b1 = labels[2]
         b2 = labels[3]
 
-        #! NORMALIZATION WITH m1, m2, b1, b2
-        # # convert m1 to azimuth to angles
-        # # y = m*x + b
-        # # azimuth it is the angle of m1 in radians with atan 
-        # # print('-'*20)
-        # # print('m1:', m1)
-
-        # #TODO: Find some way to normalize the azimuth without the atan problem             
-        # # azimuth1 = np.arctan(m1)
-        # # azimuth2 = np.arctan(m2)
-        # # # print('azimuth1:', azimuth1)
-
-        # # # normalize the azimuth (-pi to pi) -> (-1 to 1)
-        # # azimuth1 = azimuth1 / np.pi
-        # # azimuth2 = azimuth2 / np.pi        
-
-        #* alternative without atan
-        # azimuth1 = m1/DESIRED_SIZE  
-        # azimuth2 = m2/DESIRED_SIZE
-
-        # # since the data it is compatible to the image size we will relate as:
-        # # image = IMAGE_WIDTH x IMAGE_HEIGHT
-        # # as y = a*x + b -> b = y - a*x
-        # # note that for this step we are already working with the cropped image
-        # # so we will use DESRIED_SIZE
-        # # and, the MAX_M for square cases is = DESIRED_SIZE
-        # # -------------------------
-        # # where the minimum distance is when:
-        # # y = 0 and x = MAX_WIDTH with m = MAX_M
-        # # so b = 0 - (MAX_M)*MAX_WIDTH <- minimum distance
-        # MAX_M = DESIRED_SIZE
-        # dmin = - MAX_M * DESIRED_SIZE
-        # # and the maximum distance is when:
-        # # y = MAX_HEIGTH and x = MAX_WIDTH with m = MIN_M
-        # # so b = MAX_HEIGHT - (MIN_M)*MAX_WIDTH <- maximum distance
-        # dmax = DESIRED_SIZE - (-MAX_M)*DESIRED_SIZE
-
-        # # normalize the distance (-291600 to 292140) -> (-1 to 1)
-        # b1 = 2*((b1 - dmin)/(dmax - dmin)) - 1
-        # b2 = 2*((b2 - dmin)/(dmax - dmin)) - 1
-
-        # return [azimuth1, azimuth2, b1, b2]
-
         #! NORMALIZATION WITH w1, w2, q1, q2
         
         # now we can normalize:
@@ -179,15 +136,6 @@ class ArtificialLidarDatasetCNN(Dataset):
         b2 = b2 - 224
         
         w1, w2, q1, q2 = PreProcess.extract_label([m1, m2, b1, b2])
-        
-        '''
-        # normalization with the desired size
-        # but we need to avoid different magnitudes for the same label
-        q1 = q1/DESIRED_SIZE
-        q2 = q2/DESIRED_SIZE
-        w1 = 10*w1/DESIRED_SIZE 
-        w2 = 10*w2/DESIRED_SIZE
-        '''
 
         # Normalization with empirical values from parametrization.ipynb
         # X_normalized = 2 * (X - MIN) / (MAX - MIN) - 1
