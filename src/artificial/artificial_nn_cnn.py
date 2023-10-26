@@ -186,7 +186,6 @@ def getData(csv_path, batch_size, num_workers=0):
     _ = input('----------------- Press Enter to continue -----------------')
     return train_data, val_data
 
-
 def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_epochs):
 
     train_losses = []
@@ -293,7 +292,7 @@ def plotResults(results, epochs, lr):
     # save the plot in the current folder
     fig.savefig(f'losses_lr={lr}.png')
     
-    # plt.show()
+    plt.show()
     # accuracy
     # plt.plot(results['accuracy_list'], label='Accuracy')
     # plt.legend(frameon=False)

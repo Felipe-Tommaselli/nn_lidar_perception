@@ -45,7 +45,7 @@ def getData(csv_path, batch_size=7, num_workers=0):
     return train_data, val_data
 
 # Get the data
-csv_path = "../../artificial_data/tags/Artificial_Label_Data2.csv"
+csv_path = "../../artificial_data/tags/Artificial_Label_Data3.csv"
 train_data, val_data = getData(csv_path=csv_path)
 
 # test the model with the validation data for one random image
@@ -82,7 +82,7 @@ model.fc = nn.Sequential(
     nn.Linear(512, 256),
     nn.BatchNorm1d(256),
     nn.ReLU(inplace=True),
-    nn.Linear(256, 4)  # Alterado para 3 valores de saída
+    nn.Linear(256, 3)  # Alterado para 3 valores de saída
 )
 
 # Moving the model to the device (GPU/CPU)
