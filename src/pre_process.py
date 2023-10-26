@@ -59,6 +59,7 @@ class PreProcess:
 
         return self.labels, self.image
 
+    #* NON ARTIFICIAL DATA PREPROCESSING
     def process_image(self, image: np.array, labels) -> np.array:
 
         ''' Returns the processed image. '''
@@ -97,6 +98,7 @@ class PreProcess:
 
         return resized_image
 
+    #* NON ARTIFICIAL DATA PREPROCESSING
     def process_label(self, labels: list) -> list:
         ''' Returns the processed label. '''
 
@@ -107,54 +109,42 @@ class PreProcess:
         m1 = labels[0]
         m2 = labels[1]
 
-        #TODO: Find some way to normalize the azimuth without the atan problem
-        # # convert m1 to azimuth to angles
-        # # y = m*x + b
-        # # azimuth it is the angle of m1 in radians with atan 
-        # azimuth1 = np.arctan(m1)
-        # azimuth2 = np.arctan(m2)
-
-        # # normalize the azimuth (-pi to pi) -> (-1 to 1)
-        # azimuth1 = azimuth1 / np.pi
-        # azimuth2 = azimuth2 / np.pi
-
-        '''
-        m1 = labels[0]/DESIRED_SIZE
-        m2 = labels[1]/DESIRED_SIZE
-
-        # NORMALIZE THE DISTANCE 1 AND 2
-        d1 = labels[2]
-        d2 = labels[3]
-        '''
-
-        # since the data it is compatible to the image size we will relate as:
-        # image = IMAGE_WIDTH x IMAGE_HEIGHT
-        # as y = a*x + b -> b = y - a*x
-        # note that for this step we are already working with the cropped image
-        # so we will use DESRIED_SIZE
-        # and, the MAX_M for square cases is = DESIRED_SIZE
-        # -------------------------
-        # where the minimum distance is when:
-        # y = 0 and x = MAX_WIDTH with m = MAX_M
-        # so b = 0 - (MAX_M)*MAX_WIDTH <- minimum distance
-        ''' 
-        MAX_M = DESIRED_SIZE
-        dmin = - MAX_M * DESIRED_SIZE
-        # and the maximum distance is when:
-        # y = MAX_HEIGTH and x = MAX_WIDTH with m = MIN_M
-        # so b = MAX_HEIGHT - (MIN_M)*MAX_WIDTH <- maximum distance
-        dmax = DESIRED_SIZE - (-MAX_M)*DESIRED_SIZE
-
-        # normalize the distance (-291600 to 292140) -> (-1 to 1)
-        d1 = 2*((d1 - dmin)/(dmax - dmin)) - 1
-        d2 = 2*((d2 - dmin)/(dmax - dmin)) - 1
-        ''' 
-
-        #! NORMALIZATION WITH w1, w2, q1, q2
-
         return [m1, m2, d1, d2]
 
-    # UTILITIES FUNCTIONS FOR DEPROCESSING AND ROUTINE OPERATIONS
+    #* NON ARTIFICIAL DATA PREPROCESSING
+    @staticmethod
+    def scale_labels(image_size, labels, resize_factor):
+
+        # correcting the y crop (without the resize)
+        # the image_size without the resize it is the cropped_size
+        CROP_FACTOR_Y = image_size / RAW_SIZE 
+
+        m1, m2, b1, b2 = labels
+        # note that m = yb - ya / xb - xa
+        # where the crop process in y are null and in x this crop
+        # it is canceled between xb and xa, so:
+        # m_cropped = m
+        # and the resize it is a simple multiplication in the denominator and numerator
+        # so: m_resized = m_cropped
+        # -----------------------
+        # now, as y = a*x + b -> b = y - a*x
+        # the crop will make: b = b - m1*CROP_FACTOR_X*MAX_WIDTH + (1 - CROP_FACTOR_Y)*MAX_HEIGHT
+        # and the resize will make: b = RESIZE_FACTOR * (b - ...)
+        # -----------------------
+        # note that this come from the expression y' = y - CROP_FACTOR_Y*MAX_HEIGHT and with 
+        # same for x and x', we can see that the new y and x make this transformations
+        # DONT FORGET M1 IN b1 CORRECTION (it took me some hours to debbug that)
+        m1 = m1 
+        m2 = m2 
+
+        b1 = resize_factor * (b1 + m1*CROP_FACTOR_X*RAW_SIZE - (1 - CROP_FACTOR_Y)*RAW_SIZE)
+        b2 = resize_factor * (b2 + m2*CROP_FACTOR_X*RAW_SIZE - (1 - CROP_FACTOR_Y)*RAW_SIZE)
+
+        return [m1, m2, b1, b2]
+
+    # ############################################################################################
+    #              UTILITIES FUNCTIONS FOR DEPROCESSING AND ROUTINE OPERATIONS
+    # ############################################################################################
 
     @staticmethod
     def deprocess(image, label):
@@ -170,24 +160,6 @@ class PreProcess:
             w1, w2, q1, q2 = label
 
         # DEPROCESS THE LABEL
-        
-        #! NORMALIZATION WITH m1, m2, b1, b2
-        # #TODO: Find some way to normalize the azimuth without the atan problem
-        # # azimuths 1 e 2: tangent of the azimuth
-        # # m1 = np.tan(np.pi * label[0])
-        # # m2 = np.tan(np.pi * label[1])
-
-        # m1 = label[0]*DESIRED_SIZE
-        # m2 = label[1]*DESIRED_SIZE
-
-        # # distances 1 e 2: image borders normalization
-        # MAX_M = DESIRED_SIZE
-        # dmin = - MAX_M * DESIRED_SIZE
-        # dmax = DESIRED_SIZE - (-MAX_M)*DESIRED_SIZE
-
-        # d1 = (dmax - dmin)*((label[2] + 1)/2) + dmin
-        # d2 = (dmax - dmin)*((label[3] + 1)/2) + dmin
-        # label = [m1, m2, d1, d2]
 
         #! NORMALIZATION WITH w1, w2, q1, q2
         # extract_label reverse
@@ -234,35 +206,10 @@ class PreProcess:
         return [w1, w2, q1, q2]
 
 
-    @staticmethod
-    def scale_labels(image_size, labels, resize_factor):
+    # ############################################################################################
+    #         TODO: ADD COMPUTER VISION SEGMENTATION IN A STABLE NN VERSION
+    # ############################################################################################
 
-        # correcting the y crop (without the resize)
-        # the image_size without the resize it is the cropped_size
-        CROP_FACTOR_Y = image_size / RAW_SIZE 
-
-        m1, m2, b1, b2 = labels
-        # note that m = yb - ya / xb - xa
-        # where the crop process in y are null and in x this crop
-        # it is canceled between xb and xa, so:
-        # m_cropped = m
-        # and the resize it is a simple multiplication in the denominator and numerator
-        # so: m_resized = m_cropped
-        # -----------------------
-        # now, as y = a*x + b -> b = y - a*x
-        # the crop will make: b = b - m1*CROP_FACTOR_X*MAX_WIDTH + (1 - CROP_FACTOR_Y)*MAX_HEIGHT
-        # and the resize will make: b = RESIZE_FACTOR * (b - ...)
-        # -----------------------
-        # note that this come from the expression y' = y - CROP_FACTOR_Y*MAX_HEIGHT and with 
-        # same for x and x', we can see that the new y and x make this transformations
-        # DONT FORGET M1 IN b1 CORRECTION (it took me some hours to debbug that)
-        m1 = m1 
-        m2 = m2 
-
-        b1 = resize_factor * (b1 + m1*CROP_FACTOR_X*RAW_SIZE - (1 - CROP_FACTOR_Y)*RAW_SIZE)
-        b2 = resize_factor * (b2 + m2*CROP_FACTOR_X*RAW_SIZE - (1 - CROP_FACTOR_Y)*RAW_SIZE)
-
-        return [m1, m2, b1, b2]
 
     @staticmethod
     def contours_image(image):
