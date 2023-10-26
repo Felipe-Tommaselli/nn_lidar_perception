@@ -160,20 +160,14 @@ class PreProcess:
             w1, w2, q1, q2 = label
 
         # DEPROCESS THE LABEL
-
-        #! NORMALIZATION WITH w1, w2, q1, q2
-        # extract_label reverse
-        
-        q1 = q1*DESIRED_SIZE
-        q2 = q2*DESIRED_SIZE
-        w1 = w1*DESIRED_SIZE/10
-        w2 = w2*DESIRED_SIZE/10
+        print(f'[DEPROCESS] labels w1={w1}, w2={w2}, q1={q1}, q2={q2}')
+        q1_original = ((q1 + 1) / 2) * (76.89 - 50.52) + 50.52
+        q2_original = ((q2 + 1) / 2) * (170.66 - 147.24) + 147.24
+        w1_original = ((w1 + 1) / 2) * (0.58 - (-0.58)) + (-0.58)
+        w2_original = ((w2 + 1) / 2) * (0.58 - (-0.58)) + (-0.58)
 
         # print(f'labels w1={w1}, w2={w2}, q1={q1}, q2={q2}')
-        m1, m2, b1, b2 = PreProcess.extract_label([w1, w2, q1, q2])
-
-        b1 = b1 + 224
-        b2 = b2 + 224
+        m1, m2, b1, b2 = PreProcess.parametrization(w1_original, w2_original, q1_original, q2_original)
 
         label = [m1, m2, b1, b2]
 
@@ -194,15 +188,33 @@ class PreProcess:
         # we can parametrize the line as: y = m*x + b, but we want b that crosses
         # the y = 0 line. For that we can simply change the parametrization to:
         # x = w*y + q (where w = 1/m and q = -b/m). For now, it is better 
+        w1, w2, q1, q2 = PreProcess.parametrization(m1, m2, b1, b2)
 
+        # Normalization with empirical values from parametrization.ipynb
+        # X_normalized = 2 * (X - MIN) / (MAX - MIN) - 1
+        '''
+        w1: -0.58 ~ 0.58
+        w2: -0.58 ~ 0.58
+        q1: 50.52 ~ 76.89
+        q2: 147.24 ~ 170.66
+        '''        
+        print(f'[process] labels w1={w1}, w2={w2}, q1={q1}, q2={q2}')
+
+        q1 = 2*((q1 - 50.52) / (76.89 - 50.52)) - 1
+        q2 = 2*((q2 - 147.24)) / ((170.66 - 147.24)) - 1
+        w1 = 2*((w1 - (-0.58)) / ((0.58 - (-0.58)))) - 1
+        w2 = 2*((w2 - (-0.58)) / ((0.58 - (-0.58)))) - 1
+
+        return [w1, w2, q1, q2]
+
+    @staticmethod
+    def parametrization(m1, m2, b1, b2):
         w1 = 1/m1
         w2 = 1/m2
         q1 = -b1/m1
         q2 = -b2/m2
-
         # note that the in (process) and the out (deprocess) are the same operations
         # we are using the same operations for process and deprocess :)
-
         return [w1, w2, q1, q2]
 
 

@@ -62,10 +62,6 @@ class ArtificialLidarDatasetCNN(Dataset):
 
         # get the step number by the index
         step = self.labels.iloc[idx, 0]
-        # deprecated i and j for simplicity
-        # step = 300*(i - 1) + j, with i and j starting in 1
-        # i = int((step - 1) / 300) + 1
-        # j = (step - 1) % 300 + 1
 
         # get the path of the image
         path = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train3' + SLASH
@@ -92,22 +88,25 @@ class ArtificialLidarDatasetCNN(Dataset):
         b2 = 224 - b2
         labels = [m1, m2, b1, b2]
 
+        #? CHECKPOINT! Aqui as labels e a imagem estão corretas!!
+
         # PRE-PROCESSING
         image = self.image # just for now
         
+        #* PROCESS LABELs
         labels = ArtificialLidarDatasetCNN.process_label(labels)
         
-        # labels_dep = PreProcess.deprocess(image=self.image, label=labels)        
-        # m1, m2, b1, b2 = labels_dep
-        # x1 = np.arange(0, image.shape[0], 1)
-        # x2 = np.arange(0, image.shape[0], 1)
-        # y1 = m1*x1 + b1
-        # y2 = m2*x2 + b2
-        # plt.plot(x1, y1, 'r')
-        # plt.plot(x2, y2, 'r')
-        # plt.title(f'step={step}, i={i}, j={j}')
-        # plt.imshow(image, cmap='gray')
-        # plt.show()
+        labels_dep = PreProcess.deprocess(image=self.image, label=labels)        
+        m1, m2, b1, b2 = labels_dep
+        x1 = np.arange(0, image.shape[0], 1)
+        x2 = np.arange(0, image.shape[0], 1)
+        y1 = m1*x1 + b1
+        y2 = m2*x2 + b2
+        plt.plot(x1, y1, 'r')
+        plt.plot(x2, y2, 'r')
+        plt.title(f'[Dataloader] step={step}')
+        plt.imshow(image, cmap='gray')
+        plt.show()
 
         #! suppose m1 = m2
         w1, w2, q1, q2 = labels
@@ -121,36 +120,16 @@ class ArtificialLidarDatasetCNN(Dataset):
         DESIRED_SIZE = 224 #px
         MAX_M = 224 
 
-        # NORMALIZE THE AZIMUTH 1 AND 2 
         m1 = labels[0]
         m2 = labels[1]
-
-        # NORMALIZE THE DISTANCE 1 AND 2
         b1 = labels[2]
         b2 = labels[3]
 
         #! NORMALIZATION WITH w1, w2, q1, q2
         
-        # now we can normalize:
-        b1 = b1 - 224 # matplotlib 0 its in the top
-        b2 = b2 - 224
-        
         w1, w2, q1, q2 = PreProcess.extract_label([m1, m2, b1, b2])
 
-        # Normalization with empirical values from parametrization.ipynb
-        # X_normalized = 2 * (X - MIN) / (MAX - MIN) - 1
-        '''
-        w1: -0.58 ~ 0.58
-        w2: -0.58 ~ 0.58
-        q1: 50.52 ~ 76.89
-        q2: 147.24 ~ 170.66
-        '''        
-        q1n = 2*((q1 - 50.52) / (76.89 - 50.52)) - 1
-        q2n = 2*((q2 - 147.24)) / ((170.66 - 147.24)) - 1
-        w1n = 2*((w1 - (-0.58)) / ((0.58 - (-0.58)))) - 1
-        w2n = 2*((w2 - (-0.58)) / ((0.58 - (-0.58)))) - 1
-
-        return [w1n, w2n, q1n, q2n]
+        return [w1, w2, q1, q2]
 
 
 
