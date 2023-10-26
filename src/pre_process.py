@@ -160,7 +160,6 @@ class PreProcess:
             w1, w2, q1, q2 = label
 
         # DEPROCESS THE LABEL
-        print(f'[DEPROCESS] labels w1={w1}, w2={w2}, q1={q1}, q2={q2}')
         q1_original = ((q1 + 1) / 2) * (76.89 - 50.52) + 50.52
         q2_original = ((q2 + 1) / 2) * (170.66 - 147.24) + 147.24
         w1_original = ((w1 + 1) / 2) * (0.58 - (-0.58)) + (-0.58)
@@ -190,6 +189,8 @@ class PreProcess:
         # x = w*y + q (where w = 1/m and q = -b/m). For now, it is better 
         w1, w2, q1, q2 = PreProcess.parametrization(m1, m2, b1, b2)
 
+        print(f'labels w1={w1:.2f}, w2={w2:.2f}, q1={q1:.2f}, q2={q2:.2f}')
+
         # Normalization with empirical values from parametrization.ipynb
         # X_normalized = 2 * (X - MIN) / (MAX - MIN) - 1
         '''
@@ -198,8 +199,6 @@ class PreProcess:
         q1: 50.52 ~ 76.89
         q2: 147.24 ~ 170.66
         '''        
-        print(f'[process] labels w1={w1}, w2={w2}, q1={q1}, q2={q2}')
-
         q1 = 2*((q1 - 50.52) / (76.89 - 50.52)) - 1
         q2 = 2*((q2 - 147.24)) / ((170.66 - 147.24)) - 1
         w1 = 2*((w1 - (-0.58)) / ((0.58 - (-0.58)))) - 1

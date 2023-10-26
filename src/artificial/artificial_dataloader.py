@@ -95,7 +95,7 @@ class ArtificialLidarDatasetCNN(Dataset):
         
         #* PROCESS LABELs
         labels = ArtificialLidarDatasetCNN.process_label(labels)
-        
+
         labels_dep = PreProcess.deprocess(image=self.image, label=labels)        
         m1, m2, b1, b2 = labels_dep
         x1 = np.arange(0, image.shape[0], 1)
