@@ -118,12 +118,14 @@ class PreProcess:
         # azimuth1 = azimuth1 / np.pi
         # azimuth2 = azimuth2 / np.pi
 
+        '''
         m1 = labels[0]/DESIRED_SIZE
         m2 = labels[1]/DESIRED_SIZE
 
         # NORMALIZE THE DISTANCE 1 AND 2
         d1 = labels[2]
         d2 = labels[3]
+        '''
 
         # since the data it is compatible to the image size we will relate as:
         # image = IMAGE_WIDTH x IMAGE_HEIGHT
@@ -135,6 +137,7 @@ class PreProcess:
         # where the minimum distance is when:
         # y = 0 and x = MAX_WIDTH with m = MAX_M
         # so b = 0 - (MAX_M)*MAX_WIDTH <- minimum distance
+        ''' 
         MAX_M = DESIRED_SIZE
         dmin = - MAX_M * DESIRED_SIZE
         # and the maximum distance is when:
@@ -145,6 +148,9 @@ class PreProcess:
         # normalize the distance (-291600 to 292140) -> (-1 to 1)
         d1 = 2*((d1 - dmin)/(dmax - dmin)) - 1
         d2 = 2*((d2 - dmin)/(dmax - dmin)) - 1
+        ''' 
+
+        #! NORMALIZATION WITH w1, w2, q1, q2
 
         return [m1, m2, d1, d2]
 

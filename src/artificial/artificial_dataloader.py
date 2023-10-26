@@ -179,15 +179,30 @@ class ArtificialLidarDatasetCNN(Dataset):
         b2 = b2 - 224
         
         w1, w2, q1, q2 = PreProcess.extract_label([m1, m2, b1, b2])
-
+        
+        '''
         # normalization with the desired size
         # but we need to avoid different magnitudes for the same label
         q1 = q1/DESIRED_SIZE
         q2 = q2/DESIRED_SIZE
         w1 = 10*w1/DESIRED_SIZE 
         w2 = 10*w2/DESIRED_SIZE
+        '''
 
-        return [w1, w2, q1, q2]
+        # Normalization with empirical values from parametrization.ipynb
+        # X_normalized = 2 * (X - MIN) / (MAX - MIN) - 1
+        '''
+        w1: -0.58 ~ 0.58
+        w2: -0.58 ~ 0.58
+        q1: 50.52 ~ 76.89
+        q2: 147.24 ~ 170.66
+        '''        
+        q1n = 2*((q1 - 50.52) / (76.89 - 50.52)) - 1
+        q2n = 2*((q2 - 147.24)) / ((170.66 - 147.24)) - 1
+        w1n = 2*((w1 - (-0.58)) / ((0.58 - (-0.58)))) - 1
+        w2n = 2*((w2 - (-0.58)) / ((0.58 - (-0.58)))) - 1
+
+        return [w1n, w2n, q1n, q2n]
 
 
 
