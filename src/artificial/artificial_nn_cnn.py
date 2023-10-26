@@ -29,7 +29,6 @@ from torchvision import datasets
 import torchvision.models as models
 from PIL import Image
 
-import timm
 
 torch.cuda.empty_cache()
 
@@ -308,18 +307,19 @@ if __name__ == '__main__':
     ############ START ############
     # Set the device to GPU if available
     global device
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('cpu')
     print('Using {} device'.format(device))
 
     ############ PARAMETERS ############    
-    epochs = 25
+    epochs = 10
     lr = 0.01 # TODO: test different learning rates
     step_size = 15 # TODO: test different step sizes
     gamma = 0.05
-    batch_size = 160
+    batch_size = 8 # 160 AWS
 
     ############ DATA ############
-    csv_path = "../../artificial_data/tags/Artificial_Label_Data2.csv"
+    csv_path = "../../artificial_data/tags/Artificial_Label_Data3.csv"
     train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path)
 
     ############ MODEL ############

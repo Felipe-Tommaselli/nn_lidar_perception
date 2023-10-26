@@ -87,7 +87,7 @@ model.fc = nn.Sequential(
 
 # Moving the model to the device (GPU/CPU)
 model = model.to(device)
-path = os.getcwd() + '/models/' + '/model0.109-06-2023.pth'
+path = os.getcwd() + '/models/' + '/model_01_26-10-2023.pth'
 model.load_state_dict(torch.load(path))
 model.eval()
 
