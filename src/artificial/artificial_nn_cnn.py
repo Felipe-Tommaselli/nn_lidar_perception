@@ -345,7 +345,8 @@ if __name__ == '__main__':
 
     ############ DATA ############
     csv_path = "../../artificial_data/tags/Artificial_Label_Data4.csv"
-    train_path = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train4' + SLASH
+    # train_path = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train4' + SLASH
+    train_path = "../../artificial_data/train4/"
     train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path, train_path=train_path)
 
     ############ MODEL ############
