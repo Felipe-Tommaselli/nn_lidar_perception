@@ -290,7 +290,8 @@ def plotResults(results, epochs, lr):
     ax2.set_title(f"lr = {lr}")
 
     # save the plot in the current folder
-    fig.savefig(f'losses_lr={lr}.png')
+    day_time = datetime.now().strftime("%d-%m-%Y_%H-%M-%S") 
+    fig.savefig(f'losses_lr={lr}_{day_time}.png')
     
     #plt.show()
     # accuracy
@@ -371,9 +372,8 @@ if __name__ == '__main__':
 
     ############ SAVE MODEL ############
     # get day for the name of the file
-    day = datetime.now().strftime("%d-%m-%Y")
-    path = os.getcwd() + '/models/' + 'model' + '_' + str(lr).split('.')[1] + '_' + str(day) + '.pth'
-    print(path)
+    day_time = datetime.now().strftime("%d-%m-%Y_%H-%M-%S") 
+    path = os.getcwd() + '/models/' + 'model' + '_' + str(lr).split('.')[1] + '_' + str(day_time) + '.pth'
     torch.save(model.state_dict(), path)
-    print('Saved PyTorch Model State to model.pth')
+    print(f'Saved PyTorch Model State to:\n{path}')
 
