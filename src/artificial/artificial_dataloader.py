@@ -64,7 +64,7 @@ class ArtificialLidarDatasetCNN(Dataset):
         step = self.labels.iloc[idx, 0]
 
         # get the path of the image
-        path = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train3' + SLASH
+        path = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train2' + SLASH
         # full_path = os.path.join(path, 'image'+str(i)+ '_' + str(j) +'.png') # merge path and filename
         full_path = os.path.join(path, 'image'+ str(step) +'.png') # merge path and filename
 

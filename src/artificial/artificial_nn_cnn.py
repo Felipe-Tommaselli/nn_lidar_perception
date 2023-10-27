@@ -311,14 +311,14 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     ############ PARAMETERS ############    
-    epochs = 10
+    epochs = 30
     lr = 0.01 # TODO: test different learning rates
     step_size = 15 # TODO: test different step sizes
     gamma = 0.05
-    batch_size = 8 # 160 AWS
+    batch_size = 160 # 160 AWS
 
     ############ DATA ############
-    csv_path = "../../artificial_data/tags/Artificial_Label_Data3.csv"
+    csv_path = "../../artificial_data/tags/Artificial_Label_Data2.csv"
     train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path)
 
     ############ MODEL ############
