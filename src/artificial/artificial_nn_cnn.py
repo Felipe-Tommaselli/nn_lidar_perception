@@ -318,7 +318,7 @@ if __name__ == '__main__':
     batch_size = 160 # 160 AWS
 
     ############ DATA ############
-    csv_path = "../../artificial_data/tags/Artificial_Label_Data2.csv"
+    csv_path = "../../artificial_data/tags/Artificial_Label_Data4.csv"
     train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path)
 
     ############ MODEL ############
