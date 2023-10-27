@@ -28,6 +28,8 @@ from torchvision import transforms
 from torchvision import datasets
 import torchvision.models as models
 from PIL import Image
+from sklearn.model_selection import KFold
+from sklearn.metrics import accuracy_score
 
 torch.cuda.empty_cache()
 
@@ -192,7 +194,35 @@ def getData(csv_path, train_path, batch_size, num_workers=0):
     _ = input('----------------- Press Enter to continue -----------------')
     return train_data, val_data
 
-def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_epochs):
+
+def cross_validate(model, criterion, optimizer, scheduler, data, num_epochs, num_splits=5):
+    #TODO: IMPLEMENT THIS
+    kf = KFold(n_splits=num_splits, shuffle=True, random_state=42)
+
+    avg_train_losses = []
+    avg_val_losses = []
+
+    for fold, (train_idx, val_idx) in enumerate(kf.split(data)):
+        print(f"Fold {fold+1}:")
+
+        train_data = data[train_idx]
+        val_data = data[val_idx]
+
+        train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+        val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+
+        model = YourModel()  # Initialize your model here
+        optimizer = optim.SGD(model.parameters(), lr=lr)
+
+        results = train_model(model, criterion, optimizer, scheduler, train_loader, val_loader, num_epochs)
+
+        avg_train_losses.append(results['train_losses'])
+        avg_val_losses.append(results['val_losses'])
+
+    return avg_train_losses, avg_val_losses
+
+
+def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader, num_epochs):
 
     train_losses = []
     val_losses = []
@@ -347,7 +377,7 @@ if __name__ == '__main__':
     #print(model)
 
     ############ TRAINING ############
-    results = fit(model=model, criterion=criterion, optimizer=optimizer, scheduler=scheduler, train_loader=train_data, val_loader=val_data, num_epochs=epochs)
+    results = train_model(model=model, criterion=criterion, optimizer=optimizer, scheduler=scheduler, train_loader=train_data, val_loader=val_data, num_epochs=epochs)
 
     ############ RESULTS ############
     plotResults(results, epochs, lr)
