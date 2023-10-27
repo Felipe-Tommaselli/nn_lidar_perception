@@ -329,10 +329,10 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     ############ PARAMETERS ############    
-    epochs = 15
+    epochs = 12
     lr = 0.005 # TODO: test different learning rates
-    step_size = 5 # TODO: test different step sizes
-    gamma = 0.05
+    step_size = 3 # TODO: test different step sizes
+    gamma = 0.5
     batch_size = 160 # 160 AWS
     weight_decay = 1e-4 # L2 regularization
 
