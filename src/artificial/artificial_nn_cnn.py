@@ -172,10 +172,10 @@ def transformData(dataset):
     return concat_dataset
 
 
-def getData(csv_path, batch_size, num_workers=0):
+def getData(csv_path, train_path, batch_size, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     
-    dataset = ArtificialLidarDatasetCNN(csv_path)
+    dataset = ArtificialLidarDatasetCNN(csv_path, train_path)
 
     print(f'dataset size (no augmentation): {len(dataset)}')
     #! artificial não se beneficia muito disso
@@ -196,7 +196,6 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
 
     train_losses = []
     val_losses = []
-
     predictions_list = []
     labels_list = []
 
@@ -205,67 +204,56 @@ def fit(model, criterion, optimizer, scheduler, train_loader, val_loader, num_ep
         running_loss = 0.0
 
         for i, data in enumerate(train_loader):
-            
             images, labels = data['image'], data['labels']
-
             # convert to float32 and send it to the device
             # image dimension: (batch, channels, height, width)
             images = images.type(torch.float32).to(device)
             images = images.unsqueeze(1)
-
             # convert labels to float32 and send it to the device
             labels = [label.type(torch.float32).to(device) for label in labels]
             # convert labels to tensor
             labels = torch.stack(labels)
-
             # convert to format: tensor([[value1, value2, value3, value4], [value1, value2, value3, value4], ...])
             # this is: labels for each image, "batch" times -> shape: (batch, 4)
             labels = labels.permute(1, 0)    
-
             outputs = model(images)
             loss = criterion(outputs, labels) 
+            # Loss_with_L2 = Loss_without_L2 + λ * ||w||^2
+            # Calculate L2 regularization loss
+            l2_regularization_loss = 0
+            for param in model.parameters():
+                l2_regularization_loss += torch.norm(param, 2)
+            loss += weight_decay * l2_regularization_loss  # Add L2 regularization loss to the total loss
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
             scheduler.step()
-
             running_loss += loss.item()
-
         else:
         # valing the model
             with torch.no_grad():
                 # Set the model to evaluation mode
                 model.eval()
-
                 total = 0
                 val_loss = 0
-
                 for i, data in enumerate(val_loader):
                     images, labels = data['image'], data['labels']
-
                     # image dimension: (batch, channels, height, width)
                     images = images.type(torch.float32).to(device)
                     images = images.unsqueeze(1)
-
                     labels = [label.type(torch.float32).to(device) for label in labels]
                     labels = torch.stack(labels)
                     labels = labels.permute(1, 0)
-
                     labels_list.append(labels)
                     total += len(labels)
-        
                     outputs = model.forward(images) # propagação para frente
-
                     # get the predictions to calculate the accuracy
                     _, preds = torch.max(outputs, 1)
-
                     val_loss += criterion(outputs, labels).item()
                 val_losses.append(val_loss/len(val_loader))
-
             pass
         train_losses.append(running_loss/len(train_loader))
         val_losses.append(running_loss/len(val_loader))
-
         print(f'[{epoch+1}/{num_epochs}] .. Train Loss: {train_losses[-1]:.5f} .. val Loss: {val_losses[-1]:.5f}')
 
 
@@ -318,11 +306,12 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     ############ PARAMETERS ############    
-    epochs = 30
-    lr = 0.01 # TODO: test different learning rates
-    step_size = 15 # TODO: test different step sizes
+    epochs = 15
+    lr = 0.005 # TODO: test different learning rates
+    step_size = 5 # TODO: test different step sizes
     gamma = 0.05
     batch_size = 160 # 160 AWS
+    weight_decay = 1e-4 # L2 regularization
 
     ############ DATA ############
     csv_path = "../../artificial_data/tags/Artificial_Label_Data4.csv"
@@ -364,7 +353,7 @@ if __name__ == '__main__':
     model = model.to(device)
     ############ NETWORK ############
     criterion = nn.L1Loss() # TODO: test different loss functions
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=gamma)
 
     ############ DEBBUG ############

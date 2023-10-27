@@ -47,6 +47,7 @@ class ArtificialLidarDatasetCNN(Dataset):
     def __init__(self, csv_path, train_path):
         ''' Constructor of the class. '''
         self.labels = pd.read_csv(csv_path)
+        self.train_path = train_path
 
     def __len__(self) -> int:
         ''' Returns the length of the dataset (based on the labels). '''
@@ -64,7 +65,7 @@ class ArtificialLidarDatasetCNN(Dataset):
         step = self.labels.iloc[idx, 0]
 
         # full_path = os.path.join(path, 'image'+str(i)+ '_' + str(j) +'.png') # merge path and filename
-        full_path = os.path.join(train_path, 'image'+ str(step) +'.png') # merge path and filename
+        full_path = os.path.join(self.train_path, 'image'+ str(step) +'.png') # merge path and filename
 
 
         # TODO: IMPORT IMAGE WITH PIL
