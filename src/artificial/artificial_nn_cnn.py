@@ -335,20 +335,6 @@ if __name__ == '__main__':
         nn.Linear(256, 3)
     )
 
-    # Carregar o modelo ViT-Base com pesos pré-treinados
-# # Carregar o modelo DeiT-Small pré-treinado
-#     model = models.deit_small(pretrained=True)
-
-#     # Substituir a primeira camada convolucional para acomodar imagens de um canal de cor
-#     model.patch_embed.conv = nn.Conv2d(1, model.patch_embed.conv.out_channels, 
-#                                     kernel_size=model.patch_embed.conv.kernel_size,
-#                                     stride=model.patch_embed.conv.stride,
-#                                     padding=model.patch_embed.conv.padding)
-
-#     # Definir a camada linear de saída para a sua tarefa específica
-#     num_features = model.head.in_features
-#     model.head = nn.Linear(num_features, 4)
-
     # Moving the model to the device (GPU/CPU)
     model = model.to(device)
     ############ NETWORK ############
