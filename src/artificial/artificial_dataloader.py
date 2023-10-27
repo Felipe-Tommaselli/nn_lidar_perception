@@ -44,7 +44,7 @@ elif platform == "win32":
 class ArtificialLidarDatasetCNN(Dataset):
     ''' Dataset class for the lidar data with images. '''
     
-    def __init__(self, csv_path):
+    def __init__(self, csv_path, train_path):
         ''' Constructor of the class. '''
         self.labels = pd.read_csv(csv_path)
 
@@ -63,10 +63,8 @@ class ArtificialLidarDatasetCNN(Dataset):
         # get the step number by the index
         step = self.labels.iloc[idx, 0]
 
-        # get the path of the image
-        path = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train4' + SLASH
         # full_path = os.path.join(path, 'image'+str(i)+ '_' + str(j) +'.png') # merge path and filename
-        full_path = os.path.join(path, 'image'+ str(step) +'.png') # merge path and filename
+        full_path = os.path.join(train_path, 'image'+ str(step) +'.png') # merge path and filename
 
 
         # TODO: IMPORT IMAGE WITH PIL

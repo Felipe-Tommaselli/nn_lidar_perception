@@ -29,13 +29,19 @@ from torchvision import datasets
 import torchvision.models as models
 from PIL import Image
 
-
 torch.cuda.empty_cache()
 
 from artificial_dataloader import *
 sys.path.append('../')
 from pre_process import *
 
+global SLASH
+if platform == "linux" or platform == "linux2":
+    # linux
+    SLASH = "/"
+elif platform == "win32":
+    # Windows...
+    SLASH = "\\"
 
 class RotatedDataset(Subset):
     ''' this class works like a wrapper for the original dataset, rotating the images'''
@@ -320,7 +326,8 @@ if __name__ == '__main__':
 
     ############ DATA ############
     csv_path = "../../artificial_data/tags/Artificial_Label_Data4.csv"
-    train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path)
+    train_path = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train4' + SLASH
+    train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path, train_path=train_path)
 
     ############ MODEL ############
     # model = NetworkCNN(ResidualBlock).to(device)
