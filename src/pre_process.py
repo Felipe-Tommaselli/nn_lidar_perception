@@ -190,8 +190,6 @@ class PreProcess:
         # x = w*y + q (where w = 1/m and q = -b/m). For now, it is better 
         w1, w2, q1, q2 = PreProcess.parametrization(m1, m2, b1, b2)
 
-        print(f'labels w1={w1:.2f}, w2={w2:.2f}, q1={q1:.2f}, q2={q2:.2f}')
-
         # Normalization with empirical values from parametrization.ipynb
         # X_normalized = 2 * (X - MIN) / (MAX - MIN) - 1
         '''
@@ -204,9 +202,6 @@ class PreProcess:
         q2 = 2*((q2 - 36.81)) / ((299.99 - 36.81)) - 1
         w1 = 2*((w1 - (-0.58)) / ((0.58 - (-0.58)))) - 1
         w2 = 2*((w2 - (-0.58)) / ((0.58 - (-0.58)))) - 1
-
-        print(f'[POS] labels w1={w1:.2f}, w2={w2:.2f}, q1={q1:.2f}, q2={q2:.2f}')
-        print('-'*20)
 
         return [w1, w2, q1, q2]
 

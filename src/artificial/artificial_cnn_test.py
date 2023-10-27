@@ -19,8 +19,8 @@ sys.path.append('../')
 from pre_process import *
 
 # set the device
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
+# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cpu')
 
 def getData(csv_path, batch_size=7, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
@@ -143,27 +143,19 @@ fig, ax = plt.subplots()
 
 # get the slopes and intercepts
 m1p, m2p, b1p, b2p = predictions
-m2p = m1p
-m1p = 10*m1p
-m2p = 10*m2p
+
 # get the x and y coordinates of the lines
 x1 = np.arange(0, 224)
 y1p = m1p*x1 + b1p
 x2 = np.arange(0, 224)
 y2p = m2p*x2 + b2p
 
-# plot the lines
-# ax.plot(x1, y1p, color='red')
-# ax.plot(x2, y2p, color='red')
 
 # add text labels
 y_value = 50 # fix the y value
 # calculate the corresponding x values using the inverse equation of the line
 x1_value = (y_value - b1p) / m1p
 x2_value = (y_value - b2p) / m2p
-# add text labels
-# ax.text(x1_value, y_value, '1', color='red', fontsize=12, verticalalignment='bottom')
-# ax.text(x2_value, y_value, '2', color='red', fontsize=12, verticalalignment='bottom')
 
 # get the slopes and intercepts
 m1, m2, b1, b2 = label
@@ -178,30 +170,28 @@ y2 = m2*x2 + b2
 ax.plot(x1, y1, color='red')
 ax.plot(x2, y2, color='red')
 
-# y1t = (m1 + 0.3)*(x1-4) + b1 - 2
-# y2t = (m2 + 0.5)*(x2) + b2 + 2
+y1t = (m1 + 0.3)*(x1-4) + b1 - 2
+y2t = (m2 + 0.5)*(x2) + b2 + 2
 
-# ax.plot(x1, y1t, color='blue')
-# ax.plot(x2, y2t, color='blue')
+ax.plot(x1p, y1p, color='blue')
+ax.plot(x2p, y2p, color='blue')
 
-# # legend in upper right: real and predicted. real in red and predicted in blue
-# # Adicionando a legenda no canto superior esquerdo
-# # Adicionando a legenda no canto superior esquerdo
-# plt.annotate('Real ---',
-#             xy=(0.05, 0.95),
-#             xycoords='axes fraction',
-#             xytext=(10, -10),
-#             textcoords='offset points',
-#             bbox=dict(boxstyle='round,pad=0.5', fc='white', ec='white', lw=0.1),
-#             color='red')
+# legend in upper right: real and predicted. real in red and predicted in blue
+plt.annotate('Real ---',
+            xy=(0.05, 0.95),
+            xycoords='axes fraction',
+            xytext=(10, -10),
+            textcoords='offset points',
+            bbox=dict(boxstyle='round,pad=0.5', fc='white', ec='white', lw=0.1),
+            color='red')
 
-# plt.annotate('Predicted ---',
-#             xy=(0.05, 0.90),
-#             xycoords='axes fraction',
-#             xytext=(10, -10),
-#             textcoords='offset points',
-#             bbox=dict(boxstyle='round,pad=0.5', fc='white', ec='white', lw=0.1),
-#             color='blue')
+plt.annotate('Predicted ---',
+            xy=(0.05, 0.90),
+            xycoords='axes fraction',
+            xytext=(10, -10),
+            textcoords='offset points',
+            bbox=dict(boxstyle='round,pad=0.5', fc='white', ec='white', lw=0.1),
+            color='blue')
 # show the image
 ax.imshow(image, cmap='gray')
 plt.show()
