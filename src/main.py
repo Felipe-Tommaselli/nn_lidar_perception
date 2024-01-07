@@ -33,7 +33,7 @@ from sklearn.metrics import accuracy_score
 
 torch.cuda.empty_cache()
 
-from artificial_dataloader import *
+from dataloader import *
 sys.path.append('../')
 from pre_process import *
 
