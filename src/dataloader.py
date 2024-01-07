@@ -58,8 +58,8 @@ class NnDataLoader(Dataset):
         ''' Returns the sample image of the dataset. '''
 
         # move from root (\src) to \assets\images
-        if os.getcwd().split(SLASH)[-1] == 'artificial':
-            os.chdir('../..') 
+        if os.getcwd().split(SLASH)[-1] == 'src':
+            os.chdir('..') 
 
         # get the step number by the index
         step = self.labels.iloc[idx, 0]
@@ -93,7 +93,7 @@ class NnDataLoader(Dataset):
         image = self.image # just for now
         
         #* PROCESS LABELs
-        labels = ArtificialLidarDatasetCNN.process_label(labels)
+        labels = NnDataLoader.process_label(labels)
 
         # labels_dep = PreProcess.deprocess(image=self.image, label=labels)        
         # m1, m2, b1, b2 = labels_dep
