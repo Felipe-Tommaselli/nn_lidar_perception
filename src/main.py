@@ -127,7 +127,7 @@ class RotatedDataset(Subset):
         # plt.show()
 
         # normalize
-        rotated_label = ArtificialLidarDatasetCNN.process_label(rotated_label)
+        rotated_label = NnDataLoader.process_label(rotated_label)
 
         return {"image": rotated_image, "labels": rotated_label, "angle": angle} 
 
@@ -170,7 +170,7 @@ def transformData(dataset):
 def getData(csv_path, train_path, batch_size, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     
-    dataset = ArtificialLidarDatasetCNN(csv_path, train_path)
+    dataset = NnDataLoader(csv_path, train_path)
 
     print(f'dataset size (no augmentation): {len(dataset)}')
     #! artificial não se beneficia muito disso
@@ -337,9 +337,9 @@ if __name__ == '__main__':
     weight_decay = 1e-4 # L2 regularization
 
     ############ DATA ############
-    csv_path = "../../artificial_data/tags/Artificial_Label_Data4.csv"
+    csv_path = "../artificial_data/tags/Artificial_Label_Data4.csv"
     # train_path = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train4' + SLASH
-    train_path = os.path.join(os.getcwd(), '..', '..', 'artificial_data', 'train4')
+    train_path = os.path.join(os.getcwd(), '..', 'artificial_data', 'train4')
     train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path, train_path=train_path)
 
     ############ MODEL ############

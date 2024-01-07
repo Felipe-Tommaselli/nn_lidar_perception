@@ -41,7 +41,7 @@ elif platform == "win32":
     # Windows...
     SLASH = "\\"
 
-class ArtificialLidarDatasetCNN(Dataset):
+class NnDataLoader(Dataset):
     ''' Dataset class for the lidar data with images. '''
     
     def __init__(self, csv_path, train_path):
