@@ -333,7 +333,7 @@ if __name__ == '__main__':
     lr = 0.005 # TODO: test different learning rates
     step_size = 20 # TODO: test different step sizes
     gamma = 0.5
-    batch_size = 160 # 160 AWS
+    batch_size = 120 # 160 AWS
     weight_decay = 1e-4 # L2 regularization
 
     ############ DATA ############
@@ -349,19 +349,37 @@ if __name__ == '__main__':
     #?model = models.vgg16(pretrained=True)
     model = models.mobilenet_v2(pretrained=True)
 
-    model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
+    ########### MOBILE NET ########### 
+    model = models.mobilenet_v2(pretrained=True)
+    model.features[0][0] = nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1, bias=False)
 
-    num_ftrs = model.fc.in_features
-    # Adding batch normalization and an additional convolutional layer
-    model.fc = nn.Sequential(
-        nn.Linear(num_ftrs, 512),
-        nn.BatchNorm1d(512),
-        nn.ReLU(inplace=True),
-        nn.Linear(512, 256),
-        nn.BatchNorm1d(256),
-        nn.ReLU(inplace=True),
-        nn.Linear(256, 3)
+    # MobileNetV2 uses a different attribute for the classifier
+    num_ftrs = model.classifier[1].in_features
+    model.classifier[1] = nn.Sequential(
+    nn.Linear(num_ftrs, 512),
+    nn.BatchNorm1d(512),
+    nn.ReLU(inplace=True),
+    nn.Linear(512, 256),
+    nn.BatchNorm1d(256),
+    nn.ReLU(inplace=True),
+    nn.Linear(256, 3)
     )
+
+    #################################
+
+    # model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
+
+    # num_ftrs = model.fc.in_features
+    # # Adding batch normalization and an additional convolutional layer
+    # model.fc = nn.Sequential(
+    #     nn.Linear(num_ftrs, 512),
+    #     nn.BatchNorm1d(512),
+    #     nn.ReLU(inplace=True),
+    #     nn.Linear(512, 256),
+    #     nn.BatchNorm1d(256),
+    #     nn.ReLU(inplace=True),
+    #     nn.Linear(256, 3)
+    # )
 
     # Moving the model to the device (GPU/CPU)
     model = model.to(device)
