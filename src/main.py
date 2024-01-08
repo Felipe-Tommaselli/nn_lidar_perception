@@ -330,7 +330,7 @@ if __name__ == '__main__':
 
     ############ PARAMETERS ############    
     epochs = 12
-    lr = 0.005 # TODO: test different learning rates
+    lr = 0.00005 # TODO: test different learning rates
     step_size = 20 # TODO: test different step sizes
     gamma = 0.5
     batch_size = 120 # 160 AWS
@@ -347,7 +347,7 @@ if __name__ == '__main__':
     #?model = models.resnet50(pretrained=True)
     #?model = models.densenet121(pretrained=True)
     #?model = models.vgg16(pretrained=True)
-    model = models.mobilenet_v2(pretrained=True)
+    model = models.mobilenet_v2(pretrained=False)
 
     ########### MOBILE NET ########### 
     model = models.mobilenet_v2(pretrained=True)
