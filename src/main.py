@@ -343,11 +343,11 @@ if __name__ == '__main__':
     train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path, train_path=train_path)
 
     ############ MODEL ############
-    model = models.resnet18(pretrained=True)
+    #?model = models.resnet18(pretrained=True)
     #?model = models.resnet50(pretrained=True)
     #?model = models.densenet121(pretrained=True)
     #?model = models.vgg16(pretrained=True)
-    #?model = models.mobilenet_v2(pretrained=True)
+    model = models.mobilenet_v2(pretrained=True)
 
     model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
