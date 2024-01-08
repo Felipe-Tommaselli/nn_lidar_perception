@@ -331,7 +331,7 @@ if __name__ == '__main__':
     ############ PARAMETERS ############    
     epochs = 12
     lr = 0.005 # TODO: test different learning rates
-    step_size = 3 # TODO: test different step sizes
+    step_size = 20 # TODO: test different step sizes
     gamma = 0.5
     batch_size = 160 # 160 AWS
     weight_decay = 1e-4 # L2 regularization
@@ -343,8 +343,12 @@ if __name__ == '__main__':
     train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path, train_path=train_path)
 
     ############ MODEL ############
-    # model = NetworkCNN(ResidualBlock).to(device)
     model = models.resnet18(pretrained=True)
+    #?model = models.resnet50(pretrained=True)
+    #?model = models.densenet121(pretrained=True)
+    #?model = models.vgg16(pretrained=True)
+    #?model = models.mobilenet_v2(pretrained=True)
+
     model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
     num_ftrs = model.fc.in_features
