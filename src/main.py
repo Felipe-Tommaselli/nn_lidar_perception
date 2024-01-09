@@ -329,9 +329,9 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     ############ PARAMETERS ############    
-    epochs = 12
-    lr = 0.5 # TODO: test different learning rates
-    step_size = 3 # TODO: test different step sizes
+    epochs = 10
+    lr = 0.005 # TODO: test different learning rates
+    step_size = 15 # TODO: test different step sizes
     gamma = 0.5
     batch_size = 120 # 160 AWS
     weight_decay = 1e-4 # L2 regularization
@@ -350,7 +350,6 @@ if __name__ == '__main__':
     model = models.mobilenet_v2(pretrained=False)
 
     ########### MOBILE NET ########### 
-    model = models.mobilenet_v2(pretrained=True)
     model.features[0][0] = nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1, bias=False)
 
     # MobileNetV2 uses a different attribute for the classifier
