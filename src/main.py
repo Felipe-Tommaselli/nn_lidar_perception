@@ -346,23 +346,39 @@ if __name__ == '__main__':
     #?model = models.resnet18(pretrained=True)
     #?model = models.resnet50(pretrained=True)
     #?model = models.densenet121(pretrained=True)
-    #?model = models.vgg16(pretrained=True)
-    model = models.mobilenet_v2(pretrained=False)
+    model = models.vgg16(pretrained=True)
+    #?model = models.mobilenet_v2(pretrained=True)
+
+    ########### VGG NET 16 ########### 
+    model.features[0] = nn.Conv2d(1, 64, kernel_size=3, stride=1, padding=1)
+
+    # Accessing the classifier part of the VGG16 model
+    num_ftrs = model.classifier[6].in_features
+    model.classifier[6] = nn.Sequential(
+        nn.Linear(num_ftrs, 512),
+        nn.BatchNorm1d(512),
+        nn.ReLU(inplace=True),
+        nn.Linear(512, 256),
+        nn.BatchNorm1d(256),
+        nn.ReLU(inplace=True),
+        nn.Linear(256, 3)
+    )
+
 
     ########### MOBILE NET ########### 
-    model.features[0][0] = nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1, bias=False)
+    # model.features[0][0] = nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1, bias=False)
 
-    # MobileNetV2 uses a different attribute for the classifier
-    num_ftrs = model.classifier[1].in_features
-    model.classifier[1] = nn.Sequential(
-    nn.Linear(num_ftrs, 512),
-    nn.BatchNorm1d(512),
-    nn.ReLU(inplace=True),
-    nn.Linear(512, 256),
-    nn.BatchNorm1d(256),
-    nn.ReLU(inplace=True),
-    nn.Linear(256, 3)
-    )
+    # # MobileNetV2 uses a different attribute for the classifier
+    # num_ftrs = model.classifier[1].in_features
+    # model.classifier[1] = nn.Sequential(
+    # nn.Linear(num_ftrs, 512),
+    # nn.BatchNorm1d(512),
+    # nn.ReLU(inplace=True),
+    # nn.Linear(512, 256),
+    # nn.BatchNorm1d(256),
+    # nn.ReLU(inplace=True),
+    # nn.Linear(256, 3)
+    # )
 
     #################################
 
