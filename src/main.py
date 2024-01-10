@@ -331,9 +331,9 @@ if __name__ == '__main__':
 
     ############ PARAMETERS ############    
     epochs = 10
-    lr = 5 # TODO: test different learning rates
-    step_size = 2 # TODO: test different step sizes
-    gamma = 0.05
+    lr = 0.5 # TODO: test different learning rates
+    step_size = 5 # TODO: test different step sizes
+    gamma = 0.1
     batch_size = 120 # 160 AWS
     weight_decay = 1e-4 # L2 regularization
 
@@ -347,7 +347,7 @@ if __name__ == '__main__':
     #?model = models.resnet18(pretrained=True)
     #?model = EfficientNet.from_pretrained('efficientnet-b0')
     #?model = models.vgg16(pretrained=True)
-    model = models.mobilenet_v2(pretrained=True)
+    model = models.mobilenet_v2(pretrained=False)
 
     ########### EFFICENT NET ###########
     # model._conv_stem = nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1, bias=False)
