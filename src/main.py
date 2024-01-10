@@ -31,6 +31,7 @@ from PIL import Image
 from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score
 from efficientnet_pytorch import EfficientNet
+from pytorch_vit import ViT
 
 torch.cuda.empty_cache()
 
@@ -346,23 +347,36 @@ if __name__ == '__main__':
     ############ MODEL ############
     #?model = models.resnet18(pretrained=True)
     #?model = models.resnet50(pretrained=True)
-    model = EfficientNet.from_pretrained('efficientnet-b0')
+    #?model = EfficientNet.from_pretrained('efficientnet-b0')
     #?model = models.vgg16(pretrained=True)
     #?model = models.mobilenet_v2(pretrained=True)
 
-    ########### EFFICENT NET ###########
-    model._conv_stem = nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1, bias=False)
 
-    num_ftrs = model._fc.in_features
-    model._fc = nn.Sequential(
-        nn.Linear(num_ftrs, 512),
-        nn.BatchNorm1d(512),
-        nn.ReLU(inplace=True),
-        nn.Linear(512, 256),
-        nn.BatchNorm1d(256),
-        nn.ReLU(inplace=True),
-        nn.Linear(256, 3)  
+    ########### ViT NET ###########
+    # Load the ViT model
+    model = ViT(
+        image_size=224,
+        patch_size=16,
+        num_classes=3,
+        dim=512,          # Adjust based on your requirements
+        depth=6,
+        heads=8,
+        mlp_dim=512
     )
+
+    ########### EFFICENT NET ###########
+    # model._conv_stem = nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1, bias=False)
+
+    # num_ftrs = model._fc.in_features
+    # model._fc = nn.Sequential(
+    #     nn.Linear(num_ftrs, 512),
+    #     nn.BatchNorm1d(512),
+    #     nn.ReLU(inplace=True),
+    #     nn.Linear(512, 256),
+    #     nn.BatchNorm1d(256),
+    #     nn.ReLU(inplace=True),
+    #     nn.Linear(256, 3)  
+    # )
 
     ########### VGG NET 16 ########### 
     # model.features[0] = nn.Conv2d(1, 64, kernel_size=3, stride=1, padding=1)
