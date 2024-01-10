@@ -332,7 +332,7 @@ if __name__ == '__main__':
     ############ PARAMETERS ############    
     epochs = 10
     lr = 0.005 # TODO: test different learning rates
-    step_size = 15 # TODO: test different step sizes
+    step_size = 5 # TODO: test different step sizes
     gamma = 0.5
     batch_size = 80 # 160 AWS
     weight_decay = 1e-4 # L2 regularization
