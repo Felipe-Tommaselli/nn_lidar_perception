@@ -331,10 +331,10 @@ if __name__ == '__main__':
 
     ############ PARAMETERS ############    
     epochs = 10
-    lr = 0.005 # TODO: test different learning rates
-    step_size = 5 # TODO: test different step sizes
-    gamma = 0.5
-    batch_size = 80 # 160 AWS
+    lr = 5 # TODO: test different learning rates
+    step_size = 2 # TODO: test different step sizes
+    gamma = 0.05
+    batch_size = 120 # 160 AWS
     weight_decay = 1e-4 # L2 regularization
 
     ############ DATA ############
@@ -412,9 +412,9 @@ if __name__ == '__main__':
     # Moving the model to the device (GPU/CPU)
     model = model.to(device)
     ############ NETWORK ############
-    criterion = nn.L1Loss() # TODO: test different loss functions
-    # optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
-    optimizer = torch.optim.SGD(model.parameters(), lr=lr, weight_decay=weight_decay, momentum=0.0)
+    criterion = nn.MSELoss() # TODO: test different loss functions
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+    # optimizer = torch.optim.SGD(model.parameters(), lr=lr, weight_decay=weight_decay, momentum=0.0)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=gamma)
 
     ############ DEBBUG ############
