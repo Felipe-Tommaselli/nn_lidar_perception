@@ -31,7 +31,6 @@ from PIL import Image
 from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score
 from efficientnet_pytorch import EfficientNet
-from pytorch_vit import ViT
 
 torch.cuda.empty_cache()
 
@@ -350,19 +349,6 @@ if __name__ == '__main__':
     #?model = EfficientNet.from_pretrained('efficientnet-b0')
     #?model = models.vgg16(pretrained=True)
     #?model = models.mobilenet_v2(pretrained=True)
-
-
-    ########### ViT NET ###########
-    # Load the ViT model
-    model = ViT(
-        image_size=224,
-        patch_size=16,
-        num_classes=3,
-        dim=512,          # Adjust based on your requirements
-        depth=6,
-        heads=8,
-        mlp_dim=512
-    )
 
     ########### EFFICENT NET ###########
     # model._conv_stem = nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1, bias=False)
