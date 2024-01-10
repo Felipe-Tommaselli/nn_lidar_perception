@@ -345,10 +345,9 @@ if __name__ == '__main__':
 
     ############ MODEL ############
     #?model = models.resnet18(pretrained=True)
-    #?model = models.resnet50(pretrained=True)
     #?model = EfficientNet.from_pretrained('efficientnet-b0')
     #?model = models.vgg16(pretrained=True)
-    #?model = models.mobilenet_v2(pretrained=True)
+    model = models.mobilenet_v2(pretrained=True)
 
     ########### EFFICENT NET ###########
     # model._conv_stem = nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1, bias=False)
@@ -380,19 +379,19 @@ if __name__ == '__main__':
     # )
 
     ########### MOBILE NET ########### 
-    # model.features[0][0] = nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1, bias=False)
+    model.features[0][0] = nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1, bias=False)
 
-    # # MobileNetV2 uses a different attribute for the classifier
-    # num_ftrs = model.classifier[1].in_features
-    # model.classifier[1] = nn.Sequential(
-    # nn.Linear(num_ftrs, 512),
-    # nn.BatchNorm1d(512),
-    # nn.ReLU(inplace=True),
-    # nn.Linear(512, 256),
-    # nn.BatchNorm1d(256),
-    # nn.ReLU(inplace=True),
-    # nn.Linear(256, 3)
-    # )
+    # MobileNetV2 uses a different attribute for the classifier
+    num_ftrs = model.classifier[1].in_features
+    model.classifier[1] = nn.Sequential(
+    nn.Linear(num_ftrs, 512),
+    nn.BatchNorm1d(512),
+    nn.ReLU(inplace=True),
+    nn.Linear(512, 256),
+    nn.BatchNorm1d(256),
+    nn.ReLU(inplace=True),
+    nn.Linear(256, 3)
+    )
 
     #################################
 
@@ -414,7 +413,8 @@ if __name__ == '__main__':
     model = model.to(device)
     ############ NETWORK ############
     criterion = nn.L1Loss() # TODO: test different loss functions
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+    optimizer = torch.optim.SGD(model.parameters(), lr=lr, weight_decay=weight_decay, momentum=0.0)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=gamma)
 
     ############ DEBBUG ############
