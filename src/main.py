@@ -277,7 +277,7 @@ def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader
                 val_losses.append(val_loss/len(val_loader))
             pass
         train_losses.append(running_loss/len(train_loader))
-        val_losses.append(running_loss/len(val_loader))
+        #val_losses.append(running_loss/len(val_loader))
         print(f'[{epoch+1}/{num_epochs}] .. Train Loss: {train_losses[-1]:.5f} .. val Loss: {val_losses[-1]:.5f}')
 
 
