@@ -334,13 +334,13 @@ if __name__ == '__main__':
     lr = 0.005 # TODO: test different learning rates
     step_size = 5 # TODO: test different step sizes
     gamma = 0.5
-    batch_size = 12 # 160 AWS
+    batch_size = 10 # 160 AWS
     weight_decay = 1e-4 # L2 regularization
 
     ############ DATA ############
-    csv_path = "../data/artificial_data/tags/Artificial_Label_Data3.csv"
+    csv_path = "../data/artificial_data/tags/Artificial_Label_Data4.csv"
     # train_path = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train4' + SLASH
-    train_path = os.path.join(os.getcwd(), '..', 'data', 'artificial_data', 'train3')
+    train_path = os.path.join(os.getcwd(), '..', 'data', 'artificial_data', 'train4')
     train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path, train_path=train_path)
 
     ############ MODEL ############
