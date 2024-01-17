@@ -20,6 +20,7 @@ from scipy.special import logsumexp
 import matplotlib.pyplot as plt
 import torch
 import os
+import random
 
 global SLASH
 if platform == "linux" or platform == "linux2":
@@ -92,12 +93,12 @@ class PreProcess:
         self.resize_factor = DESIRED_SIZE/ int(cropped_image.shape[0])
         self.cropped_size = int(cropped_image.shape[0])
 
-        #* contoured_image = PreProcess.contours_image(resized_image)
+        contoured_image = PreProcess.contours_image(resized_image)
 
         # normalize the image (0 to 255) -> (0 to 1)
         # resized_image = resized_image / 255 #! does not work well 
 
-        return resized_image
+        return contoured_image
 
     #* NON ARTIFICIAL DATA PREPROCESSING
     def process_label(self, labels: list) -> list:
@@ -225,7 +226,6 @@ class PreProcess:
     @staticmethod
     def contours_image(image):
         ''' Returns the image with the contours. '''
-
         # inverter a imagem 
         img = cv2.bitwise_not(image)
 
@@ -312,8 +312,9 @@ class PreProcess:
         axs[1, 4].set_title('Contorno desenhado')
 
         # Save the contours_img in the assets/vision folder
-        file_path = os.path.join(folder_path, f"contours_img{np.randint(1000)}.png")
-        cv2.imwrite('../assets/vision/', contours_img)
+        folder_path = '../assets/vision/'
+        file_path = os.path.join(folder_path, f"contours_img{random.randint(0, 1000)}.png")
+        cv2.imwrite(file_path, contours_img)
 
         #plt.show()
         plt.cla()

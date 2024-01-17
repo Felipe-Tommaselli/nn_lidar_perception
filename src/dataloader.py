@@ -91,7 +91,8 @@ class NnDataLoader(Dataset):
 
         # PRE-PROCESSING
         image = self.image # just for now
-        
+        image = PreProcess.contours_image(image)
+
         #* PROCESS LABELs
         labels = NnDataLoader.process_label(labels)
 
