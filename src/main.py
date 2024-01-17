@@ -412,7 +412,7 @@ if __name__ == '__main__':
     # Moving the model to the device (GPU/CPU)
     model = model.to(device)
     ############ NETWORK ############
-    criterion = nn.L1Loss() # TODO: test different loss functions
+    criterion = nn.L1Loss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     # optimizer = torch.optim.SGD(model.parameters(), lr=lr, weight_decay=weight_decay, momentum=0.0)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=gamma)

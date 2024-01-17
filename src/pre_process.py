@@ -19,6 +19,7 @@ import math
 from scipy.special import logsumexp
 import matplotlib.pyplot as plt
 import torch
+import os
 
 global SLASH
 if platform == "linux" or platform == "linux2":
@@ -309,7 +310,12 @@ class PreProcess:
         axs[1, 3].set_title('Contorno desenhado')
         axs[1, 4].imshow(contourned_img, cmap='gray')
         axs[1, 4].set_title('Contorno desenhado')
-        plt.show()
+
+        # Save the contours_img in the assets/vision folder
+        file_path = os.path.join(folder_path, f"contours_img{np.randint(1000)}.png")
+        cv2.imwrite('../assets/vision/', contours_img)
+
+        #plt.show()
         plt.cla()
         plt.close()
 
