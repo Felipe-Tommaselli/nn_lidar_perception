@@ -1,6 +1,5 @@
 # ignore .csv files in datasets/ folder 
 datasets/
-assets/tags/Lidar_Data.csv
 
 data/artificial_data/train/
 data/artificial_data/train2/
