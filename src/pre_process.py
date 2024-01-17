@@ -289,36 +289,35 @@ class PreProcess:
         contourned_img = cv2.drawContours(cv2.bitwise_not(img), contours, -1, (0, 255, 0), 3)
 
         ####### MOSTRAR AS IMAGENS ########
-        fig, axs = plt.subplots(2, 5, figsize=(15, 6))
-        axs[0, 0].imshow(cv2.bitwise_not(img), cmap='gray')
-        axs[0, 0].set_title('Imagem original')
-        axs[0, 1].imshow(cv2.bitwise_not(img_dilated), cmap='gray')
-        axs[0, 1].set_title('Imagem Dilatada')
-        axs[0, 2].imshow(cv2.bitwise_not(img_blur_final), cmap='gray')
-        axs[0, 2].set_title('Imagem suavizada')
-        axs[0, 3].imshow(cv2.bitwise_not(img_eroded), cmap='gray')
-        axs[0, 3].set_title('Imagem Erodida')
-        axs[0, 4].imshow(cv2.bitwise_not(thresh), cmap='gray')
-        axs[0, 4].set_title('Imagem binarizada')
-        axs[1, 0].imshow(cv2.bitwise_not(thresh), cmap='gray')
-        axs[1, 0].set_title('Imagem binarizada')
-        axs[1, 1].imshow(contours_img, cmap='gray')
-        axs[1, 1].set_title('Contornos')
-        axs[1, 2].imshow(largest_contour_img, cmap='gray')
-        axs[1, 2].set_title('Contorno de maior área')
-        axs[1, 3].imshow(contourned_img_blur, cmap='gray')
-        axs[1, 3].set_title('Contorno desenhado')
-        axs[1, 4].imshow(contourned_img, cmap='gray')
-        axs[1, 4].set_title('Contorno desenhado')
+        # fig, axs = plt.subplots(2, 5, figsize=(15, 6))
+        # axs[0, 0].imshow(cv2.bitwise_not(img), cmap='gray')
+        # axs[0, 0].set_title('Imagem original')
+        # axs[0, 1].imshow(cv2.bitwise_not(img_dilated), cmap='gray')
+        # axs[0, 1].set_title('Imagem Dilatada')
+        # axs[0, 2].imshow(cv2.bitwise_not(img_blur_final), cmap='gray')
+        # axs[0, 2].set_title('Imagem suavizada')
+        # axs[0, 3].imshow(cv2.bitwise_not(img_eroded), cmap='gray')
+        # axs[0, 3].set_title('Imagem Erodida')
+        # axs[0, 4].imshow(cv2.bitwise_not(thresh), cmap='gray')
+        # axs[0, 4].set_title('Imagem binarizada')
+        # axs[1, 0].imshow(cv2.bitwise_not(thresh), cmap='gray')
+        # axs[1, 0].set_title('Imagem binarizada')
+        # axs[1, 1].imshow(contours_img, cmap='gray')
+        # axs[1, 1].set_title('Contornos')
+        # axs[1, 2].imshow(largest_contour_img, cmap='gray')
+        # axs[1, 2].set_title('Contorno de maior área')
+        # axs[1, 3].imshow(contourned_img_blur, cmap='gray')
+        # axs[1, 3].set_title('Contorno desenhado')
+        # axs[1, 4].imshow(contourned_img, cmap='gray')
+        # axs[1, 4].set_title('Contorno desenhado')
 
-        # Save the contours_img in the assets/vision folder
-        folder_path = '../assets/vision/'
-        file_path = os.path.join(folder_path, f"contours_img{random.randint(0, 1000)}.png")
-        cv2.imwrite(file_path, contours_img)
-
+        # # Save the contours_img in the assets/vision folder
+        # folder_path = '../assets/vision/'
+        # file_path = os.path.join(folder_path, f"contours_img{random.randint(0, 1000)}.png")
+        # cv2.imwrite(file_path, contours_img)
         #plt.show()
-        plt.cla()
-        plt.close()
+        #plt.cla()
+        # plt.close()
 
         # criar a máscara das bordas internas
         border_size = 6
