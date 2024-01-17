@@ -92,12 +92,12 @@ class PreProcess:
         self.resize_factor = DESIRED_SIZE/ int(cropped_image.shape[0])
         self.cropped_size = int(cropped_image.shape[0])
 
-        contoured_image = PreProcess.contours_image(resized_image)
+        #* contoured_image = PreProcess.contours_image(resized_image)
 
         # normalize the image (0 to 255) -> (0 to 1)
         # resized_image = resized_image / 255 #! does not work well 
 
-        return contoured_image
+        return resized_image
 
     #* NON ARTIFICIAL DATA PREPROCESSING
     def process_label(self, labels: list) -> list:
