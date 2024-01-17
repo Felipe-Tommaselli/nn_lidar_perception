@@ -2,10 +2,10 @@
 datasets/
 assets/tags/Lidar_Data.csv
 
-artificial_data/train/
-artificial_data/train2/
-artificial_data/train4/
-artificial_data/artificial_data.zip
+data/artificial_data/train/
+data/artificial_data/train2/
+data/artificial_data/train4/
+data/artificial_data/artificial_data.zip
 zip/
 ROSBags/
 
