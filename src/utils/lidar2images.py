@@ -64,7 +64,7 @@ folder = Tags:
     "Lidar_Data.csv" '''
 
 global POINT_WIDTH
-POINT_WIDTH = 10
+POINT_WIDTH = 18
 
 class lidar2images:
     """ Class convert the lidar data to images with each step of the lidar data (angle and distance) been converted to a point in a 2D space. """
@@ -144,7 +144,8 @@ class lidar2images:
             # adding the subplot
             plt.cla()
             # plotting the graph
-            plt.plot(xl,yl, '.', markersize=POINT_WIDTH, color='#40b255',picker=3)
+            #plt.plot(xl,yl, '.', markersize=POINT_WIDTH, color='#40b255',picker=3)
+            plt.plot(xl,yl, '.', markersize=POINT_WIDTH, color='black')
 
             # disable axes
             plt.axis('off')
@@ -167,7 +168,7 @@ class lidar2images:
             # change image size to 507x507 pixels
 
             #! plt.pause(0.1)
-            plt.show()
+            #! plt.show()
 
             print(f'[{t}]')
             if os.getcwd().split(SLASH)[-1] == 'src':
