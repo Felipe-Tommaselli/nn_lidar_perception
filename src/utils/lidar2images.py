@@ -36,8 +36,11 @@ import numpy as np
 import os
 import cv2
 
+os.chdir('..')
+os.chdir('..')
+
 global fid
-fid = 2
+fid = 1
 
 global SLASH
 if platform == "linux" or platform == "linux2":
@@ -49,8 +52,8 @@ elif platform == "win32":
 
 global filename 
 global folder
-filename = "Lidar_Data" + str(fid) + ".csv"
-folder = "datasets"
+filename = "Corridor_Data" + str(fid) + ".csv"
+folder = "datasets/gazebo"
 
 ''' There are other options:
 folder = Dataset:
@@ -102,23 +105,26 @@ class lidar2images:
     @staticmethod
     def filterData(readings) -> list:
         """ This function normalizes data and limits the lidar data to a maximum value of 5 meters. """
-        #readings = [float(e) for e in readings[7:1088] if e != ''] # removing empty values
         readings = list(map(lambda s: s.replace('\"', '').strip(), readings)) # remove \n and others
+        readings = list(map(lambda s: s.replace('inf', '').strip(), readings)) # remove inf and others
+        readings = [e for e in readings if e != ''] # remove empty elements
         readings = list(map(float, readings[7:1088])) # convert to float
-        
-        # if mean of readings is higher than 10, the normalization is necessary
-        if float(np.mean(readings)) > 10.0:
-            final_readings = [float(r)/1000 for r in readings if float(r)/1000 < 5] # normalizing the data
+        if len(readings) > 0:
+            # if mean of readings is higher than 10, the normalization is necessary
+            if float(np.mean(readings)) > 10.0:
+                final_readings = [float(r)/1000 for r in readings if float(r)/1000 < 5] # normalizing the data
+            else: 
+                final_readings = [float(r) for r in readings if float(r) < 5]
         else: 
-            final_readings = [float(r) for r in readings if float(r) < 5]
+            final_readings = readings
         return final_readings
 
     @staticmethod
     def polar2xy(lidar) -> list:
         """ This function converts the polar coordinates of the lidar data to cartesian coordinates."""
-        min_angle = np.deg2rad(-45)
-        max_angle = np.deg2rad(225) # lidar range
-        angle = np.linspace(min_angle, max_angle, 1081, endpoint = False)
+        min_angle = np.deg2rad(0)
+        max_angle = np.deg2rad(180) # lidar range
+        angle = np.linspace(min_angle, max_angle, len(lidar), endpoint = False)
 
         # convert polar to cartesian:
         # x = r * cos(theta)
@@ -134,38 +140,40 @@ class lidar2images:
     def plot_lines(xl: list, yl: list, t: int) -> None:
         """ This function plots the lidar data in a 2D space. """
 
-        # adding the subplot
-        plt.cla()
-        # plotting the graph
-        plt.plot(xl,yl, '.', markersize=POINT_WIDTH, color='#40b255',picker=3)
+        if len(xl) > 0:
+            # adding the subplot
+            plt.cla()
+            # plotting the graph
+            plt.plot(xl,yl, '.', markersize=POINT_WIDTH, color='#40b255',picker=3)
 
-        # disable axes
-        plt.axis('off')
-        # set xlim and ylim
-        plt.xlim([-1.0, 1.2])
-        plt.ylim([-0.25, 3])
-        plt.grid(False)
-        
-        # taking borders off for the save 
-        plt.gca().spines['top'].set_visible(False)
-        plt.gca().spines['right'].set_visible(False)
-        plt.gca().spines['bottom'].set_visible(False)
-        plt.gca().spines['left'].set_visible(False)
-        # copy the figure to save it later (without the markers that are added "on_pick")
-        
-        plt.tight_layout()
-        plt.gcf().set_size_inches(5.07, 5.07)
-        plt.gcf().canvas.draw()
+            # disable axes
+            plt.axis('off')
+            # set xlim and ylim
+            plt.xlim([-1.0, 1.2])
+            plt.ylim([-0.25, 3])
+            plt.grid(False)
+            
+            # taking borders off for the save 
+            plt.gca().spines['top'].set_visible(False)
+            plt.gca().spines['right'].set_visible(False)
+            plt.gca().spines['bottom'].set_visible(False)
+            plt.gca().spines['left'].set_visible(False)
+            # copy the figure to save it later (without the markers that are added "on_pick")
+            
+            plt.tight_layout()
+            plt.gcf().set_size_inches(5.07, 5.07)
+            plt.gcf().canvas.draw()
 
-        # change image size to 507x507 pixels
+            # change image size to 507x507 pixels
 
-        # plt.pause(0.1)
+            #! plt.pause(0.1)
+            plt.show()
 
-        print(f'[{t}]')
-        if os.getcwd().split(SLASH)[-1] == 'src':
-            os.chdir('..')
-        path = ''. join([os.getcwd(), SLASH, 'data', SLASH, 'images', SLASH])
-        plt.savefig(path + 'image'+str(t))
+            print(f'[{t}]')
+            if os.getcwd().split(SLASH)[-1] == 'src':
+                os.chdir('..')
+            path = ''. join([os.getcwd(), SLASH, 'data', SLASH, 'gazebo_data', SLASH, 'train1', SLASH])
+            plt.savefig(path + 'image'+str(t))
 
 
 if __name__ == '__main__':
