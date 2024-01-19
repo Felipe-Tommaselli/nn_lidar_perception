@@ -168,7 +168,7 @@ class lidar2images:
             # change image size to 507x507 pixels
 
             #! plt.pause(0.1)
-            plt.show()
+            #! plt.show()
 
             print(f'[{t}]')
             if os.getcwd().split(SLASH)[-1] == 'src':
