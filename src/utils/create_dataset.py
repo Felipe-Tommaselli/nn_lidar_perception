@@ -29,9 +29,9 @@ def laserscan_messages_to_csv(messages, output_filename):
             writer.writerow([])
 
 if __name__ == "__main__":
-    bag_filename = "../datasets/gazebo/corridor" + str(fid) + ".bag"
+    bag_filename = "../datasets/gazebo/crop" + str(fid) + ".bag"
     
-    output_filename = "../datasets/Corridor_Data" + str(fid) + ".csv"
+    output_filename = "../datasets/Crop_Data" + str(fid) + ".csv"
     messages_laser = extract_topic_messages(bag_filename)
 
     laserscan_messages_to_csv(messages_laser, output_filename)

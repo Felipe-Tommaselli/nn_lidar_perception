@@ -40,7 +40,7 @@ os.chdir('..')
 os.chdir('..')
 
 global fid
-fid = 1
+fid = 2
 
 global SLASH
 if platform == "linux" or platform == "linux2":
@@ -52,7 +52,7 @@ elif platform == "win32":
 
 global filename 
 global folder
-filename = "Corridor_Data" + str(fid) + ".csv"
+filename = "Crop_Data1" + ".csv"
 folder = "datasets/gazebo"
 
 ''' There are other options:
@@ -168,7 +168,7 @@ class lidar2images:
             # change image size to 507x507 pixels
 
             #! plt.pause(0.1)
-            #! plt.show()
+            plt.show()
 
             print(f'[{t}]')
             if os.getcwd().split(SLASH)[-1] == 'src':
