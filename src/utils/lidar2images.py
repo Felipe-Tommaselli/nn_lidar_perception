@@ -173,7 +173,7 @@ class lidar2images:
             print(f'[{t}]')
             if os.getcwd().split(SLASH)[-1] == 'src':
                 os.chdir('..')
-            path = ''. join([os.getcwd(), SLASH, 'data', SLASH, 'gazebo_data', SLASH, 'train1', SLASH])
+            path = ''. join([os.getcwd(), SLASH, 'data', SLASH, 'gazebo_data', SLASH, 'train2', SLASH])
             plt.savefig(path + 'image'+str(t))
 
 
@@ -183,11 +183,11 @@ if __name__ == '__main__':
     for step in range(0,len(l2i.data)):
         # split data (each line) in a lista with all the values
         readings = l2i.data[step].split(",")
-        # filter data
+
         lidar_readings = l2i.filterData(readings=readings)
-        # convert polar to cartesian
-        x,y = l2i.polar2xy(lidar=lidar_readings) 
-        # plot image
-        l2i.plot_lines(xl=x, yl=y, t=step)
-        # if step == 5:
-        #     break
+        if len(lidar_readings)>0:
+            x,y = l2i.polar2xy(lidar=lidar_readings) 
+            l2i.plot_lines(xl=x, yl=y, t=step)
+        else:
+            pass
+
