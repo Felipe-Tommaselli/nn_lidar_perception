@@ -120,11 +120,11 @@ class lidar2images:
         return final_readings
 
     @staticmethod
-    def polar2xy(lidar) -> list:
+    def polar2xy(lidar, N) -> list:
         """ This function converts the polar coordinates of the lidar data to cartesian coordinates."""
         min_angle = np.deg2rad(0)
         max_angle = np.deg2rad(180) # lidar range
-        angle = np.linspace(min_angle, max_angle, len(lidar), endpoint = False)
+        angle = np.linspace(min_angle, max_angle, N, endpoint = False)
 
         # convert polar to cartesian:
         # x = r * cos(theta)
@@ -151,7 +151,7 @@ class lidar2images:
             plt.axis('off')
             # set xlim and ylim
             plt.xlim([-2, 2])
-            plt.ylim([0, 3])
+            plt.ylim([0, 2])
             plt.grid(False)
             
             # taking borders off for the save 
@@ -186,7 +186,7 @@ if __name__ == '__main__':
 
         lidar_readings = l2i.filterData(readings=readings)
         if len(lidar_readings)>0:
-            x,y = l2i.polar2xy(lidar=lidar_readings) 
+            x,y = l2i.polar2xy(lidar=lidar_readings, N=len(readings)) 
             l2i.plot_lines(xl=x, yl=y, t=step)
         else:
             pass
