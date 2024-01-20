@@ -40,7 +40,7 @@ os.chdir('..')
 os.chdir('..')
 
 global fid
-fid = 2
+fid = 3
 
 global SLASH
 if platform == "linux" or platform == "linux2":
@@ -52,7 +52,7 @@ elif platform == "win32":
 
 global filename 
 global folder
-filename = "Crop_Data1" + ".csv"
+filename = "Crop_Data3" + ".csv"
 folder = "datasets/gazebo"
 
 ''' There are other options:
@@ -112,9 +112,9 @@ class lidar2images:
         if len(readings) > 0:
             # if mean of readings is higher than 10, the normalization is necessary
             if float(np.mean(readings)) > 10.0:
-                final_readings = [float(r)/1000 for r in readings if float(r)/1000 < 5] # normalizing the data
+                final_readings = [float(r)/1000 for r in readings if float(r)/1000 < 10] # normalizing the data
             else: 
-                final_readings = [float(r) for r in readings if float(r) < 5]
+                final_readings = [float(r) for r in readings if float(r) < 10]
         else: 
             final_readings = readings
         return final_readings
@@ -150,8 +150,8 @@ class lidar2images:
             # disable axes
             plt.axis('off')
             # set xlim and ylim
-            plt.xlim([-1.0, 1.2])
-            plt.ylim([-0.25, 3])
+            plt.xlim([-2, 2])
+            plt.ylim([0, 3])
             plt.grid(False)
             
             # taking borders off for the save 
@@ -168,12 +168,12 @@ class lidar2images:
             # change image size to 507x507 pixels
 
             #! plt.pause(0.1)
-            #! plt.show()
+            # plt.show()
 
             print(f'[{t}]')
             if os.getcwd().split(SLASH)[-1] == 'src':
                 os.chdir('..')
-            path = ''. join([os.getcwd(), SLASH, 'data', SLASH, 'gazebo_data', SLASH, 'train2', SLASH])
+            path = ''. join([os.getcwd(), SLASH, 'data', SLASH, 'gazebo_data', SLASH, 'train3', SLASH])
             plt.savefig(path + 'image'+str(t))
 
 
