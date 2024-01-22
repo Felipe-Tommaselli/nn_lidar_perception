@@ -40,7 +40,7 @@ os.chdir('..')
 os.chdir('..')
 
 global fid
-fid = 3
+fid = 4
 
 global SLASH
 if platform == "linux" or platform == "linux2":
@@ -52,7 +52,7 @@ elif platform == "win32":
 
 global filename 
 global folder
-filename = "Crop_Data3" + ".csv"
+filename = "Crop_Data" + str(fid) + ".csv"
 folder = "datasets/gazebo"
 
 ''' There are other options:
@@ -63,8 +63,6 @@ folder = Tags:
     "Label_Data.csv"
     "Lidar_Data.csv" '''
 
-global POINT_WIDTH
-POINT_WIDTH = 18
 
 class lidar2images:
     """ Class convert the lidar data to images with each step of the lidar data (angle and distance) been converted to a point in a 2D space. """
@@ -140,6 +138,7 @@ class lidar2images:
     def plot_lines(xl: list, yl: list, t: int) -> None:
         """ This function plots the lidar data in a 2D space. """
 
+        POINT_WIDTH = 18
         if len(xl) > 0:
             # adding the subplot
             plt.cla()
@@ -150,8 +149,8 @@ class lidar2images:
             # disable axes
             plt.axis('off')
             # set xlim and ylim
-            plt.xlim([-2, 2])
-            plt.ylim([0, 2])
+            plt.xlim([-0.5, 6.0])
+            plt.ylim([-0.2, 3.5])
             plt.grid(False)
             
             # taking borders off for the save 
@@ -168,12 +167,12 @@ class lidar2images:
             # change image size to 507x507 pixels
 
             #! plt.pause(0.1)
-            # plt.show()
+            #plt.show()
 
             print(f'[{t}]')
             if os.getcwd().split(SLASH)[-1] == 'src':
                 os.chdir('..')
-            path = ''. join([os.getcwd(), SLASH, 'data', SLASH, 'gazebo_data', SLASH, 'train3', SLASH])
+            path = ''. join([os.getcwd(), SLASH, 'data', SLASH, 'gazebo_data', SLASH, 'train', str(fid), SLASH])
             plt.savefig(path + 'image'+str(t))
 
 
