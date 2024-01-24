@@ -40,7 +40,7 @@ os.chdir('..')
 os.chdir('..')
 
 global fid
-fid = 4
+fid = 5
 
 global SLASH
 if platform == "linux" or platform == "linux2":
@@ -54,14 +54,6 @@ global filename
 global folder
 filename = "Crop_Data" + str(fid) + ".csv"
 folder = "datasets/gazebo"
-
-''' There are other options:
-folder = Dataset:
-    "filter_syncro_data_validation.csv"
-    "filter_syncro_data_norm.csv"
-folder = Tags:
-    "Label_Data.csv"
-    "Lidar_Data.csv" '''
 
 
 class lidar2images:
@@ -103,18 +95,19 @@ class lidar2images:
     @staticmethod
     def filterData(readings) -> list:
         """ This function normalizes data and limits the lidar data to a maximum value of 5 meters. """
-        readings = list(map(lambda s: s.replace('\"', '').strip(), readings)) # remove \n and others
-        readings = list(map(lambda s: s.replace('inf', '').strip(), readings)) # remove inf and others
-        readings = [e for e in readings if e != ''] # remove empty elements
-        readings = list(map(float, readings[7:1088])) # convert to float
-        if len(readings) > 0:
-            # if mean of readings is higher than 10, the normalization is necessary
-            if float(np.mean(readings)) > 10.0:
-                final_readings = [float(r)/1000 for r in readings if float(r)/1000 < 10] # normalizing the data
-            else: 
-                final_readings = [float(r) for r in readings if float(r) < 10]
-        else: 
-            final_readings = readings
+        # readings = list(map(lambda s: s.replace('\"', '').strip(), readings)) # remove \n and others
+        # readings = list(map(lambda s: s.replace('inf', '').strip(), readings)) # remove inf and others
+        # readings = [e for e in readings if e != ''] # remove empty elements
+        # readings = list(map(float, readings[7:1088])) # convert to float
+        # if len(readings) > 0:
+        #     # if mean of readings is higher than 10, the normalization is necessary
+        #     if float(np.mean(readings)) > 10.0:
+        #         final_readings = [float(r)/1000 for r in readings if float(r)/1000 < 10] # normalizing the data
+        #     else: 
+        #         final_readings = [float(r) for r in readings if float(r) < 10]
+        # else: 
+        #     final_readings = readings
+        final_readings = list(map(float, readings[2:]))
         return final_readings
 
     @staticmethod
@@ -149,8 +142,8 @@ class lidar2images:
             # disable axes
             plt.axis('off')
             # set xlim and ylim
-            plt.xlim([-0.5, 6.0])
-            plt.ylim([-0.2, 3.5])
+            plt.xlim([-1.5, 1.5])
+            plt.ylim([0, 2.2])
             plt.grid(False)
             
             # taking borders off for the save 
