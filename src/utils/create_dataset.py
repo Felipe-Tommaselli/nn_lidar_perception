@@ -4,7 +4,7 @@ from sensor_msgs.msg import LaserScan, Image
 import os
 
 global fid 
-fid = 4
+fid = 5
 
 os.chdir('..') 
 
