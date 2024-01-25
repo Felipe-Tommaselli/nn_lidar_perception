@@ -12,7 +12,6 @@ import torchvision.models as models
 device = torch.device("cpu")
 
 os.chdir('..')
-os.chdir('..')
 print(os.getcwd())
 
 global fid
@@ -42,8 +41,8 @@ def load_model():
 
     return model
 
-def get_data(t:int):
-    image = cv2.imread(os.path.join("data", "gazebo_data", f"train{fid}", f"image{t}.png"))
+def get_data(t:int, path: str):
+    image = cv2.imread(os.path.join(path, f"image{t}.png"))
 
     # convert image to numpy 
     image = np.array(image)
@@ -143,7 +142,7 @@ if __name__ == '__main__':
     model = load_model()
 
     # Count the number of files in the folder
-    path = os.path.join("data", "gazebo_data", f"train{fid}")
+    path = os.path.join(os.getcwd(), "data", "gazebo_data", f"train{fid}")
     file_count = len([f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))])
     print(f"Number of files in the folder: {file_count}")
 
@@ -158,16 +157,16 @@ if __name__ == '__main__':
     # create the lines with rand values
     line1, = ax.plot(x, x, color='red', label='Predicted', linewidth=linewidth)
     line2, = ax.plot(x, x, color='red', linewidth=linewidth)
+    image = np.zeros((224, 224)) # empty blank (224, 224) image
 
     border_style = dict(facecolor='none', edgecolor='black', linewidth=2)
     ax.add_patch(plt.Rectangle((0, 0), 1, 1, **border_style, transform=ax.transAxes))
     plt.legend(loc='upper right', prop={'size': 9, 'family': 'Ubuntu'})
-    ax.imshow(image, cmap='magma', norm=PowerNorm(gamma=16), alpha=0.65)
     ax.axis('off')
+    ax.imshow(image, cmap='magma', norm=PowerNorm(gamma=16), alpha=0.65)
 
-
-    for t in range(0, file_count):
-        image = get_data(t)
+    for t in range(2, file_count, 2):
+        image = get_data(t, path)
         predictions = inference(image, model)
         y1p, y2p, image = prepare_plot(x, predictions, image)
 
@@ -177,9 +176,11 @@ if __name__ == '__main__':
         line2.set_xdata(x)
         line2.set_ydata(y2p)
     
-        # drawing updated values
-        figure.canvas.draw()
+        ax.imshow(image, cmap='magma', norm=PowerNorm(gamma=16), alpha=0.65)
 
-        figure.canvas.flush_events()
+        # drawing updated values
+        fig.canvas.draw()
+
+        fig.canvas.flush_events()
         time.sleep(0.1)
 
