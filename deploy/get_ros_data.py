@@ -11,8 +11,8 @@ import time
 def lidar_callback(data, fig, line1):
     # This callback function will be called whenever a new message is received on the "/terrasentia/scan" topic
     distances = data.ranges
-    print(int(np.ceil(distances[100]*10)))
     y1p = np.ones(len(x))*int(np.ceil(distances[100]*100))
+    print(y1p[0])
 
     # updating data values
     line1.set_xdata(x)
