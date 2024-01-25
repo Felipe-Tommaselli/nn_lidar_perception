@@ -19,7 +19,7 @@ fid = 5
 
 def load_model():
     ########### MOBILE NET ########### 
-    model = models.mobilenet_v2(pretrained=True)
+    model = models.mobilenet_v2()
     model.features[0][0] = torch.nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1, bias=False)
 
     # MobileNetV2 uses a different attribute for the classifier
@@ -65,11 +65,11 @@ def deprocess(image, label):
 
     if len(label) == 3:
         # we suppose m1 = m2, so we can use the same deprocess
-        print('supposing m1 = m2')   
+        #print('supposing m1 = m2')   
         w1, q1, q2 = label
         w2 = w1
     elif len(label) == 4:
-        print('not supposing m1 = m2')        
+        #print('not supposing m1 = m2')        
         w1, w2, q1, q2 = label
 
     # DEPROCESS THE LABEL
@@ -78,7 +78,7 @@ def deprocess(image, label):
     w1_original = ((w1 + 1) * (0.58 - (-0.58)) / 2) + (-0.58)
     w2_original = ((w2 + 1) * (0.58 - (-0.58)) / 2) + (-0.58)
 
-    print(f'labels w1={w1}, w2={w2}, q1={q1}, q2={q2}')
+    #print(f'labels w1={w1}, w2={w2}, q1={q1}, q2={q2}')
     m1 = 1/w1_original
     m2 = 1/w2_original
     b1 = -q1_original / w1_original
@@ -98,7 +98,7 @@ def inference(image, model):
     # Encerre a contagem de tempo após a inferência
     end_time = time.time()
 
-    print('Inference time: {:.4f} ms'.format((end_time - start_time)*1000))
+    #print('Inference time: {:.4f} ms'.format((end_time - start_time)*1000))
 
     return predictions
 
@@ -149,7 +149,6 @@ if __name__ == '__main__':
     ########## PLOT ########## 
     plt.ion()
 
-    plt.title("Inference", fontsize=22)
     fig, ax = plt.subplots(figsize=(8, 5), frameon=True)
     x = np.arange(0, 224)
     linewidth = 2.5
@@ -165,7 +164,7 @@ if __name__ == '__main__':
     ax.axis('off')
     ax.imshow(image, cmap='magma', norm=PowerNorm(gamma=16), alpha=0.65)
 
-    for t in range(2, file_count, 2):
+    for t in range(2, file_count, 20):
         image = get_data(t, path)
         predictions = inference(image, model)
         y1p, y2p, image = prepare_plot(x, predictions, image)
@@ -178,9 +177,11 @@ if __name__ == '__main__':
     
         ax.imshow(image, cmap='magma', norm=PowerNorm(gamma=16), alpha=0.65)
 
+        plt.title(f"Inference {int(t//2)}/{file_count}", fontsize=22)
+
         # drawing updated values
         fig.canvas.draw()
 
         fig.canvas.flush_events()
-        time.sleep(0.1)
+        time.sleep(0.05)
 
