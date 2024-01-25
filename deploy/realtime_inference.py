@@ -25,19 +25,6 @@ fid = 5
 
 ############### ROS INTEGRATION ###############
 
-class LidarSubscriber:
-    def __init__(self):
-        self.distances = []
-
-    def lidar_callback(self, data):
-        # This callback function will be called whenever a new message is received on the "/terrasentia/scan" topic
-        self.distances = data.ranges
-
-    def subscribe(self):
-        rospy.init_node('RTinference', anonymous=True)
-        rospy.Subscriber('/terrasentia/scan', LaserScan, self.lidar_callback)
-        rospy.spin()
-
 ############### MODEL LOAD ############### 
 
 def load_model():
@@ -66,15 +53,47 @@ def load_model():
 
 ############### DATA EXTRACTION ###############
 
-def extract_topic_messages(bag_filename):
-    messages_laser = []
-    for topic, msg, t in bag.read_messages():
-        if topic == "/terrasentia/scan":
-            messages_laser.append((t, list(msg.ranges)))
-    return messages_laser
+def generate_image(data):
 
-def get_image(t:int, path: str):
-    image = cv2.imread(os.path.join(path, f"image{t}.png"))
+    lidar = data.ranges
+    
+    min_angle = np.deg2rad(0)
+    max_angle = np.deg2rad(180) # lidar range
+    angle = np.linspace(min_angle, max_angle, len(data), endpoint = False)
+
+    # convert polar to cartesian:
+    # x = r * cos(theta)
+    # y = r * sin(theta)
+    # where r is the distance from the lidar (x in lidar)
+    # and angle is the step between the angles measure in each distance (angle(lidar.index(x))
+    x_lidar = [x*np.cos(angle[lidar.index(x)]) for x in lidar]
+    y_lidar = [y*np.sin(angle[lidar.index(y)]) for y in lidar]
+
+    POINT_WIDTH = 18
+    if len(xl) > 0:
+        plt.cla()
+        plt.plot(xl,yl, '.', markersize=POINT_WIDTH, color='black')
+        plt.axis('off')
+        plt.xlim([-1.5, 1.5])
+        plt.ylim([0, 2.2])
+        plt.grid(False)
+        
+        plt.gca().spines['top'].set_visible(False)
+        plt.gca().spines['right'].set_visible(False)
+        plt.gca().spines['bottom'].set_visible(False)
+        plt.gca().spines['left'].set_visible(False)
+        
+        plt.tight_layout()
+        plt.gcf().set_size_inches(5.07, 5.07)
+        plt.gcf().canvas.draw()
+
+        plt.savefig('temp_image')
+
+
+def get_image():
+    image = cv2.imread("temp_image.png")
+
+    os.remove("temp_image.png")
 
     # convert image to numpy 
     image = np.array(image)
@@ -171,23 +190,35 @@ def show(x, y1p, y2p, image):
     ax.axis('off')
     plt.show()
 
+
+def lidar_callback(data):
+
+    model = load_model()
+    
+    generate_image(data)
+    image = get_image()
+    predictions = inference(image, model)
+    y1p, y2p, image = prepare_plot(x, predictions, image)
+
+    # updating data values
+    line1.set_xdata(x)
+    line1.set_ydata(y1p)
+    line2.set_xdata(x)
+    line2.set_ydata(y2p)
+
+    ax.imshow(image, cmap='magma', norm=PowerNorm(gamma=16), alpha=0.65)
+
+    plt.title(f"Inference {int(t//2)}/{file_count}", fontsize=22)
+
+    # drawing updated values
+    fig.canvas.draw()
+
+    fig.canvas.flush_events()
+    time.sleep(0.05)
+
 ############### MAIN ###############
 
 if __name__ == '__main__':
-
-    lidar_subscriber = LidarSubscriber()
-    lidar_subscriber.subscribe()
-
-    # Access the LiDAR data from the main function
-    distances_in_main = lidar_subscriber.distances
-    print(distances_in_main)
-
-    model = load_model()
-
-    # Count the number of files in the folder
-    path = os.path.join(os.getcwd(), "data", "gazebo_data", f"train{fid}")
-    file_count = len([f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))])
-    print(f"Number of files in the folder: {file_count}")
 
     ########## PLOT ########## 
     plt.ion()
@@ -207,24 +238,6 @@ if __name__ == '__main__':
     ax.axis('off')
     ax.imshow(image, cmap='magma', norm=PowerNorm(gamma=16), alpha=0.65)
 
-    for t in range(2, file_count, 20):
-        image = get_data(t, path)
-        predictions = inference(image, model)
-        y1p, y2p, image = prepare_plot(x, predictions, image)
-
-        # updating data values
-        line1.set_xdata(x)
-        line1.set_ydata(y1p)
-        line2.set_xdata(x)
-        line2.set_ydata(y2p)
-    
-        ax.imshow(image, cmap='magma', norm=PowerNorm(gamma=16), alpha=0.65)
-
-        plt.title(f"Inference {int(t//2)}/{file_count}", fontsize=22)
-
-        # drawing updated values
-        fig.canvas.draw()
-
-        fig.canvas.flush_events()
-        time.sleep(0.05)
-
+    rospy.init_node('RTinference', anonymous=True)
+    rospy.Subscriber('/terrasentia/scan', LaserScan, lidar_callback)
+    rospy.spin()
