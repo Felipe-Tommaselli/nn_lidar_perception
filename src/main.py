@@ -244,10 +244,10 @@ def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader
             loss = criterion(outputs, labels) 
             # Loss_with_L2 = Loss_without_L2 + λ * ||w||^2
             # Calculate L2 regularization loss
-            l2_regularization_loss = 0
-            for param in model.parameters():
-                l2_regularization_loss += torch.norm(param, 2)
-            loss += weight_decay * l2_regularization_loss  # Add L2 regularization loss to the total loss
+            # l2_regularization_loss = 0
+            # for param in model.parameters():
+            #     l2_regularization_loss += torch.norm(param, 2)
+            # loss += weight_decay * l2_regularization_loss  # Add L2 regularization loss to the total loss
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -270,14 +270,13 @@ def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader
                     labels = labels.permute(1, 0)
                     labels_list.append(labels)
                     total += len(labels)
-                    outputs = model.forward(images) # propagação para frente
+                    outputs = model.forward(images)
                     # get the predictions to calculate the accuracy
                     _, preds = torch.max(outputs, 1)
                     val_loss += criterion(outputs, labels).item()
                 val_losses.append(val_loss/len(val_loader))
             pass
         train_losses.append(running_loss/len(train_loader))
-        #val_losses.append(running_loss/len(val_loader))
         print(f'[{epoch+1}/{num_epochs}] .. Train Loss: {train_losses[-1]:.5f} .. val Loss: {val_losses[-1]:.5f}')
 
 
@@ -334,7 +333,7 @@ if __name__ == '__main__':
     lr = 0.005 # TODO: test different learning rates
     step_size = 5 # TODO: test different step sizes
     gamma = 0.5
-    batch_size = 10 # 160 AWS
+    batch_size = 120 # 160 AWS
     weight_decay = 1e-4 # L2 regularization
 
     ############ DATA ############
@@ -347,7 +346,7 @@ if __name__ == '__main__':
     #?model = models.resnet18(pretrained=True)
     #?model = EfficientNet.from_pretrained('efficientnet-b0')
     #?model = models.vgg16(pretrained=True)
-    model = models.mobilenet_v2(pretrained=False)
+    model = models.mobilenet_v2()
 
     ########### EFFICENT NET ###########
     # model._conv_stem = nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1, bias=False)
@@ -387,10 +386,7 @@ if __name__ == '__main__':
     nn.Linear(num_ftrs, 512),
     nn.BatchNorm1d(512),
     nn.ReLU(inplace=True),
-    nn.Linear(512, 256),
-    nn.BatchNorm1d(256),
-    nn.ReLU(inplace=True),
-    nn.Linear(256, 3)
+    nn.Linear(512, 3)
     )
 
     #################################
@@ -413,7 +409,9 @@ if __name__ == '__main__':
     model = model.to(device)
     ############ NETWORK ############
     criterion = nn.L1Loss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+    #optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
+
     # optimizer = torch.optim.SGD(model.parameters(), lr=lr, weight_decay=weight_decay, momentum=0.0)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=gamma)
 
