@@ -6,7 +6,10 @@ import cv2
 import torch
 import numpy as np
 import math 
+import matplotlib
+matplotlib.use('Qt5Agg')  # Use the Qt5Agg backend
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 from matplotlib.colors import PowerNorm
 import seaborn as sns 
 import torchvision.models as models
@@ -25,26 +28,57 @@ fid = 5
 
 class RTinference:
     def __init__(self):
-        self.model = self.load_model()
+        print('init...')
+        self.load_model()
 
-        # plot 
-        self.fig = None
-        self.line1 = None
-        self.line2 = None
+        ########## PLOT ##########
+        self.fig, _ = plt.subplots(figsize=(8, 5), frameon=True)
+        self.x = np.arange(0, 224)
+
+        # create the lines with rand values
+        self.line1, = plt.plot(self.x, self.x, color='red', label='Predicted', linewidth=2.5)
+        self.line2, = plt.plot(self.x, self.x, color='red', label='Predicted', linewidth=2.5)
+        self.image = np.zeros((224, 224))  # empty blank (224, 224) self.image
+
+        border_style = dict(facecolor='none', edgecolor='black', linewidth=2)
+        plt.gca().add_patch(plt.Rectangle((0, 0), 1, 1, **border_style, transform=plt.gca().transAxes))
+        plt.axis('off')
+        plt.imshow(self.image, cmap='magma')
+
+        ############### RUN ###############
+        self.y1p = np.zeros(len(self.x))
+        self.y2p = np.zeros(len(self.x))
+
+        # Set up the ROS subscriber
+        rospy.init_node('RTinference', anonymous=True)
+        rospy.Subscriber('/terrasentia/scan', LaserScan, self.lidar_callback)
+
+        # Set up the animation
+        self.animation = FuncAnimation(self.fig, self.update_plot, interval=5000)  # Adjust the interval as needed
+
+        # Show the plot
+        plt.show(block=True)
 
 
     ############### ROS INTEGRATION ###############
+    def update_plot(self, frame):
+        # Update data values
+        self.line1.set_ydata(self.y1p)
+        self.line2.set_ydata(self.y2p)
+
+        # Change title
+        self.fig.suptitle('Inference')
 
     ############### MODEL LOAD ############### 
 
-    def load_model():
+    def load_model(self):
         ########### MOBILE NET ########### 
-        model = models.mobilenet_v2()
-        model.features[0][0] = torch.nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1, bias=False)
+        self.model = models.mobilenet_v2()
+        self.model.features[0][0] = torch.nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1, bias=False)
 
         # MobileNetV2 uses a different attribute for the classifier
-        num_ftrs = model.classifier[1].in_features
-        model.classifier[1] = torch.nn.Sequential(
+        num_ftrs = self.model.classifier[1].in_features
+        self.model.classifier[1] = torch.nn.Sequential(
         torch.nn.Linear(num_ftrs, 512),
         torch.nn.BatchNorm1d(512),
         torch.nn.ReLU(inplace=True),
@@ -56,14 +90,12 @@ class RTinference:
 
         path = os.getcwd() + '/models/' + 'model_005_17-01-2024_15-38-12.pth'
         checkpoint = torch.load(path, map_location='cpu')  # Load to CPU
-        model.load_state_dict(checkpoint)
-        model.eval()
-
-        return model
+        self.model.load_state_dict(checkpoint)
+        self.model.eval()
 
     ############### DATA EXTRACTION ###############
 
-    def generate_image(data):
+    def generate_image(self, data):
 
         lidar = data.ranges
         
@@ -100,7 +132,7 @@ class RTinference:
             plt.savefig('temp_image')
 
 
-    def get_image():
+    def get_image(self):
         image = cv2.imread("temp_image.png")
 
         os.remove("temp_image.png")
@@ -123,7 +155,7 @@ class RTinference:
 
     ############### INFERENCE AND PLOT ###############
 
-    def deprocess(image, label):
+    def deprocess(self, image, label):
         ''' Returns the deprocessed image and label. '''
 
         if len(label) == 3:
@@ -151,12 +183,12 @@ class RTinference:
 
         return label
 
-    def inference(image, model):
+    def inference(self, image):
         # Inicie a contagem de tempo antes da inferência
         start_time = time.time()
 
         # get the model predictions
-        predictions = model(image)
+        predictions = self.model(image)
 
         # Encerre a contagem de tempo após a inferência
         end_time = time.time()
@@ -165,10 +197,10 @@ class RTinference:
 
         return predictions
 
-    def prepare_plot(x, predictions, image):
+    def prepare_plot(self, predictions, image):
         # convert the predictions to numpy array
         predictions = predictions.to('cpu').cpu().detach().numpy()
-        predictions = deprocess(image=image, label=predictions[0].tolist())
+        predictions = self.deprocess(image=image, label=predictions[0].tolist())
 
 
         # convert image to cpu 
@@ -182,75 +214,22 @@ class RTinference:
         m1p, m2p, b1p, b2p = predictions
 
         # get the x and y coordinates of the lines
-        y1p = m1p*x + b1p
-        y2p = m2p*x + b2p
+        y1p = m1p*self.x + b1p
+        y2p = m2p*self.x + b2p
 
         return y1p, y2p, image
 
-    def show(x, y1p, y2p, image):
-        linewidth = 2.5
 
-        ax.plot(x, y1p, color='red', label='Predicted', linewidth=linewidth)
-        ax.plot(x, y2p, color='red', linewidth=linewidth)
+    def lidar_callback(self, data):
 
-        border_style = dict(facecolor='none', edgecolor='black', linewidth=2)
-        ax.add_patch(plt.Rectangle((0, 0), 1, 1, **border_style, transform=ax.transAxes))
-        plt.legend(loc='upper right', prop={'size': 9, 'family': 'Ubuntu'})
-        ax.imshow(image, cmap='magma', norm=PowerNorm(gamma=16), alpha=0.65)
-        ax.axis('off')
-        plt.show()
+        self.generate_image(data)
+        image = self.get_image()
+        predictions = self.inference(image)
+        self.y1p, self.y2p, self.image = self.prepare_plot(predictions, image)
 
-
-    def lidar_callback(data):
-
-        model = load_model()
-        print('model ok')
-
-        generate_image(data)
-        print('generate image ok')
-        image = get_image()
-        print('get image ok')
-        predictions = inference(image, model)
-        print('inference ok')
-        y1p, y2p, image = prepare_plot(x, predictions, image)
-        print('prepare plot ok')
-
-        # updating data values
-        line1.set_xdata(x)
-        line1.set_ydata(y1p)
-        line2.set_xdata(x)
-        line2.set_ydata(y2p)
-
-        ax.imshow(image, cmap='magma', norm=PowerNorm(gamma=16), alpha=0.65)
-
-        # drawing updated values
-        fig.canvas.draw()
-
-        fig.canvas.flush_events()
-        time.sleep(0.05)
 
 ############### MAIN ###############
 
 if __name__ == '__main__':
 
-    ########## PLOT ########## 
-    plt.ion()
-
-    fig, ax = plt.subplots(figsize=(8, 5), frameon=True)
-    x = np.arange(0, 224)
-    linewidth = 2.5
-
-    # create the lines with rand values
-    line1, = ax.plot(x, x, color='red', label='Predicted', linewidth=linewidth)
-    line2, = ax.plot(x, x, color='red', linewidth=linewidth)
-    image = np.zeros((224, 224)) # empty blank (224, 224) image
-
-    border_style = dict(facecolor='none', edgecolor='black', linewidth=2)
-    ax.add_patch(plt.Rectangle((0, 0), 1, 1, **border_style, transform=ax.transAxes))
-    plt.legend(loc='upper right', prop={'size': 9, 'family': 'Ubuntu'})
-    ax.axis('off')
-    ax.imshow(image, cmap='magma', norm=PowerNorm(gamma=16), alpha=0.65)
-
-    rospy.init_node('RTinference', anonymous=True)
-    rospy.Subscriber('/terrasentia/scan', LaserScan, lidar_callback)
-    rospy.spin()
+    run = RTinference()
