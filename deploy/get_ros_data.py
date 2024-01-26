@@ -2,58 +2,57 @@
 
 import rospy
 from sensor_msgs.msg import LaserScan
+import matplotlib
+matplotlib.use('Qt5Agg')  # Use the Qt5Agg backend
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 import numpy as np
 
-import time
-
-class lidar_subscriber:
+class LidarSubscriber:
     def __init__(self):
-        self.fig = None
-        self.line1 = None
-        self.ax = None
 
-        ########## PLOT ########## 
-        plt.ion()
-
-        self.fig, self.ax = plt.subplots(figsize=(8, 5), frameon=True)
+        ########## PLOT ##########
+        self.fig, _ = plt.subplots(figsize=(8, 5), frameon=True)
         self.x = np.arange(0, 224)
         linewidth = 2.5
 
         # create the lines with rand values
-        self.line1, = self.ax.plot(self.x, self.x, color='red', label='Predicted', linewidth=linewidth)
-        image = np.zeros((224, 224)) # empty blank (224, 224) image
+        self.line, = plt.plot(self.x, self.x, color='red', label='Predicted', linewidth=linewidth)
+        image = np.zeros((224, 224))  # empty blank (224, 224) image
 
         border_style = dict(facecolor='none', edgecolor='black', linewidth=2)
-        self.ax.add_patch(plt.Rectangle((0, 0), 1, 1, **border_style, transform=self.ax.transAxes))
-        self.ax.axis('off')
-        self.ax.imshow(image, cmap='magma')
+        plt.gca().add_patch(plt.Rectangle((0, 0), 1, 1, **border_style, transform=plt.gca().transAxes))
+        plt.axis('off')
+        plt.imshow(image, cmap='magma')
 
-        self.lidar_main()
+        ############### RUN ###############
+        self.y1p = np.zeros(len(self.x))
+
+        # Set up the ROS subscriber
+        rospy.init_node('lidar_subscriber', anonymous=True)
+        rospy.Subscriber('/terrasentia/scan', LaserScan, self.lidar_callback)
+
+        # Set up the animation
+        self.animation = FuncAnimation(self.fig, self.update_plot, interval=100)  # Adjust the interval as needed
+
+        # Show the plot
+        plt.show(block=True)
+
+    def update_plot(self, frame):
+        # Update data values
+        self.line.set_ydata(self.y1p)
+
+        # Change title
+        self.fig.suptitle('Updated Title')
 
     def lidar_callback(self, data):
         # This callback function will be called whenever a new message is received on the "/terrasentia/scan" topic
         distances = data.ranges
-        y1p = np.ones(len(self.x))*int(np.ceil(distances[100]*100))
-        print(y1p[0])
-
-        # updating data values
-        self.line1.set_xdata(self.x)
-        self.line1.set_ydata(y1p)
-
-        # change title
-        self.fig.suptitle('Updated Title')
-
-        # drawing updated values
-        self.fig.canvas.draw()
-
-        self.fig.canvas.flush_events()
-        rospy.Rate(2).sleep()
-
-    def lidar_main(self):
-        rospy.init_node('lidar_subscriber', anonymous=True)
-        rospy.Subscriber('/terrasentia/scan', LaserScan, self.lidar_callback)
-        rospy.spin()
+        try:
+            if isinstance(distances[10], float):
+                self.y1p = np.ones(len(self.x)) * int(np.ceil(distances[10] * 100))
+        except:
+            pass
 
 if __name__ == '__main__':
-    ls = lidar_subscriber()
+    ls = LidarSubscriber()
