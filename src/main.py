@@ -337,9 +337,9 @@ if __name__ == '__main__':
     weight_decay = 1e-4 # L2 regularization
 
     ############ DATA ############
-    csv_path = "../data/artificial_data/tags/Artificial_Label_Data4.csv"
+    csv_path = "../data/artificial_data/tags/Artificial_Label_Data5.csv"
     # train_path = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train4' + SLASH
-    train_path = os.path.join(os.getcwd(), '..', 'data', 'artificial_data', 'train4')
+    train_path = os.path.join(os.getcwd(), '..', 'data', 'artificial_data', 'train5')
     train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path, train_path=train_path)
 
     ############ MODEL ############
