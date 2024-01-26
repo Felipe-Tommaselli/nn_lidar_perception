@@ -174,7 +174,10 @@ if __name__ == '__main__':
         line1.set_ydata(y1p)
         line2.set_xdata(x)
         line2.set_ydata(y2p)
-    
+
+        print("y1p:", y1p[0])
+        print("y2p:", y2p[0])
+
         ax.imshow(image, cmap='magma', norm=PowerNorm(gamma=16), alpha=0.65)
 
         plt.title(f"Inference {int(t//2)}/{file_count}", fontsize=22)

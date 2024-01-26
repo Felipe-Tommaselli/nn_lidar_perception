@@ -34,27 +34,28 @@ class RTinference:
         ########## PLOT ##########
         self.fig, _ = plt.subplots(figsize=(8, 5), frameon=True)
         self.x = np.arange(0, 224)
-
-        # create the lines with rand values
-        self.line1, = plt.plot(self.x, self.x, color='red', label='Predicted', linewidth=2.5)
-        self.line2, = plt.plot(self.x, self.x, color='red', label='Predicted', linewidth=2.5)
         self.image = np.zeros((224, 224))  # empty blank (224, 224) self.image
+        self.y1p = np.ones(len(self.x))*50
+        self.y2p = np.ones(len(self.x))*100
+
 
         border_style = dict(facecolor='none', edgecolor='black', linewidth=2)
         plt.gca().add_patch(plt.Rectangle((0, 0), 1, 1, **border_style, transform=plt.gca().transAxes))
         plt.axis('off')
         plt.imshow(self.image, cmap='magma')
 
+        # create the lines with rand values
+        self.line1, = plt.plot(self.x, self.y1p, color='red', label='Predicted', linewidth=2.5, zorder=2)
+        self.line2, = plt.plot(self.x, self.y2p, color='red', label='Predicted', linewidth=2.5, zorder=2)
         ############### RUN ###############
-        self.y1p = np.zeros(len(self.x))
-        self.y2p = np.zeros(len(self.x))
-
         # Set up the ROS subscriber
         rospy.init_node('RTinference', anonymous=True)
         rospy.Subscriber('/terrasentia/scan', LaserScan, self.lidar_callback)
 
         # Set up the animation
-        self.animation = FuncAnimation(self.fig, self.update_plot, interval=5000)  # Adjust the interval as needed
+        self.animation = FuncAnimation(self.fig, self.update_plot, interval=8000, cache_frame_data=False, save_count=0)
+        # Start the animation loop
+        self.animation.event_source.start()
 
         # Show the plot
         plt.show(block=True)
@@ -66,8 +67,18 @@ class RTinference:
         self.line1.set_ydata(self.y1p)
         self.line2.set_ydata(self.y2p)
 
+        # Print or log values for debugging
+        print("y1p:", self.y1p[0])
+        print("y2p:", self.y2p[0])
+
         # Change title
         self.fig.suptitle('Inference')
+
+    def lidar_callback(self, data):
+        self.generate_image(data)
+        image = self.get_image()
+        predictions = self.inference(image)
+        self.y1p, self.y2p, self.image = self.prepare_plot(predictions, image)
 
     ############### MODEL LOAD ############### 
 
@@ -110,6 +121,10 @@ class RTinference:
         # and angle is the step between the angles measure in each distance (angle(lidar.index(x))
         xl = [x*np.cos(angle[lidar.index(x)]) for x in lidar]
         yl = [y*np.sin(angle[lidar.index(y)]) for y in lidar]
+
+        # take all the "inf" off
+        xl = [10.0 if value == 'inf' else value for value in xl]
+        yl = [10.0 if value == 'inf' else value for value in yl] 
 
         POINT_WIDTH = 18
         if len(xl) > 0:
@@ -218,15 +233,6 @@ class RTinference:
         y2p = m2p*self.x + b2p
 
         return y1p, y2p, image
-
-
-    def lidar_callback(self, data):
-
-        self.generate_image(data)
-        image = self.get_image()
-        predictions = self.inference(image)
-        self.y1p, self.y2p, self.image = self.prepare_plot(predictions, image)
-
 
 ############### MAIN ###############
 
