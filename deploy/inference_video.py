@@ -28,13 +28,10 @@ def load_model():
     torch.nn.Linear(num_ftrs, 512),
     torch.nn.BatchNorm1d(512),
     torch.nn.ReLU(inplace=True),
-    torch.nn.Linear(512, 256),
-    torch.nn.BatchNorm1d(256),
-    torch.nn.ReLU(inplace=True),
-    torch.nn.Linear(256, 3)
+    torch.nn.Linear(512, 3)
     )
 
-    path = os.getcwd() + '/models/' + 'model_005_17-01-2024_15-38-12.pth'
+    path = os.getcwd() + '/models/' + 'model_005_26-01-2024_21-37-22.pth'
     checkpoint = torch.load(path, map_location='cpu')  # Load to CPU
     model.load_state_dict(checkpoint)
     model.eval()
@@ -175,8 +172,8 @@ if __name__ == '__main__':
         line2.set_xdata(x)
         line2.set_ydata(y2p)
 
-        print("y1p:", y1p[0])
-        print("y2p:", y2p[0])
+        #print("y1p:", y1p[0])
+        #print("y2p:", y2p[0])
 
         ax.imshow(image, cmap='magma', norm=PowerNorm(gamma=16), alpha=0.65)
 
