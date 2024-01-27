@@ -291,33 +291,26 @@ def plotResults(results, epochs, lr):
     # losses
     # print both losses side by side with subplots (1 row, 2 columns)
     # ax1 for train losses and ax2 for val losses
-    fig, (ax1, ax2) = plt.subplots(1, 2)
-    
-    ax1.plot(results['train_losses'], label='Train Loss')
-    ax1.legend(frameon=False)
-    ax1.set_xlabel("Epoch")
-    ax1.set_ylabel("Loss")
-    ax1.set_title("Train Loss")
 
-    ax2.plot(results['val_losses'], label='Val Loss')
-    ax2.legend(frameon=False)
-    ax2.set_xlabel("Epoch")
-    ax2.set_ylabel("Loss")
-    ax2.set_title("Val Loss")
-    ax2.set_title(f"lr = {lr}")
+    # Plotting training and validation loss
+    plt.plot(results['train_losses'], label='Training Loss', marker='o')
+    plt.plot(results['val_losses'], label='Validation Loss', marker='o')
+
+    # Adding labels and title
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.title('Learning Loss Plot (L1 Loss)\nFinal Training Loss: {:.4f}'.format(results['train_losses'][-1]))
+
+    # Adding legend
+    plt.legend()
+
+    # Adjusting layout for better visualization
+    plt.tight_layout()
 
     # save the plot in the current folder
     day_time = datetime.now().strftime("%d-%m-%Y_%H-%M-%S") 
     fig.savefig(f'losses_lr={lr}_{day_time}.png')
     
-    #plt.show()
-    # accuracy
-    # plt.plot(results['accuracy_list'], label='Accuracy')
-    # plt.legend(frameon=False)
-    # plt.xlabel("Epoch")
-    # plt.ylabel("Accuracy")
-    # plt.title("Accuracy")
-    # plt.show()
 
 
 if __name__ == '__main__':

@@ -9,20 +9,16 @@ validation_loss = [0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.33, 0.3, 0.28, 0.26, 0.25,
 final_training_loss = training_loss[-1]
 final_validation_loss = validation_loss[-1]
 
-# Plotting the training loss
-plt.subplot(1, 2, 1)
+# Plotting training and validation loss
 plt.plot(epochs, training_loss, label='Training Loss', marker='o')
-plt.xlabel('Epochs')
-plt.ylabel('Loss')
-plt.title('Training Loss (lr=0.005)\nFinal Loss: {:.4f}'.format(final_training_loss))
-plt.legend()
-
-# Plotting the validation loss
-plt.subplot(1, 2, 2)
 plt.plot(epochs, validation_loss, label='Validation Loss', marker='o')
+
+# Adding labels and title
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
-plt.title('Validation Loss (lr=0.005)\nFinal Loss: {:.4f}'.format(final_validation_loss))
+plt.title('Learning Loss Plot (L1 Loss)\nFinal Training Loss: {:.4f}'.format(final_training_loss))
+
+# Adding legend
 plt.legend()
 
 # Adjusting layout for better visualization
