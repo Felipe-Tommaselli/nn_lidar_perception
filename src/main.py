@@ -108,7 +108,6 @@ def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader
                     labels = [label.type(torch.float32).to(device) for label in labels]
                     labels = torch.stack(labels)
                     labels = labels.permute(1, 0)
-                    total += len(labels)
                     outputs = model.forward(images)
                     val_loss += criterion(outputs, labels).item()
                 val_losses.append(val_loss/len(val_loader))
