@@ -199,7 +199,7 @@ if __name__ == '__main__':
     lr = float(5*1e-4) # TODO: test different learning rates
     step_size = 2 # TODO: test different step sizes
     gamma = 0
-    batch_size = 160 # 160 AWS
+    batch_size = 140 # 160 AWS
     weight_decay = 1e-2 # L2 regularization
 
     ############ DATA ############
