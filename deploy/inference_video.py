@@ -31,7 +31,7 @@ def load_model():
     torch.nn.Linear(512, 3)
     )
 
-    path = os.getcwd() + '/models/' + 'model_005_26-01-2024_21-37-22.pth'
+    path = os.getcwd() + '/models/' + 'model_0001_29-01-2024_18-11-40.pth'
     checkpoint = torch.load(path, map_location='cpu')  # Load to CPU
     model.load_state_dict(checkpoint)
     model.eval()
