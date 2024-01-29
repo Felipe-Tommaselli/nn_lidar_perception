@@ -172,7 +172,7 @@ def plotResults(results, epochs, lr):
     # Adding labels and title
     ax.set_xlabel('Epochs')
     ax.set_ylabel('Loss')
-    ax.set_title('Learning Loss Plot (L1 Loss)\nFinal Training Loss: {:.4f}'.format(results['train_losses'][-1]))
+    ax.set_title('Learning Loss Plot (MSE Loss)\nFinal Training Loss: {:.4f}'.format(results['train_losses'][-1]))
 
     # Adding legend
     ax.legend()
@@ -196,11 +196,11 @@ if __name__ == '__main__':
 
     ############ PARAMETERS ############    
     epochs = 10
-    lr = float(1e-4) # TODO: test different learning rates
+    lr = float(5*1e-4) # TODO: test different learning rates
     step_size = 2 # TODO: test different step sizes
     gamma = 0
-    batch_size = 120 # 160 AWS
-    weight_decay = 1e-7 # L2 regularization
+    batch_size = 140 # 160 AWS
+    weight_decay = 1e-8 # L2 regularization
 
     ############ DATA ############
     csv_path = "../data/artificial_data/tags/Artificial_Label_Data6.csv"
@@ -274,7 +274,7 @@ if __name__ == '__main__':
     # Moving the model to the device (GPU/CPU)
     model = model.to(device)
     ############ NETWORK ############
-    criterion = nn.L1Loss()
+    criterion = nn.MSELoss()
     #optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
 
