@@ -122,13 +122,13 @@ for angle in range(-25, 26, 1):
 
         # Gerar pontos entre as retas
         if divider > 100:
-            d = np.random.randint(30, 40)
+            d = np.random.randint(60, 80)
         else: 
-            d = np.random.randint(15, 22)
+            d = np.random.randint(60, 70)
         for _ in range(d):
-            boundary = np.random.randint(8, 12)
+            boundary = np.random.randint(5, 7)
             # escolher um y aleatorio entre 0 e 224
-            y = np.random.randint(0, (2*image_size)//3)
+            y = np.random.randint(0, (9*image_size)//10)
             # achar o limiar da reta de boundary para aquele x e da reta normal
             x1_boundary = (y - b1r) / m1r
             x2_boundary = (y - b2r) / m2r
@@ -137,7 +137,7 @@ for angle in range(-25, 26, 1):
             x_coords.append(x)
             y_coords.append(y)
 
-        #################### Dentro Topo ####################
+        # #################### Dentro Topo ####################
 
         num_clusters = np.random.randint(4, 6)  # Número de subconjuntos
         # Gerar pontos com aglomeração em subconjuntos #! parte de cima (obstrução do lidar)
@@ -164,15 +164,15 @@ for angle in range(-25, 26, 1):
                 x_coords.append(x)
                 y_coords.append(y)
 
-        #################### Fora 1 ####################
+        # #################### Fora 1 ####################
 
-        num_clusters = np.random.randint(8, 14)  # Número de subconjuntos
+        num_clusters = np.random.randint(15, 22)  # Número de subconjuntos
         # Gerar pontos com aglomeração em subconjuntos #! pontos de fora das retas
         for cluster in range(num_clusters):
-            points_per_cluster = 7  # Número de pontos por subconjunto
-            boundary = np.random.randint(13, 17)
+            points_per_cluster = 3  # Número de pontos por subconjunto
+            boundary = np.random.randint(8, 11)
             # escolher um y aleatorio entre 0 e 224
-            central_y = np.random.randint(0, image_size//2)
+            central_y = np.random.randint(0, (2*image_size//3))
             # achar o limiar da reta de boundary para aquele x e da reta normal
             x1_boundary = (central_y - b1r) / m1r
             x2_boundary = (central_y - b2r) / m2r
@@ -194,12 +194,12 @@ for angle in range(-25, 26, 1):
                 x_coords.append(x)
                 y_coords.append(y)
 
-        #################### Fora 2 ####################
+        # #################### Fora 2 ####################
 
-        num_clusters = np.random.randint(4, 6) # Número de subconjuntos
+        num_clusters = np.random.randint(3, 6) # Número de subconjuntos
         # Gerar pontos com aglomeração em subconjuntos
         for cluster in range(num_clusters):
-            points_per_cluster = 5  # Número de pontos por subconjunto
+            points_per_cluster = 4  # Número de pontos por subconjunto
             boundary1 = np.random.randint(13, 17)
             boundary2 = np.random.randint(27, 32)
             # escolher um y aleatorio entre 0 e 224
@@ -225,50 +225,48 @@ for angle in range(-25, 26, 1):
                 x_coords.append(x)
                 y_coords.append(y)
 
-        # #################### Fora 3 ####################
+        # # #################### Fora 3 ####################
 
-        # Gerar pontos entre os dois boundarys
-        for _ in range(np.random.randint(7, 16)):
-            boundary1 = np.random.randint(23, 27)
-            boundary2 = np.random.randint(53, 57)
-            # escolher um y aleatorio entre 0 e 224
-            y = np.random.randint(0, (2*image_size)//3)
-            # achar o limiar da reta de boundary para aquele x e da reta normal
-            x1_boundary = (y - b1r) / m1r
-            x2_boundary = (y - b2r) / m2r
-            # fit do x1 e x2 com os boundarys
-            if angle < -15:
-                x = np.random.randint(x2_boundary + boundary1, x2_boundary + boundary2)
-            elif angle > 15:
-                x = np.random.randint(x1_boundary - boundary2, x1_boundary - boundary1)
-            else: 
-                x = np.random.choice([np.random.randint(x1_boundary - boundary2, x1_boundary - boundary1), np.random.randint(x2_boundary + boundary1, x2_boundary + boundary2)])        
-            x_coords.append(x)
-            y_coords.append(y)
+        # # Gerar pontos entre os dois boundarys
+        # for _ in range(np.random.randint(3, 5)):
+        #     boundary1 = np.random.randint(23, 27)
+        #     boundary2 = np.random.randint(53, 57)
+        #     # escolher um y aleatorio entre 0 e 224
+        #     y = np.random.randint(0, image_size)
+        #     # achar o limiar da reta de boundary para aquele x e da reta normal
+        #     x1_boundary = (y - b1r) / m1r
+        #     x2_boundary = (y - b2r) / m2r
+        #     # fit do x1 e x2 com os boundarys
+        #     if angle < -15:
+        #         x = np.random.randint(x2_boundary + boundary1, x2_boundary + boundary2)
+        #     elif angle > 15:
+        #         x = np.random.randint(x1_boundary - boundary2, x1_boundary - boundary1)
+        #     else: 
+        #         x = np.random.choice([np.random.randint(x1_boundary - boundary2, x1_boundary - boundary1), np.random.randint(x2_boundary + boundary1, x2_boundary + boundary2)])        
+        #     x_coords.append(x)
+        #     y_coords.append(y)
 
-        #################### Fora Cima ####################
+        # #################### Fora Cima ####################
 
         # Gerar pontos nos primeiros pixels de fora de cada reta (altura de cima)
-        for _ in range(np.random.randint(15, 18)):
-            boundary = np.random.randint(8, 12)
+        # linhas de plantação adjacentes
+        for _ in range(np.random.randint(10, 12)):
+            boundary = np.random.randint(1, 6)
             # escolher um y aleatorio entre 0 e 224
             y = np.random.randint(image_size//2, image_size)
-            # achar o limiar da reta de boundary para aquele x e da reta normal
-            x1_boundary = (y - b1r) / m1r
-            x2_boundary = (y - b2r) / m2r
             # fit do x1 e x2 com os boundarys
-            x = np.random.choice([np.random.randint(x1_boundary - boundary, x1_boundary), np.random.randint(x2_boundary, x2_boundary + boundary)])
+            x = np.random.choice([np.random.randint(0, boundary), np.random.randint(image_size - boundary, image_size)])
             x_coords.append(x)
             y_coords.append(y)
 
-        #################### Fora baixo ####################
+        # #################### Fora baixo ####################
 
-        num_clusters = np.random.randint(3, 5)  # Número de subconjuntos
+        num_clusters = np.random.randint(2, 3)  # Número de subconjuntos
         # Gerar pontos com aglomeração em subconjuntos 
         for cluster in range(num_clusters):
             points_per_cluster = 2  # Número de pontos por subconjunto
             boundary = np.random.randint(13, 17)
-            central_y = np.random.randint(0, image_size//9)
+            central_y = np.random.randint(0, image_size//12)
             # achar o limiar da reta de boundary para aquele x e da reta normal
             x1_boundary = (central_y - b1r) / m1r
             x2_boundary = (central_y - b2r) / m2r
@@ -290,30 +288,29 @@ for angle in range(-25, 26, 1):
                 x_coords.append(x)
                 y_coords.append(y)
 
-        #################### Borda ####################
+        # #################### Borda ####################
 
-        # Gerar pontos entre os pixels nos pontos mais distantes das retas
-        for _ in range(np.random.randint(3, 7)):
-            if angle < 10:
-                x = np.random.randint(image_size - 40, image_size)
-            elif angle > 10:
-                x = np.random.randint(0, 40) 
-            else: 
-                x = np.random.randint(0, image_size)
+        # # Gerar pontos entre os pixels nos pontos mais distantes das retas
+        # for _ in range(np.random.randint(3, 7)):
+        #     if angle < 10:
+        #         x = np.random.randint(image_size - 40, image_size)
+        #     elif angle > 10:
+        #         x = np.random.randint(0, 40) 
+        #     else: 
+        #         x = np.random.randint(0, image_size)
 
-            y = np.random.randint(0, image_size//2)
-            x_coords.append(x)
-            y_coords.append(y)
+        #     y = np.random.randint(0, image_size//2)
+        #     x_coords.append(x)
+        #     y_coords.append(y)
 
-        #################### Random ####################
+        # #################### Random ####################
 
         # Gerar pontos aleatórios ao longo da imagem
-        for _ in range(np.random.randint(2, 8)):
+        for _ in range(np.random.randint(12, 18)):
             x = np.random.randint(0, image_size)
             y = np.random.randint(0, image_size)
             x_coords.append(x)
             y_coords.append(y)
-
         #* ################ PLOT ################
 
         # Criar a figura e o eixo
@@ -350,7 +347,7 @@ for angle in range(-25, 26, 1):
         if  os.getcwd().split(SLASH)[-1] != 'IC_NN_Lidar':
             os.chdir('../..') #! TROCAR ISSO DEPOIS QUE SAIR DO TEST
         path = os.getcwd() + SLASH + str(''.join(['data', SLASH, 'artificial_data', SLASH, 'tags'])) + SLASH
-        label_file_path = os.path.join(path, 'Artificial_Label_Data5.csv') 
+        label_file_path = os.path.join(path, 'Artificial_Label_Data6.csv') 
 
         label_file = open(label_file_path, 'r')
         text = label_file.readlines()
@@ -363,7 +360,7 @@ for angle in range(-25, 26, 1):
         # copy the image on the step to the folder of the images that are already classified
         if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..') 
-        folder_class = os.getcwd() + SLASH + 'data' + SLASH + 'artificial_data' + SLASH + 'train5' + SLASH
+        folder_class = os.getcwd() + SLASH + 'data' + SLASH + 'artificial_data' + SLASH + 'train6' + SLASH
 
         if not os.path.exists(folder_class):
             os.makedirs(folder_class)
