@@ -60,44 +60,14 @@ def getData(csv_path, train_path, batch_size, num_workers=0):
     return train_data, val_data
 
 
-def cross_validate(model, criterion, optimizer, scheduler, data, num_epochs, num_splits=5):
-    #TODO: IMPLEMENT THIS
-    kf = KFold(n_splits=num_splits, shuffle=True, random_state=42)
-
-    avg_train_losses = []
-    avg_val_losses = []
-
-    for fold, (train_idx, val_idx) in enumerate(kf.split(data)):
-        print(f"Fold {fold+1}:")
-
-        train_data = data[train_idx]
-        val_data = data[val_idx]
-
-        train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=num_workers)
-        val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False, num_workers=num_workers)
-
-        model = YourModel()  # Initialize your model here
-        optimizer = optim.SGD(model.parameters(), lr=lr)
-
-        results = train_model(model, criterion, optimizer, scheduler, train_loader, val_loader, num_epochs)
-
-        avg_train_losses.append(results['train_losses'])
-        avg_val_losses.append(results['val_losses'])
-
-    return avg_train_losses, avg_val_losses
-
-
 def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader, num_epochs):
 
     train_losses = []
     val_losses = []
-    predictions_list = []
-    labels_list = []
 
     for epoch in range(num_epochs):
         model.train()
         running_loss = 0.0
-
         for i, data in enumerate(train_loader):
             images, labels = data['image'], data['labels']
             # convert to float32 and send it to the device
@@ -129,7 +99,6 @@ def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader
             with torch.no_grad():
                 # Set the model to evaluation mode
                 model.eval()
-                total = 0
                 val_loss = 0
                 for i, data in enumerate(val_loader):
                     images, labels = data['image'], data['labels']
@@ -139,11 +108,8 @@ def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader
                     labels = [label.type(torch.float32).to(device) for label in labels]
                     labels = torch.stack(labels)
                     labels = labels.permute(1, 0)
-                    labels_list.append(labels)
                     total += len(labels)
                     outputs = model.forward(images)
-                    # get the predictions to calculate the accuracy
-                    _, preds = torch.max(outputs, 1)
                     val_loss += criterion(outputs, labels).item()
                 val_losses.append(val_loss/len(val_loader))
             pass
@@ -200,7 +166,7 @@ if __name__ == '__main__':
     step_size = 2 # TODO: test different step sizes
     gamma = 0
     batch_size = 140 # 160 AWS
-    weight_decay = 1e-2 # L2 regularization
+    weight_decay = 1e-8 # L2 regularization
 
     ############ DATA ############
     csv_path = "../data/artificial_data/tags/Artificial_Label_Data6.csv"
