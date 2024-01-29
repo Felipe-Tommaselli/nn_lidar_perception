@@ -28,9 +28,11 @@ The artificial data are generated with the `artificial_generator.py` script. Thi
 
 | Data     | N. Labels | Description |
 |----------|-----------|-------------|
-| train    |  27000    |   Original code with the old labeling, prettly solid but we got best.    |
-| train2   |  45500    |   Hard training setup, near to 50k images.    |
-| train3   |  245      |   Small training setup to fast tests.    |
-| train4   |  19500    |   Medium setup that satisfy most of the tests.    |
+| train    |  27000    |   (Real imitation) Original code with the old labeling, prettly solid but we got best.    |
+| train2   |  45500    |   (Real imitation) Hard training setup, near to 50k images.    |
+| train3   |  245      |   (Real imitation) Small training setup to fast tests.    |
+| train4   |  19500    |   (Real imitation) Medium setup that satisfy most of the tests.    |
+| train5   |  19500    |   (Gazebo imitation) Short setup that probably satisfy most of the tests.    |
+| train6   |  19500    |   (Gazebo imitation) Short setup that probably satisfy most of the tests. NOISE ADDED.   |
 
 *obs: All the datasets are labeled automatically with the script*
