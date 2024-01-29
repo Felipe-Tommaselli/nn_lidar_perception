@@ -199,8 +199,8 @@ if __name__ == '__main__':
     lr = float(5*1e-4) # TODO: test different learning rates
     step_size = 2 # TODO: test different step sizes
     gamma = 0
-    batch_size = 140 # 160 AWS
-    weight_decay = 1e-8 # L2 regularization
+    batch_size = 160 # 160 AWS
+    weight_decay = 1e-2 # L2 regularization
 
     ############ DATA ############
     csv_path = "../data/artificial_data/tags/Artificial_Label_Data6.csv"
@@ -209,39 +209,7 @@ if __name__ == '__main__':
     train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path, train_path=train_path)
 
     ############ MODEL ############
-    #?model = models.resnet18(pretrained=True)
-    #?model = EfficientNet.from_pretrained('efficientnet-b0')
-    #?model = models.vgg16(pretrained=True)
     model = models.mobilenet_v2()
-
-    ########### EFFICENT NET ###########
-    # model._conv_stem = nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1, bias=False)
-
-    # num_ftrs = model._fc.in_features
-    # model._fc = nn.Sequential(
-    #     nn.Linear(num_ftrs, 512),
-    #     nn.BatchNorm1d(512),
-    #     nn.ReLU(inplace=True),
-    #     nn.Linear(512, 256),
-    #     nn.BatchNorm1d(256),
-    #     nn.ReLU(inplace=True),
-    #     nn.Linear(256, 3)  
-    # )
-
-    ########### VGG NET 16 ########### 
-    # model.features[0] = nn.Conv2d(1, 64, kernel_size=3, stride=1, padding=1)
-
-    # # Accessing the classifier part of the VGG16 model
-    # num_ftrs = model.classifier[6].in_features
-    # model.classifier[6] = nn.Sequential(
-    #     nn.Linear(num_ftrs, 512),
-    #     nn.BatchNorm1d(512),
-    #     nn.ReLU(inplace=True),
-    #     nn.Linear(512, 256),
-    #     nn.BatchNorm1d(256),
-    #     nn.ReLU(inplace=True),
-    #     nn.Linear(256, 3)
-    # )
 
     ########### MOBILE NET ########### 
     model.features[0][0] = nn.Conv2d(1, 32, kernel_size=3, stride=2, padding=1, bias=False)
@@ -254,22 +222,6 @@ if __name__ == '__main__':
     nn.ReLU(inplace=True),
     nn.Linear(512, 3)
     )
-
-    #################################
-
-    # model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
-
-    # num_ftrs = model.fc.in_features
-    # # Adding batch normalization and an additional convolutional layer
-    # model.fc = nn.Sequential(
-    #     nn.Linear(num_ftrs, 512),
-    #     nn.BatchNorm1d(512),
-    #     nn.ReLU(inplace=True),
-    #     nn.Linear(512, 256),
-    #     nn.BatchNorm1d(256),
-    #     nn.ReLU(inplace=True),
-    #     nn.Linear(256, 3)
-    # )
 
     # Moving the model to the device (GPU/CPU)
     model = model.to(device)
