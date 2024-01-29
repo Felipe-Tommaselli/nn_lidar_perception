@@ -194,11 +194,11 @@ if __name__ == '__main__':
 
     ############ PARAMETERS ############    
     epochs = 10
-    lr = 0.005 # TODO: test different learning rates
-    step_size = 5 # TODO: test different step sizes
-    gamma = 0.5
+    lr = 0.001 # TODO: test different learning rates
+    step_size = 2 # TODO: test different step sizes
+    gamma = 0.1
     batch_size = 120 # 160 AWS
-    weight_decay = 1e-4 # L2 regularization
+    weight_decay = 1e-7 # L2 regularization
 
     ############ DATA ############
     csv_path = "../data/artificial_data/tags/Artificial_Label_Data5.csv"
