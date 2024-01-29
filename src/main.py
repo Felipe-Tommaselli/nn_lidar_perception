@@ -163,7 +163,7 @@ if __name__ == '__main__':
     step_size = 2 # TODO: test different step sizes
     gamma = 0
     batch_size = 140 # 160 AWS
-    weight_decay = 1e-8 # L2 regularization
+    weight_decay = 0 # L2 regularization
 
     ############ DATA ############
     csv_path = "../data/artificial_data/tags/Artificial_Label_Data6.csv"
