@@ -91,8 +91,6 @@ def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader
 
     train_losses = []
     val_losses = []
-    predictions_list = []
-    labels_list = []
 
     for epoch in range(num_epochs):
         model.train()
@@ -129,8 +127,7 @@ def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader
             with torch.no_grad():
                 # Set the model to evaluation mode
                 model.eval()
-                total = 0
-                val_loss = 0
+                val_loss = 0.0
                 for i, data in enumerate(val_loader):
                     images, labels = data['image'], data['labels']
                     # image dimension: (batch, channels, height, width)
@@ -139,11 +136,8 @@ def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader
                     labels = [label.type(torch.float32).to(device) for label in labels]
                     labels = torch.stack(labels)
                     labels = labels.permute(1, 0)
-                    labels_list.append(labels)
-                    total += len(labels)
+                    
                     outputs = model.forward(images)
-                    # get the predictions to calculate the accuracy
-                    _, preds = torch.max(outputs, 1)
                     val_loss += criterion(outputs, labels).item()
                 val_losses.append(val_loss/len(val_loader))
             pass
@@ -200,7 +194,7 @@ if __name__ == '__main__':
     step_size = 2 # TODO: test different step sizes
     gamma = 0
     batch_size = 160 # 160 AWS
-    weight_decay = 1e-2 # L2 regularization
+    weight_decay = 1e-8 # L2 regularization
 
     ############ DATA ############
     csv_path = "../data/artificial_data/tags/Artificial_Label_Data6.csv"
