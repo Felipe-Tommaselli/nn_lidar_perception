@@ -47,7 +47,7 @@ def getData(csv_path, train_path, batch_size, num_workers=0):
     print(f'dataset size (no augmentation): {len(dataset)}')
     #! artificial não se beneficia muito disso
     # dataset = transformData(dataset)
-    print(f'dataset size (w/ augmentation): {len(dataset)}')
+    #print(f'dataset size (w/ augmentation): {len(dataset)}')
 
     train_size, val_size = int(0.7*len(dataset)), np.ceil(0.3*len(dataset)).astype('int')
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
