@@ -92,7 +92,7 @@ def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            #scheduler.step()
+            scheduler.step()
             running_loss += loss.item()
         else:
         # valing the model
@@ -140,6 +140,9 @@ def plotResults(results, epochs, lr):
     ax.set_ylabel('Loss')
     ax.set_title('Learning Loss Plot (L1 Loss)\nFinal Training Loss: {:.4f}'.format(results['train_losses'][-1]))
 
+    # Add grid
+    ax.grid(True)
+
     # Adding legend
     ax.legend()
 
@@ -160,9 +163,9 @@ if __name__ == '__main__':
 
     ############ PARAMETERS ############    
     epochs = 20
-    lr = float(5*1e-4) # TODO: test different learning rates
-    step_size = 2 # TODO: test different step sizes
-    gamma = 0
+    lr = float(5*1e-3) # TODO: test different learning rates
+    step_size = 4 # TODO: test different step sizes
+    gamma = 0.2
     batch_size = 120 # 160 AWS
     weight_decay = 0 # L2 regularization
 
