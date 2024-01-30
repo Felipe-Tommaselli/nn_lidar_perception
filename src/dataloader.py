@@ -30,6 +30,8 @@ from torch.utils.data import Dataset, DataLoader, random_split, ConcatDataset, S
 from torchvision import datasets
 import torchvision.models as models
 
+import copy
+
 sys.path.append('../')
 from pre_process import *
 
@@ -46,57 +48,66 @@ class NnDataLoader(Dataset):
     
     def __init__(self, csv_path, train_path):
         ''' Constructor of the class. '''
-        self.labels = pd.read_csv(csv_path)
+        labels = pd.read_csv(csv_path)
         self.train_path = train_path
-
-    def __len__(self) -> int:
-        ''' Returns the length of the dataset (based on the labels). '''
-        
-        return len(self.labels)
-
-    def __getitem__(self, idx: int) -> dict:
-        ''' Returns the sample image of the dataset. '''
 
         # move from root (\src) to \assets\images
         if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..') 
 
-        # get the step number by the index
-        step = self.labels.iloc[idx, 0]
+        self.images = list()
+        self.labels_list = list()
 
-        # full_path = os.path.join(path, 'image'+str(i)+ '_' + str(j) +'.png') # merge path and filename
-        full_path = os.path.join(self.train_path, 'image'+ str(step) +'.png') # merge path and filename
+        for idx in range(len(labels)):
+
+            # get the step number by the index
+            step = labels.iloc[idx, 0]
+
+            # full_path = os.path.join(path, 'image'+str(i)+ '_' + str(j) +'.png')
+            full_path = os.path.join(self.train_path, 'image'+ str(step) +'.png') 
+
+            # TODO: IMPORT IMAGE WITH PIL
+            # image treatment (only green channel)
+            image = cv2.imread(full_path, -1)
+            image = cv2.resize(image, (224, 224), interpolation=cv2.INTER_LINEAR)
+            image = image[:, :, 1] # only green channel
+            self.images.append(image)
+
+            #* PROCESS LABELs
+            wq_labels = NnDataLoader.process_label(labels.iloc[idx, 1:])
+
+            self.labels_list.append(wq_labels) # take step out of labels
+
+        # translate labels_list to numpy
+        labels_numpy = np.asarray(self.labels_list)
+        print(f'labels shape: {labels_numpy.shape}')
+        self.std = np.std(labels_numpy, axis=0)
+        self.mean = np.mean(labels_numpy, axis=0)
+
+        print(f'mean: {self.mean} | std: {self.std}')
 
 
-        # TODO: IMPORT IMAGE WITH PIL
-        # image treatment (only green channel)
-        self.image = cv2.imread(full_path, -1)
-        self.image = cv2.resize(self.image, (224, 224), interpolation=cv2.INTER_LINEAR)
-        self.image = self.image[:, :, 1] # only green channel
-        # to understand the crop, see the image in the assets folder and the lidar_tag.py file
+    def __len__(self) -> int:
+        ''' Returns the length of the dataset (based on the labels). '''
+        
+        return len(self.labels_list)
 
-        labels = self.labels.iloc[idx, 1:] # take step out of labels
+    def __getitem__(self, idx: int) -> dict:
+        ''' Returns the sample image of the dataset. '''
 
-        # labels = [m1, m2, b1, b2]
-        m1, m2, b1, b2 = labels
+        # PRE-PROCESSING
+        image = copy.deepcopy(self.images[idx])
+        #image = PreProcess.contours_image(image)  #! visual 
 
-        # correcting matplotlib and opencv axis problem
-        m1 = -m1
-        m2 = -m2
-        b1 = 224 - b1
-        b2 = 224 - b2
-        labels = [m1, m2, b1, b2]
+        labels = copy.deepcopy(self.labels_list[idx])
+        print(f'labels: {labels}')
+        labels = PreProcess.standard_extract_label(labels, self.mean, self.std)
+        print(f'labels dep: {labels}')
+        print('-'*25)
 
         #? CHECKPOINT! Aqui as labels e a imagem estão corretas!!
 
-        # PRE-PROCESSING
-        image = self.image # just for now
-        #image = PreProcess.contours_image(image)  #! visual 
-
-        #* PROCESS LABELs
-        labels = NnDataLoader.process_label(labels)
-
-        # labels_dep = PreProcess.deprocess(image=self.image, label=labels)        
+        # labels_dep = PreProcess.standard_deprocess(image=image, label=labels, mean=self.mean, std=self.std)        
         # m1, m2, b1, b2 = labels_dep
         # x1 = np.arange(0, image.shape[0], 1)
         # x2 = np.arange(0, image.shape[0], 1)
@@ -104,7 +115,7 @@ class NnDataLoader(Dataset):
         # y2 = m2*x2 + b2
         # plt.plot(x1, y1, 'r')
         # plt.plot(x2, y2, 'r')
-        # plt.title(f'[Dataloader] step={step}')
+        # plt.title(f'[Dataloader] step={idx}')
         # plt.imshow(image, cmap='gray')
         # plt.show()
 
@@ -120,14 +131,14 @@ class NnDataLoader(Dataset):
         DESIRED_SIZE = 224 #px
         MAX_M = 224 
 
-        m1 = labels[0]
-        m2 = labels[1]
-        b1 = labels[2]
-        b2 = labels[3]
+        m1 = -labels[0]
+        m2 = -labels[1]
+        b1 = MAX_M - labels[2]
+        b2 = MAX_M - labels[3]
 
         #! NORMALIZATION WITH w1, w2, q1, q2
         
-        w1, w2, q1, q2 = PreProcess.extract_label([m1, m2, b1, b2])
+        w1, w2, q1, q2 = PreProcess.parametrization(m1, m2, b1, b2)
 
         return [w1, w2, q1, q2]
 

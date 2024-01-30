@@ -110,6 +110,7 @@ def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader
                     labels = labels.permute(1, 0)
                     outputs = model.forward(images)
                     val_loss += criterion(outputs, labels).item()
+                    #TODO: calculate MSE
                 val_losses.append(val_loss/len(val_loader))
             pass
         train_losses.append(running_loss/len(train_loader))
@@ -137,7 +138,7 @@ def plotResults(results, epochs, lr):
     # Adding labels and title
     ax.set_xlabel('Epochs')
     ax.set_ylabel('Loss')
-    ax.set_title('Learning Loss Plot (MSE Loss)\nFinal Training Loss: {:.4f}'.format(results['train_losses'][-1]))
+    ax.set_title('Learning Loss Plot (L1 Loss)\nFinal Training Loss: {:.4f}'.format(results['train_losses'][-1]))
 
     # Adding legend
     ax.legend()
@@ -162,13 +163,13 @@ if __name__ == '__main__':
     lr = float(5*1e-4) # TODO: test different learning rates
     step_size = 2 # TODO: test different step sizes
     gamma = 0
-    batch_size = 140 # 160 AWS
+    batch_size = 8 # 160 AWS
     weight_decay = 0 # L2 regularization
 
     ############ DATA ############
-    csv_path = "../data/artificial_data/tags/Artificial_Label_Data6.csv"
+    csv_path = "../data/artificial_data/tags/Artificial_Label_Data3.csv"
     # train_path = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train4' + SLASH
-    train_path = os.path.join(os.getcwd(), '..', 'data', 'artificial_data', 'train6')
+    train_path = os.path.join(os.getcwd(), '..', 'data', 'artificial_data', 'train3')
     train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path, train_path=train_path)
 
     ############ MODEL ############
