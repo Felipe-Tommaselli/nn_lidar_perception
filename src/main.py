@@ -162,7 +162,7 @@ if __name__ == '__main__':
 
     ############ PARAMETERS ############    
     epochs = 12
-    lr = float(5*1e-2) # TODO: test different learning rates
+    lr = float(5*1e-6) # TODO: test different learning rates
     step_size = 2 # TODO: test different step sizes
     gamma = 0
     batch_size = 140 # 160 AWS
