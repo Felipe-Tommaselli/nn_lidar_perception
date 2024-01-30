@@ -80,7 +80,6 @@ class NnDataLoader(Dataset):
 
         # translate labels_list to numpy
         labels_numpy = np.asarray(self.labels_list)
-        print(f'labels shape: {labels_numpy.shape}')
         self.std = np.std(labels_numpy, axis=0)
         self.mean = np.mean(labels_numpy, axis=0)
 
@@ -100,10 +99,7 @@ class NnDataLoader(Dataset):
         #image = PreProcess.contours_image(image)  #! visual 
 
         labels = copy.deepcopy(self.labels_list[idx])
-        print(f'labels: {labels}')
         labels = PreProcess.standard_extract_label(labels, self.mean, self.std)
-        print(f'labels dep: {labels}')
-        print('-'*25)
 
         #? CHECKPOINT! Aqui as labels e a imagem estão corretas!!
 
