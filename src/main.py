@@ -140,7 +140,6 @@ def plotResults(results, epochs, lr):
     ax.set_ylabel('Loss')
     ax.set_title('Learning Loss Plot (L1 Loss)\nFinal Training Loss: {:.4f}'.format(results['train_losses'][-1]))
 
-    # Add grid
     ax.grid(True)
 
     # Adding legend
@@ -162,11 +161,11 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     ############ PARAMETERS ############    
-    epochs = 15
-    lr = float(5e-4) # TODO: test different learning rates
-    step_size = 4 # TODO: test different step sizes
+    epochs = 12
+    lr = float(5*1e-4) # TODO: test different learning rates
+    step_size = 2 # TODO: test different step sizes
     gamma = 0
-    batch_size = 120 # 160 AWS
+    batch_size = 140 # 160 AWS
     weight_decay = 0 # L2 regularization
 
     ############ DATA ############
