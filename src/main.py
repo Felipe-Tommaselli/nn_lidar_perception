@@ -92,7 +92,7 @@ def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            scheduler.step()
+            #scheduler.step()
             running_loss += loss.item()
         else:
         # valing the model
@@ -165,7 +165,7 @@ if __name__ == '__main__':
     epochs = 15
     lr = float(5e-4) # TODO: test different learning rates
     step_size = 4 # TODO: test different step sizes
-    gamma = 0.5
+    gamma = 0
     batch_size = 120 # 160 AWS
     weight_decay = 0 # L2 regularization
 
