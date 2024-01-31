@@ -161,8 +161,8 @@ if __name__ == '__main__':
     print('Using {} device'.format(device))
 
     ############ PARAMETERS ############    
-    epochs = 12
-    lr = float(5*1e-6) # TODO: test different learning rates
+    epochs = 16
+    lr = float(1e-6) # TODO: test different learning rates
     step_size = 2 # TODO: test different step sizes
     gamma = 0
     batch_size = 140 # 160 AWS
