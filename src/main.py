@@ -212,6 +212,10 @@ if __name__ == '__main__':
     ############ SAVE MODEL ############
     # get day for the name of the file
     day_time = datetime.now().strftime("%d-%m-%Y_%H-%M-%S") 
-    path = os.getcwd() + '/models/' + 'model' + '_' + str(lr).split('.')[1] + '_' + str(day_time) + '.pth'
+    try:
+        lrstr = str(lr).split('.')[1]
+    except:
+        lrstr = str(lr)
+    path = os.getcwd() + '/models/' + 'model' + '_' + lrstr + '_' + str(day_time) + '.pth'
     torch.save(model.state_dict(), path)
     print(f'Saved PyTorch Model State to:\n{path}')
