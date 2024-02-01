@@ -1,0 +1,46 @@
+id: 01-02-2024_14-43-47
+mean0: !!python/object/apply:numpy.core.multiarray.scalar
+- &id001 !!python/object/apply:numpy.dtype
+  args:
+  - f8
+  - false
+  - true
+  state: !!python/tuple
+  - 3
+  - <
+  - null
+  - null
+  - null
+  - -1
+  - -1
+  - 0
+- !!binary |
+  isK2j57mO78=
+mean1: !!python/object/apply:numpy.core.multiarray.scalar
+- *id001
+- !!binary |
+  lsK2j57mO78=
+mean2: !!python/object/apply:numpy.core.multiarray.scalar
+- *id001
+- !!binary |
+  eZjOst5AUUA=
+mean3: !!python/object/apply:numpy.core.multiarray.scalar
+- *id001
+- !!binary |
+  HRDPQaJmY0A=
+std0: !!python/object/apply:numpy.core.multiarray.scalar
+- *id001
+- !!binary |
+  t6YGYyLEzT8=
+std1: !!python/object/apply:numpy.core.multiarray.scalar
+- *id001
+- !!binary |
+  t6YGYyLEzT8=
+std2: !!python/object/apply:numpy.core.multiarray.scalar
+- *id001
+- !!binary |
+  KEbK+qkwSkA=
+std3: !!python/object/apply:numpy.core.multiarray.scalar
+- *id001
+- !!binary |
+  UMvcHi85SkA=
