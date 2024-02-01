@@ -32,9 +32,9 @@ for angle in range(-25, 26, 1):
     i+=1
     j = 0
     if angle < -15 or angle > 15:
-        bound = 150
+        bound = 2
     else: 
-        bound = 300
+        bound = 3
     print('bound: ', bound)
     while j < bound:
         count_step += 1
@@ -347,7 +347,7 @@ for angle in range(-25, 26, 1):
         if  os.getcwd().split(SLASH)[-1] != 'IC_NN_Lidar':
             os.chdir('../..') #! TROCAR ISSO DEPOIS QUE SAIR DO TEST
         path = os.getcwd() + SLASH + str(''.join(['data', SLASH, 'artificial_data', SLASH, 'tags'])) + SLASH
-        label_file_path = os.path.join(path, 'Artificial_Label_Data6.csv') 
+        label_file_path = os.path.join(path, 'Artificial_Label_Data7.csv') 
 
         label_file = open(label_file_path, 'r')
         text = label_file.readlines()
@@ -360,7 +360,7 @@ for angle in range(-25, 26, 1):
         # copy the image on the step to the folder of the images that are already classified
         if os.getcwd().split(SLASH)[-1] == 'src':
             os.chdir('..') 
-        folder_class = os.getcwd() + SLASH + 'data' + SLASH + 'artificial_data' + SLASH + 'train6' + SLASH
+        folder_class = os.getcwd() + SLASH + 'data' + SLASH + 'artificial_data' + SLASH + 'train7' + SLASH
 
         if not os.path.exists(folder_class):
             os.makedirs(folder_class)
