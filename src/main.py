@@ -163,7 +163,7 @@ if __name__ == '__main__':
     runid = str(day_time) # id of this particular run
 
     ############ PARAMETERS ############    
-    epochs = 20
+    epochs = 2
     lr = float(2e-5) # TODO: test different learning rates
     step_size = 2 # TODO: test different step sizes
     gamma = 0
