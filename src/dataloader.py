@@ -29,6 +29,7 @@ from torchvision.transforms import functional as F
 from torch.utils.data import Dataset, DataLoader, random_split, ConcatDataset, Subset
 from torchvision import datasets
 import torchvision.models as models
+import yaml
 
 import copy
 
@@ -46,7 +47,7 @@ elif platform == "win32":
 class NnDataLoader(Dataset):
     ''' Dataset class for the lidar data with images. '''
     
-    def __init__(self, csv_path, train_path):
+    def __init__(self, csv_path, train_path, runid):
         ''' Constructor of the class. '''
         labels = pd.read_csv(csv_path)
         self.train_path = train_path
@@ -85,6 +86,24 @@ class NnDataLoader(Dataset):
 
         print(f'mean: {self.mean} | std: {self.std}')
 
+        data = {
+            'id': runid,  
+            'mean0': self.mean[0],
+            'mean1': self.mean[1],
+            'mean2': self.mean[2],
+            'mean3': self.mean[3],
+            'std0': self.std[0],
+            'std1': self.std[1],
+            'std2': self.std[2],
+            'std3': self.std[3],
+        }
+        
+        if os.getcwd() == 'src':
+            os.chdir('..')
+        path="./models/"
+        
+        with open(path + 'config.yaml', 'a') as file:
+            yaml.dump(data, file, default_flow_style=False)
 
     def __len__(self) -> int:
         ''' Returns the length of the dataset (based on the labels). '''

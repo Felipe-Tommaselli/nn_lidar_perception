@@ -39,10 +39,10 @@ sys.path.append('../')
 from pre_process import *
 
 
-def getData(csv_path, train_path, batch_size, num_workers=0):
+def getData(csv_path, train_path, batch_size, runid, num_workers=0):
     ''' get images from the folder (assets/images) and return a DataLoader object '''
     
-    dataset = NnDataLoader(csv_path, train_path)
+    dataset = NnDataLoader(csv_path, train_path, runid)
 
     print(f'dataset size (no augmentation): {len(dataset)}')
     #! artificial não se beneficia muito disso
@@ -52,8 +52,8 @@ def getData(csv_path, train_path, batch_size, num_workers=0):
     train_size, val_size = int(0.7*len(dataset)), np.ceil(0.3*len(dataset)).astype('int')
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
     
-    train_data = DataLoader(train_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
-    val_data  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True,num_workers=num_workers)
+    train_data = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+    val_data  = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 
     print(f'train size: {train_size}, val size: {val_size}')
     _ = input('----------------- Press Enter to continue -----------------')
@@ -124,7 +124,7 @@ def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader
     
     return results
 
-def plotResults(results, epochs, lr):
+def plotResults(results, epochs, lr, runid):
     # losses
     # print both losses side by side with subplots (1 row, 2 columns)
     # ax1 for train losses and ax2 for val losses
@@ -149,16 +149,18 @@ def plotResults(results, epochs, lr):
     plt.tight_layout()
 
     # Save the plot in the current folder
-    day_time = datetime.now().strftime("%d-%m-%Y_%H-%M-%S") 
-    fig.savefig(f'losses_lr={lr}_{day_time}.png')
+    fig.savefig(f'losses_{runid}.png')
 
 if __name__ == '__main__':
     ############ START ############
     # Set the device to GPU if available
     global device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    #device = torch.device('cpu')
     print('Using {} device'.format(device))
+
+    ############ RUN ID ############
+    day_time = datetime.now().strftime("%d-%m-%Y_%H-%M-%S") 
+    runid = str(day_time) # id of this particular run
 
     ############ PARAMETERS ############    
     epochs = 20
@@ -172,7 +174,7 @@ if __name__ == '__main__':
     csv_path = "../data/artificial_data/tags/Artificial_Label_Data6.csv"
     # train_path = os.getcwd() + SLASH + 'artificial_data' + SLASH + 'train4' + SLASH
     train_path = os.path.join(os.getcwd(), '..', 'data', 'artificial_data', 'train6')
-    train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path, train_path=train_path)
+    train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path, train_path=train_path, runid=runid)
 
     ############ MODEL ############
     model = models.mobilenet_v2()
@@ -207,7 +209,7 @@ if __name__ == '__main__':
     results = train_model(model=model, criterion=criterion, optimizer=optimizer, scheduler=scheduler, train_loader=train_data, val_loader=val_data, num_epochs=epochs)
 
     ############ RESULTS ############
-    plotResults(results, epochs, lr)
+    plotResults(results, epochs, lr, runid)
 
     ############ SAVE MODEL ############
     # get day for the name of the file
@@ -216,6 +218,6 @@ if __name__ == '__main__':
         lrstr = str(lr).split('.')[1]
     except:
         lrstr = str(lr)
-    path = os.getcwd() + '/models/' + 'model' + '_' + lrstr + '_' + str(day_time) + '.pth'
+    path = os.getcwd() + '/models/' + 'model' + '_' + runid + '.pth'
     torch.save(model.state_dict(), path)
     print(f'Saved PyTorch Model State to:\n{path}')
