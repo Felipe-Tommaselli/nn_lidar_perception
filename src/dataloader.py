@@ -59,6 +59,8 @@ class NnDataLoader(Dataset):
         self.images = list()
         self.labels_list = list()
 
+        ############ LOAD DATASET ############
+
         for idx in range(len(labels)):
 
             # get the step number by the index
@@ -79,13 +81,14 @@ class NnDataLoader(Dataset):
 
             self.labels_list.append(wq_labels) # take step out of labels
 
+        ############ OBTAIN MEAN AND STD FOR NORMALIZATION ############
+        
         # translate labels_list to numpy
         labels_numpy = np.asarray(self.labels_list)
         self.std = np.std(labels_numpy, axis=0)
         self.mean = np.mean(labels_numpy, axis=0)
-
-        print(f'mean: {self.mean} | std: {self.std}')
-
+        
+        ############ SAVE MEAN AND STD IN config.yaml ############
         data = {
             'id': runid,  
             'mean0': self.mean[0],
@@ -101,7 +104,10 @@ class NnDataLoader(Dataset):
         if os.getcwd() == 'src':
             os.chdir('..')
         path="./models/"
-        
+
+        # Convert NumPy arrays to lists in a one-liner
+        data = {key: value.tolist() if isinstance(value, np.ndarray) else value for key, value in data.items()}
+
         with open(path + 'config.yaml', 'a') as file:
             yaml.dump(data, file, default_flow_style=False)
 
