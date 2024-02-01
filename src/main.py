@@ -163,8 +163,8 @@ if __name__ == '__main__':
     runid = str(day_time) # id of this particular run
 
     ############ PARAMETERS ############    
-    epochs = 2
-    lr = float(2e-5) # TODO: test different learning rates
+    epochs = 20
+    lr = float(0.00009) # TODO: test different learning rates
     step_size = 2 # TODO: test different step sizes
     gamma = 0
     batch_size = 140 # 160 AWS
