@@ -29,8 +29,7 @@ from torchvision.transforms import functional as F
 from torch.utils.data import Dataset, DataLoader, random_split, ConcatDataset, Subset
 from torchvision import datasets
 import torchvision.models as models
-import yaml
-
+import json
 import copy
 
 sys.path.append('../')
@@ -90,24 +89,32 @@ class NnDataLoader(Dataset):
         
         ############ SAVE MEAN AND STD IN config.yaml ############
         data = {
-            'id': runid,  
-            'mean0': str(self.mean[0]),
-            'mean1': str(self.mean[1]),
-            'mean2': str(self.mean[2]),
-            'mean3': str(self.mean[3]),
-            'std0': str(self.std[0]),
-            'std1': str(self.std[1]),
-            'std2': str(self.std[2]),
-            'std3': str(self.std[3]),
+            'id': runid,  # You can set the appropriate id value
+            'mean0': self.mean[0],
+            'mean1': self.mean[1],
+            'mean2': self.mean[2],
+            'mean3': self.mean[3],
+            'std0': self.std[0],
+            'std1': self.std[1],
+            'std2': self.std[2],
+            'std3': self.std[3]
         }
-        
+
         if os.getcwd() == 'src':
             os.chdir('..')
-        path="./models/"
+        filename = './models/params.json'
 
-        with open(path + 'config.yaml', 'a') as file:
-            yaml.dump(data, file, default_flow_style=False)
-            file.write('\n')
+        # Load existing data if the file already exists
+        try:
+            with open(filename, 'r') as file:
+                existing_data = json.load(file)
+        except (FileNotFoundError, json.decoder.JSONDecodeError):
+            pass
+
+        # Append the new data to the file
+        with open(filename, 'w') as file:
+            json.dump(data, file, indent=4)
+
 
     def __len__(self) -> int:
         ''' Returns the length of the dataset (based on the labels). '''
