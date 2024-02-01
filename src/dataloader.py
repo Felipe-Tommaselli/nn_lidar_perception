@@ -107,6 +107,7 @@ class NnDataLoader(Dataset):
 
         with open(path + 'config.yaml', 'a') as file:
             yaml.dump(data, file, default_flow_style=False)
+            file.write('\n')
 
     def __len__(self) -> int:
         ''' Returns the length of the dataset (based on the labels). '''
