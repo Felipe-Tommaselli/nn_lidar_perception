@@ -91,22 +91,19 @@ class NnDataLoader(Dataset):
         ############ SAVE MEAN AND STD IN config.yaml ############
         data = {
             'id': runid,  
-            'mean0': self.mean[0],
-            'mean1': self.mean[1],
-            'mean2': self.mean[2],
-            'mean3': self.mean[3],
-            'std0': self.std[0],
-            'std1': self.std[1],
-            'std2': self.std[2],
-            'std3': self.std[3],
+            'mean0': str(self.mean[0]),
+            'mean1': str(self.mean[1]),
+            'mean2': str(self.mean[2]),
+            'mean3': str(self.mean[3]),
+            'std0': str(self.std[0]),
+            'std1': str(self.std[1]),
+            'std2': str(self.std[2]),
+            'std3': str(self.std[3]),
         }
         
         if os.getcwd() == 'src':
             os.chdir('..')
         path="./models/"
-
-        # Convert NumPy arrays to lists in a one-liner
-        data = {key: value.tolist() if isinstance(value, np.ndarray) else value for key, value in data.items()}
 
         with open(path + 'config.yaml', 'a') as file:
             yaml.dump(data, file, default_flow_style=False)
