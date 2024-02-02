@@ -112,8 +112,10 @@ class NnDataLoader(Dataset):
             pass
 
         # Append the new data to the file
-        with open(filename, 'w') as file:
+        with open(filename, 'a') as file:
             json.dump(data, file, indent=4)
+            file.write('\n')
+
 
 
     def __len__(self) -> int:
