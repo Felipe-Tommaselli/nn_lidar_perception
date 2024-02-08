@@ -36,7 +36,7 @@ The approach based on images is due to the amount of **noise** in the input data
 
 > The current implementation does not consider temporal information itself, however, future implementations expect that temporal neural networks can be aggregated to avoid problems with obstacles and occlusion of LiDAR.
 
-> Note that the author already published the parcial results in the LARS 2023 [3]. DOI: 10.1109/LARS/SBR/WRE59448.2023.10332981
+> **Note that the author already published the parcial results in the LARS 2023 [3]. DOI: 10.1109/LARS/SBR/WRE59448.2023.10332981**
 
 ## Parcial Results
 
