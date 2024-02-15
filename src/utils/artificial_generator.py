@@ -8,14 +8,7 @@ import os
 import sys
 from sys import platform
 
-global SLASH
-if platform == "linux" or platform == "linux2":
-    # linux
-    SLASH = "/"
-elif platform == "win32":
-    # Windows...
-    SLASH = "\\"
-
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # Configurações
 image_size = 224  # Tamanho da imagem
 
@@ -27,15 +20,66 @@ x_coords = []
 i, j = 0, 0
 count_step = 0
 
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+FID = '8'
+
+PATH = os.getcwd() + '/' + str(''.join(['data', '/', 'artificial_data', '/', 'tags'])) + '/'
+NAME = 'Artificial_Label_Data' + FID + '.csv'
+
+IMAGE_DIR = os.getcwd() + '/' + 'data' + '/' + 'artificial_data' + '/' + 'train' + FID + '/'
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+############## DEFINITIONS ##############
+RANGE1, RANGE2, STEP = [-35, 36, 1]
+BOUND1, BOUND2 = [2, 4]
+DIVIDER1_a, DIVIDER1_b = [70, 90] 
+DIVIDER2_a, DIVIDER2_b = [70, 110] 
+############## DENTRO BAIXO (DB) ##############
+DIVIDER_LIM, DB_D1_a, DB_D1_b, DB_D2_a, DB_D2_b = [100, 60, 80, 60, 70]
+DB_BOUND1, DB_BOUND2 = [5, 7]
+DB_RANGE1, DB_RANGE2 = [0, (9*image_size)//10]
+DB_COLOR = 'black'
+############## DENTRO TOPO (DT) ##############
+DT_CLUST1, DT_CLUST2, DT_POINTS = [4, 6, 2]
+DT_BOUND1, DT_BOUND2 = [28, 32]
+DT_RANGE1, DT_RANGE2 = [2*image_size//3, image_size]
+DT_COLOR = 'black'
+############## FORA 1 ##############
+F1_CLUST1, F1_CLUST2, F1_POINTS = [5, 22, 3]
+F1_BOUND1, F1_BOUND2 = [8, 11]
+F1_RANGE1, F1_RANGE2 = [0, (2*image_size//3)]
+F1_COLOR = 'black'
+############## FORA 2 ##############
+F2_CLUST1, F2_CLUST2, F2_POINTS = [2, 6, 4]
+F2_BOUND1_a, F2_BOUND1_b = [13, 17]
+F2_BOUND2_a, F2_BOUND2_b = [27, 32]
+F2_RANGE1, F2_RANGE2 = [0, (2*image_size//3)]
+F2_COLOR = 'black'
+############## FORA CIMA ##############
+FC_LIM, FC_D1_a, FC_D1_b, FC_D2_a, FC_D2_b = [15, 3, 30, 0, 10]
+FC_BOUND1, FC_BOUND2 = [1, 15]
+FC_RANGE1, FC_RANGE2 = [image_size//2, image_size]
+FC_COLOR = 'black'
+############## FORA BAIXO ##############
+FB_CLUST1, FB_CLUST2, FB_POINTS = [2, 3, 3]
+FB_BOUND1, FB_BOUND2 = [13, 17]
+FB_CENTRAL1, FB_CENTRAL2 = [image_size//24, image_size//6]
+FB_COLOR = 'black'
+############## RANDOM ##############
+RND_RANGE1, RND_RANGE2 = [0, 30]
+RND_COLOR = 'black'
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 # rotacionar as retas
-for angle in range(-25, 26, 1):
+for angle in range(RANGE1, RANGE2, STEP):
     i+=1
     j = 0
     if angle < -15 or angle > 15:
-        bound = 2
+        bound = BOUND1
     else: 
-        bound = 3
-    print('bound: ', bound)
+        bound = BOUND2
     while j < bound:
         count_step += 1
         j += 1
@@ -43,9 +87,9 @@ for angle in range(-25, 26, 1):
 
         pivot = (np.random.randint(82, 142), 0)
         if pivot[0] < 97 or pivot[0] > 127:
-            divider = np.random.randint(70, 90)  # Espaçamento entre as retas
+            divider = np.random.randint(DIVIDER1_a, DIVIDER1_b)  # Espaçamento entre as retas
         else: 
-            divider = np.random.randint(70, 110)
+            divider = np.random.randint(DIVIDER2_a, DIVIDER2_b)
 
         # prevent problems with the angle
         if angle < -40 or angle > 40:
@@ -118,17 +162,22 @@ for angle in range(-25, 26, 1):
 
         #* ################ GENERATE POINTS ################
 
+        # PLOT
+        fig, ax = plt.subplots(figsize=(5, 5), dpi=58)
+        ax.set_xlim(0, image_size)
+        ax.set_ylim(0, image_size)
+
         #################### Dentro Baixo ####################
 
         # Gerar pontos entre as retas
-        if divider > 100:
-            d = np.random.randint(60, 80)
+        if divider > DIVIDER_LIM:
+            d = np.random.randint(DB_D1_a, DB_D1_b)
         else: 
-            d = np.random.randint(60, 70)
+            d = np.random.randint(DB_D2_a, DB_D2_b)
         for _ in range(d):
-            boundary = np.random.randint(5, 7)
+            boundary = np.random.randint(DB_BOUND1, DB_BOUND2)
             # escolher um y aleatorio entre 0 e 224
-            y = np.random.randint(0, (9*image_size)//10)
+            y = np.random.randint(DB_RANGE1, DB_RANGE2)
             # achar o limiar da reta de boundary para aquele x e da reta normal
             x1_boundary = (y - b1r) / m1r
             x2_boundary = (y - b2r) / m2r
@@ -136,16 +185,19 @@ for angle in range(-25, 26, 1):
             x = np.random.choice([np.random.randint(x1_boundary, x1_boundary + boundary), np.random.randint(x2_boundary - boundary, x2_boundary)])
             x_coords.append(x)
             y_coords.append(y)
+        ax.scatter(x_coords, y_coords, s=90, c=DB_COLOR)
+        x_coords = []
+        y_coords = []
 
         # #################### Dentro Topo ####################
 
-        num_clusters = np.random.randint(4, 6)  # Número de subconjuntos
+        num_clusters = np.random.randint(DT_CLUST1, DT_CLUST2)  # Número de subconjuntos
         # Gerar pontos com aglomeração em subconjuntos #! parte de cima (obstrução do lidar)
         for _ in range(num_clusters):
-            points_per_cluster = 2  # Número de pontos por subconjunto
-            boundary = np.random.randint(28, 32)
+            points_per_cluster = DT_POINTS  # Número de pontos por subconjunto
+            boundary = np.random.randint(DT_BOUND1, DT_BOUND2)
             # escolher um y aleatorio entre 0 e 224
-            central_y = np.random.randint(2*image_size//3, image_size)
+            central_y = np.random.randint(DT_RANGE1, DT_RANGE2)
             # achar o limiar da reta de boundary para aquele x e da reta normal
             x1_boundary = (central_y - b1r) / m1r
             x2_boundary = (central_y - b2r) / m2r
@@ -163,16 +215,19 @@ for angle in range(-25, 26, 1):
                 y = int(round(central_y + dy))
                 x_coords.append(x)
                 y_coords.append(y)
+        ax.scatter(x_coords, y_coords, s=90, c=DT_COLOR)
+        x_coords = []
+        y_coords = []
 
         # #################### Fora 1 ####################
 
-        num_clusters = np.random.randint(15, 22)  # Número de subconjuntos
+        num_clusters = np.random.randint(F1_CLUST1, F1_CLUST2)  # Número de subconjuntos
         # Gerar pontos com aglomeração em subconjuntos #! pontos de fora das retas
         for cluster in range(num_clusters):
-            points_per_cluster = 3  # Número de pontos por subconjunto
-            boundary = np.random.randint(8, 11)
+            points_per_cluster = F1_POINTS  # Número de pontos por subconjunto
+            boundary = np.random.randint(F1_BOUND1, F1_BOUND2)
             # escolher um y aleatorio entre 0 e 224
-            central_y = np.random.randint(0, (2*image_size//3))
+            central_y = np.random.randint(F1_RANGE1, F1_RANGE2)
             # achar o limiar da reta de boundary para aquele x e da reta normal
             x1_boundary = (central_y - b1r) / m1r
             x2_boundary = (central_y - b2r) / m2r
@@ -193,17 +248,21 @@ for angle in range(-25, 26, 1):
                 y = int(round(central_y + dy))
                 x_coords.append(x)
                 y_coords.append(y)
+        ax.scatter(x_coords, y_coords, s=90, c=F1_COLOR)
+        x_coords = []
+        y_coords = []
+
 
         # #################### Fora 2 ####################
 
-        num_clusters = np.random.randint(3, 6) # Número de subconjuntos
+        num_clusters = np.random.randint(2, 6) # Número de subconjuntos
         # Gerar pontos com aglomeração em subconjuntos
         for cluster in range(num_clusters):
             points_per_cluster = 4  # Número de pontos por subconjunto
-            boundary1 = np.random.randint(13, 17)
-            boundary2 = np.random.randint(27, 32)
+            boundary1 = np.random.randint(F2_BOUND1_a, F2_BOUND1_b)
+            boundary2 = np.random.randint(F2_BOUND2_a, F2_BOUND2_b)
             # escolher um y aleatorio entre 0 e 224
-            central_y = np.random.randint(0, (2*image_size)//3)
+            central_y = np.random.randint(F2_RANGE1, F2_RANGE2)
             # achar o limiar da reta de boundary para aquele x e da reta normal
             x1_boundary = (central_y - b1r) / m1r
             x2_boundary = (central_y - b2r) / m2r
@@ -224,49 +283,38 @@ for angle in range(-25, 26, 1):
                 y = int(round(central_y + dy))
                 x_coords.append(x)
                 y_coords.append(y)
-
-        # # #################### Fora 3 ####################
-
-        # # Gerar pontos entre os dois boundarys
-        # for _ in range(np.random.randint(3, 5)):
-        #     boundary1 = np.random.randint(23, 27)
-        #     boundary2 = np.random.randint(53, 57)
-        #     # escolher um y aleatorio entre 0 e 224
-        #     y = np.random.randint(0, image_size)
-        #     # achar o limiar da reta de boundary para aquele x e da reta normal
-        #     x1_boundary = (y - b1r) / m1r
-        #     x2_boundary = (y - b2r) / m2r
-        #     # fit do x1 e x2 com os boundarys
-        #     if angle < -15:
-        #         x = np.random.randint(x2_boundary + boundary1, x2_boundary + boundary2)
-        #     elif angle > 15:
-        #         x = np.random.randint(x1_boundary - boundary2, x1_boundary - boundary1)
-        #     else: 
-        #         x = np.random.choice([np.random.randint(x1_boundary - boundary2, x1_boundary - boundary1), np.random.randint(x2_boundary + boundary1, x2_boundary + boundary2)])        
-        #     x_coords.append(x)
-        #     y_coords.append(y)
+        ax.scatter(x_coords, y_coords, s=90, c=F2_COLOR)
+        x_coords = []
+        y_coords = []
 
         # #################### Fora Cima ####################
 
         # Gerar pontos nos primeiros pixels de fora de cada reta (altura de cima)
         # linhas de plantação adjacentes
-        for _ in range(np.random.randint(10, 12)):
-            boundary = np.random.randint(1, 6)
+        if angle < -FC_LIM or angle > FC_LIM:
+            a, b = [FC_D1_a, FC_D1_b]
+        else:
+            a, b = [FC_D2_a, FC_D2_b]
+        for _ in range(np.random.randint(a, b)):
+            boundary = np.random.randint(FC_BOUND1, FC_BOUND2)
             # escolher um y aleatorio entre 0 e 224
-            y = np.random.randint(image_size//2, image_size)
+            y = np.random.randint(FC_RANGE1, FC_RANGE2)
             # fit do x1 e x2 com os boundarys
             x = np.random.choice([np.random.randint(0, boundary), np.random.randint(image_size - boundary, image_size)])
             x_coords.append(x)
             y_coords.append(y)
+        ax.scatter(x_coords, y_coords, s=90, c=FC_COLOR)
+        x_coords = []
+        y_coords = []
 
         # #################### Fora baixo ####################
 
-        num_clusters = np.random.randint(2, 3)  # Número de subconjuntos
+        num_clusters = np.random.randint(FB_CLUST1, FB_CLUST2)  # Número de subconjuntos
         # Gerar pontos com aglomeração em subconjuntos 
         for cluster in range(num_clusters):
-            points_per_cluster = 2  # Número de pontos por subconjunto
-            boundary = np.random.randint(13, 17)
-            central_y = np.random.randint(0, image_size//12)
+            points_per_cluster = FB_POINTS  # Número de pontos por subconjunto
+            boundary = np.random.randint(FB_BOUND1, FB_BOUND2)
+            central_y = np.random.randint(FB_CENTRAL1, FB_CENTRAL2)
             # achar o limiar da reta de boundary para aquele x e da reta normal
             x1_boundary = (central_y - b1r) / m1r
             x2_boundary = (central_y - b2r) / m2r
@@ -287,52 +335,28 @@ for angle in range(-25, 26, 1):
                 y = int(round(central_y + dy))
                 x_coords.append(x)
                 y_coords.append(y)
-
-        # #################### Borda ####################
-
-        # # Gerar pontos entre os pixels nos pontos mais distantes das retas
-        # for _ in range(np.random.randint(3, 7)):
-        #     if angle < 10:
-        #         x = np.random.randint(image_size - 40, image_size)
-        #     elif angle > 10:
-        #         x = np.random.randint(0, 40) 
-        #     else: 
-        #         x = np.random.randint(0, image_size)
-
-        #     y = np.random.randint(0, image_size//2)
-        #     x_coords.append(x)
-        #     y_coords.append(y)
+        ax.scatter(x_coords, y_coords, s=90, c=FB_COLOR)
+        x_coords = []
+        y_coords = []
 
         # #################### Random ####################
 
         # Gerar pontos aleatórios ao longo da imagem
-        for _ in range(np.random.randint(12, 18)):
+        for _ in range(np.random.randint(RND_RANGE1, RND_RANGE2)):
             x = np.random.randint(0, image_size)
             y = np.random.randint(0, image_size)
             x_coords.append(x)
             y_coords.append(y)
+        ax.scatter(x_coords, y_coords, s=90, c=RND_COLOR)
+        x_coords = []
+        y_coords = []
+
         #* ################ PLOT ################
 
         # Criar a figura e o eixo
         fig, ax = plt.subplots(figsize=(5, 5), dpi=58)
         ax.set_xlim(0, image_size)
         ax.set_ylim(0, image_size)
-        # ax.set_title(f'Step: {str(i)}_{str(j)}')
-        
-        # Desenhar as retas rotacionadas (com pontos de início e fim)
-        # ax.plot(x_line, y1_line_rotated, 'r')
-        # ax.plot(x_line, y2_line_rotated, 'r')
-
-        # Linhas auxiliares
-        # yline = np.arange(0, image_size, 1)
-        # x1line = (yline - b1r) / m1r - 20
-        # x2line = (yline - b2r) / m2r + 20
-
-        # ax.plot(x1line, yline, 'c')
-        # ax.plot(x2line, yline, 'c')
-
-        # Desenhar os pontos
-        ax.scatter(x_coords, y_coords, s=90, c='black')
         
         # Remover as bordas e ticks dos eixos
         ax.set_xticks([])
@@ -344,10 +368,9 @@ for angle in range(-25, 26, 1):
         # step = 300*(i-1) + j
         labels = f'{str(count_step)}, {m1r}, {m2r}, {b1r}, {b2r}'
 
-        if  os.getcwd().split(SLASH)[-1] != 'IC_NN_Lidar':
-            os.chdir('../..') #! TROCAR ISSO DEPOIS QUE SAIR DO TEST
-        path = os.getcwd() + SLASH + str(''.join(['data', SLASH, 'artificial_data', SLASH, 'tags'])) + SLASH
-        label_file_path = os.path.join(path, 'Artificial_Label_Data7.csv') 
+        if  os.getcwd().split('/')[-1] != 'IC_NN_Lidar':
+            os.chdir('../..') 
+        label_file_path = os.path.join(PATH, NAME) 
 
         label_file = open(label_file_path, 'r')
         text = label_file.readlines()
@@ -358,21 +381,16 @@ for angle in range(-25, 26, 1):
         label_file.close()
 
         # copy the image on the step to the folder of the images that are already classified
-        if os.getcwd().split(SLASH)[-1] == 'src':
+        if os.getcwd().split('/')[-1] == 'src':
             os.chdir('..') 
-        folder_class = os.getcwd() + SLASH + 'data' + SLASH + 'artificial_data' + SLASH + 'train7' + SLASH
 
-        if not os.path.exists(folder_class):
-            os.makedirs(folder_class)
-        # sabe matplotlib plot on folder_class
-        # img_name = folder_class + 'image' + str(i) + '_' + str(j) + '.png'
-        img_name = folder_class + 'image' + str(count_step) + '.png'
+        if not os.path.exists(IMAGE_DIR):
+            os.makedirs(IMAGE_DIR)
+
+        img_name = IMAGE_DIR + 'image' + str(count_step) + '.png'
         plt.savefig(img_name, bbox_inches='tight', pad_inches=0)
         if count_step % 100 == 0:
             print('File saved: ', count_step)
-        
-        # Mostrar a imagem na tela
-        # plt.show()
         
         plt.close()
 
