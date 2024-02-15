@@ -21,12 +21,19 @@ i, j = 0, 0
 count_step = 0
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if  os.getcwd().split('/')[-1] != 'IC_NN_Lidar':
+    os.chdir('../..') 
+    
 FID = '8'
 
 PATH = os.getcwd() + '/' + str(''.join(['data', '/', 'artificial_data', '/', 'tags'])) + '/'
 NAME = 'Artificial_Label_Data' + FID + '.csv'
 
 IMAGE_DIR = os.getcwd() + '/' + 'data' + '/' + 'artificial_data' + '/' + 'train' + FID + '/'
+
+
+if not os.path.exists(IMAGE_DIR):
+    os.makedirs(IMAGE_DIR)
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -368,8 +375,6 @@ for angle in range(RANGE1, RANGE2, STEP):
         # step = 300*(i-1) + j
         labels = f'{str(count_step)}, {m1r}, {m2r}, {b1r}, {b2r}'
 
-        if  os.getcwd().split('/')[-1] != 'IC_NN_Lidar':
-            os.chdir('../..') 
         label_file_path = os.path.join(PATH, NAME) 
 
         label_file = open(label_file_path, 'r')
@@ -379,13 +384,6 @@ for angle in range(RANGE1, RANGE2, STEP):
         label_file = open(label_file_path, 'a')
         label_file.write('\n' + labels)
         label_file.close()
-
-        # copy the image on the step to the folder of the images that are already classified
-        if os.getcwd().split('/')[-1] == 'src':
-            os.chdir('..') 
-
-        if not os.path.exists(IMAGE_DIR):
-            os.makedirs(IMAGE_DIR)
 
         img_name = IMAGE_DIR + 'image' + str(count_step) + '.png'
         plt.savefig(img_name, bbox_inches='tight', pad_inches=0)
