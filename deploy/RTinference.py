@@ -1,75 +1,123 @@
 #!/usr/bin/env python3
 
+from __future__ import print_function
+
+import warnings
+warnings.filterwarnings("ignore")
+
 import os
-import time
 import cv2
+import time
+import json
 import torch
 import numpy as np
-import math 
 import matplotlib
-matplotlib.use('Qt5Agg')  # Use the Qt5Agg backend
+import colorful as cf
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 from matplotlib.colors import PowerNorm
-import seaborn as sns 
 import torchvision.models as models
-
-from std_msgs.msg import Float32MultiArray
-from sensor_msgs.msg import LaserScan
-from custom_msgs.srv import RTInferenceService  # Assuming you have a custom service message
-
-
-from sensor_msgs.msg import LaserScan
 
 import rospy
 
+from std_msgs.msg import Float32
+from std_srvs.srv import Empty
+from sensor_msgs.msg import LaserScan
+
+from wp_gen.srv import RTInference, RTInferenceResponse, RTInferenceRequest
+from wp_gen.msg import CropLine
+
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
+
 device = torch.device("cpu")
+
+############ GLOBAL PARAMS ############
+global runid
+runid = '02-02-2024_00-45-55'
+global SHOW
+SHOW = True
 
 os.chdir('..')
 print(os.getcwd())
 
-global fid
-fid = 5
-
 class RTinference:
     def __init__(self):
         print('init...')
+
+        ########## MODEL LOAD ##########
         self.load_model()
+
+        ########## PARAMS LOAD ##########
+        result = self.read_params_from_json(query_id=runid)
+        if result is not None:
+            print('params.json query sucessful.')
+            self.mean = [result['mean0'], result['mean1'], result['mean2'], result['mean3']]
+            self.std = [result['std0'], result['std1'], result['std2'], result['std3']]
+        else:
+            print("No data found for the specified id.")
+            self.mean = None
+            self.std = None
 
         ########## PLOT ##########
         self.fig, _ = plt.subplots(figsize=(8, 5), frameon=True)
-        self.x = np.arange(0, 224)
         self.image = np.zeros((224, 224))  # empty blank (224, 224) self.image
-        self.y1p = np.ones(len(self.x))*50
-        self.y2p = np.ones(len(self.x))*100
+        self.response = [0.0, 0.0, 0.0, 0.0] # m1, m2, b1, b2
 
         ############### RUN ###############
         # Set up the ROS subscriber
-        rospy.init_node('RTinference', anonymous=True)
+        self.data = None
+        rospy.init_node('RTinference_node')
         rospy.Subscriber('/terrasentia/scan', LaserScan, self.lidar_callback)
 
-        # Set up the ROS service server
-        rospy.Service('/rt_inference_service', RTInferenceService, self.rt_inference_service)
+        self.pub = rospy.Publisher('/lidar_plot', Image, queue_size=10)
+        self.bridge = CvBridge()
 
+        # Set up the ROS service server
+        rospy.Service('RTInference', RTInference, self.rt_inference_service)
+        rospy.loginfo(cf.green("Server is ready to receive requests"))
+
+        rate = rospy.Rate(10)
+        while not rospy.is_shutdown():
+            try:
+                self.run()
+            except Exception as e:
+                print(e)
+                pass
+            
+            rate.sleep()
 
     ############### ROS INTEGRATION ###############
     def lidar_callback(self, data):
-        self.generate_image(data)
-        image = self.get_image()
-        predictions = self.inference(image)
-        self.y1p, self.y2p, self.image = self.prepare_plot(predictions, image)
+        self.data = data
+
+    def run(self):
+        if self.data is not None: # check for consistency
+            self.generate_image(self.data)
+            self.image, raw_image = self.get_image()
+
+            self.response = self.inference(self.image)
+
+            ros_image = self.plot(self.response, raw_image)
+            self.pub.publish(ros_image)
 
     def rt_inference_service(self, req):
-        # This function is called when a service request is received
-        # You can modify it according to your needs
-        response = RTInferenceServiceResponse()
-        response.y1p = self.y1p.tolist()  # Convert numpy array to list
-        response.y2p = self.y2p.tolist()  # Convert numpy array to list
-        response.image = self.image.flatten().tolist()  # Convert 2D array to list
-        return response
+        rospy.loginfo(cf.yellow(f"Received request {req}"))
+        
+        # self.response is the mechanism that permits the call service to get the most uptated data
+        m1, m2, b1, b2 = self.response
+        print(f'm1={m1:.2f}, m2={m2:.2f}, b1={b1:.2f}, b2={b2:.2f}')
+
+        line1 = CropLine(m1, b1)
+        line2 = CropLine(m2, b2)
+        
+        if req.show:
+            image = self.image.flatten().tolist()
+            return line1, line2, image
+        else:
+            image = []
+            return line1, line2, image
 
     ############### MODEL LOAD ############### 
-
     def load_model(self):
         ########### MOBILE NET ########### 
         self.model = models.mobilenet_v2()
@@ -81,21 +129,44 @@ class RTinference:
         torch.nn.Linear(num_ftrs, 512),
         torch.nn.BatchNorm1d(512),
         torch.nn.ReLU(inplace=True),
-        torch.nn.Linear(512, 256),
-        torch.nn.BatchNorm1d(256),
-        torch.nn.ReLU(inplace=True),
-        torch.nn.Linear(256, 3)
+        torch.nn.Linear(512, 3)
         )
 
-        path = os.getcwd() + '/models/' + 'model_005_17-01-2024_15-38-12.pth'
+        path = os.getcwd() + '/models/' + 'model_' + runid + '.pth'
         checkpoint = torch.load(path, map_location='cpu')  # Load to CPU
         self.model.load_state_dict(checkpoint)
         self.model.eval()
 
     ############### DATA EXTRACTION ###############
 
-    def generate_image(self, data):
+    def read_params_from_json(self, filename='./models/params.json', query_id=None):
+        if os.getcwd() == 'scripts':
+            os.chdir('..')
+        try:
+            with open(filename, 'r') as file:
+                data = json.load(file)
 
+                if query_id is not None and data['id'] != query_id:
+                    return None  # Return None if the queried id does not match
+
+                result_dict = {
+                    'id': data['id'],
+                    'mean0': data['mean0'],
+                    'mean1': data['mean1'],
+                    'mean2': data['mean2'],
+                    'mean3': data['mean3'],
+                    'std0': data['std0'],
+                    'std1': data['std1'],
+                    'std2': data['std2'],
+                    'std3': data['std3']
+                }
+
+                return result_dict
+
+        except (FileNotFoundError, json.decoder.JSONDecodeError, KeyError):
+            return None
+
+    def generate_image(self, data):
         lidar = data.ranges
         
         min_angle = np.deg2rad(0)
@@ -145,8 +216,10 @@ class RTinference:
 
         # crop image to 224x224 in the pivot point (112 to each side)
         # image = image[100:400, :, :]
-        image = image[:,:, 1]
         image = cv2.resize(image, (224, 224), interpolation=cv2.INTER_LINEAR)
+
+        raw_image = image
+        image = image[:,:, 1]
 
         # add one more layer to image: [1, 1, 224, 224] as batch size
         image = np.expand_dims(image, axis=0)
@@ -154,37 +227,9 @@ class RTinference:
 
         # convert to torch
         image = torch.from_numpy(image).float()
-        return image
+        return image, raw_image
 
-    ############### INFERENCE AND PLOT ###############
-
-    def deprocess(self, image, label):
-        ''' Returns the deprocessed image and label. '''
-
-        if len(label) == 3:
-            # we suppose m1 = m2, so we can use the same deprocess
-            #print('supposing m1 = m2')   
-            w1, q1, q2 = label
-            w2 = w1
-        elif len(label) == 4:
-            #print('not supposing m1 = m2')        
-            w1, w2, q1, q2 = label
-
-        # DEPROCESS THE LABEL
-        q1_original = ((q1 + 1) * (187.15 - (-56.06)) / 2) + (-56.06)
-        q2_original = ((q2 + 1) * (299.99 - 36.81) / 2) + 36.81
-        w1_original = ((w1 + 1) * (0.58 - (-0.58)) / 2) + (-0.58)
-        w2_original = ((w2 + 1) * (0.58 - (-0.58)) / 2) + (-0.58)
-
-        #print(f'labels w1={w1}, w2={w2}, q1={q1}, q2={q2}')
-        m1 = 1/w1_original
-        m2 = 1/w2_original
-        b1 = -q1_original / w1_original
-        b2 = -q2_original / w2_original
-
-        label = [m1, m2, b1, b2]
-
-        return label
+    ############### INFERENCE AND PLOT ##############
 
     def inference(self, image):
         # Inicie a contagem de tempo antes da inferência
@@ -197,30 +242,79 @@ class RTinference:
         end_time = time.time()
 
         #print('Inference time: {:.4f} ms'.format((end_time - start_time)*1000))
+        
+        # correct different format inputs
+        predictions = predictions.to('cpu').cpu().detach().numpy().tolist()[0]
+        if len(predictions) == 3:
+            w1, q1, q2 = predictions
+            w2 = w1
+        elif len(predictions) == 4:
+            w1, w2, q1, q2 = predictions
+        else: 
+            w1, w2, q1, q2 = [None, None, None, None]
 
-        return predictions
+        # deprocess
+        if not any(e is None for e in [w1, w2, q1, q2]): # enter only if there is no None in the list
+            m1, m2, b1, b2 = self.deprocess(label=[w1, w2, q1, q2])
+        else:
+            m1, m2, b1, b2 = [w1, w2, q1, q2] # Can't use this data
 
-    def prepare_plot(self, predictions, image):
-        # convert the predictions to numpy array
-        predictions = predictions.to('cpu').cpu().detach().numpy()
-        predictions = self.deprocess(image=image, label=predictions[0].tolist())
+        return [m1, m2, b1, b2]
 
+    def deprocess(self, label):
+        ''' Returns the deprocessed image and label. '''
 
-        # convert image to cpu 
-        image = image.to('cpu').cpu().detach().numpy()
-        # image it is shape (1, 1, 507, 507), we need to remove the first dimension
-        image = image[0][0]
+        if len(label) == 3:
+            # we suppose m1 = m2, so we can use the same deprocess
+            w1, q1, q2 = label
+            w2 = w1
+        elif len(label) == 4:
+            w1, w2, q1, q2 = label
 
-        # line equations explicitly
+        # DEPROCESS THE LABEL
+        w1 = (w1 * self.std[0]) + self.mean[0]
+        w2 = (w2 * self.std[1]) + self.mean[1]
+        q1 = (q1 * self.std[2]) + self.mean[2]
+        q2 = (q2 * self.std[3]) + self.mean[3]
 
-        # get the slopes and intercepts
-        m1p, m2p, b1p, b2p = predictions
+        m1 = 1/w1
+        m2 = 1/w2
+        b1 = -q1/w1
+        b2 = -q2/w2
 
-        # get the x and y coordinates of the lines
-        y1p = m1p*self.x + b1p
-        y2p = m2p*self.x + b2p
+        return [m1, m2, b1, b2]
 
-        return y1p, y2p, image
+    def plot(self, response, raw_image):
+        m1 = response[0]
+        m2 = response[1]
+        b1 = response[2]
+        b2 = response[3]
+
+        # Calculate the endpoints of the line
+        x11 = 0
+        y11 = int(m1 * x11 + b1)
+
+        x12 = raw_image.shape[1]  # Width of the image
+        y12 = int(m1 * x12 + b1)
+
+        # Draw the line on the image
+        line_color = (0, 0, 255)  
+        line_thickness = 2
+        cv2.line(raw_image, (x11, y11), (x12, y12), line_color, line_thickness)
+
+        # Calculate the endpoints of the line
+        x21 = 0
+        y21 = int(m2 * x21 + b2)
+
+        x22 = raw_image.shape[1]  # Width of the image
+        y22 = int(m2 * x22 + b2)
+
+        cv2.line(raw_image, (x21, y21), (x22, y22), line_color, line_thickness)
+
+        #image_np = np.squeeze(raw_image) #.detach().cpu().numpy())
+        ros_image = self.bridge.cv2_to_imgmsg(raw_image, encoding="passthrough")
+
+        return ros_image
 
 ############### MAIN ###############
 
