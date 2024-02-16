@@ -39,7 +39,7 @@ if not os.path.exists(IMAGE_DIR):
 
 ############## DEFINITIONS ##############
 RANGE1, RANGE2, STEP = [-35, 36, 1]
-BOUND1, BOUND2 = [2, 4]
+BOUND1, BOUND2 = [200, 350]
 DIVIDER1_a, DIVIDER1_b = [70, 90] 
 DIVIDER2_a, DIVIDER2_b = [70, 110] 
 ############## DENTRO BAIXO (DB) ##############
