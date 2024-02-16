@@ -360,8 +360,6 @@ for angle in range(RANGE1, RANGE2, STEP):
 
         #* ################ PLOT ################
 
-        # Criar a figura e o eixo
-        fig, ax = plt.subplots(figsize=(5, 5), dpi=58)
         ax.set_xlim(0, image_size)
         ax.set_ylim(0, image_size)
         
