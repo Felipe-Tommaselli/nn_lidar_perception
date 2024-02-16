@@ -1,4 +1,6 @@
-# Data
+# IC_NN_LIDAR: Data
+
+> This package contain the raw data used to train the Neural Network. This data can be generated artificially or recorded from the field in real life and in simulation.
 
 The data sources for the Neural Network are located in this directory. It is important to note that we utilized the `lidar2images.py`, `create_dataset.py` and the `lidar_tag.py` scripts to transform the raw data to this format. 
 In general, we have two formats in this directory:
