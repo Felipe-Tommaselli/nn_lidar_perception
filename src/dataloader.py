@@ -88,7 +88,7 @@ class NnDataLoader(Dataset):
         self.mean = np.mean(labels_numpy, axis=0)
         
         ############ SAVE MEAN AND STD IN config.yaml ############
-        data = {
+        new_params = {
             'id': runid,  # You can set the appropriate id value
             'mean0': self.mean[0],
             'mean1': self.mean[1],
@@ -104,20 +104,13 @@ class NnDataLoader(Dataset):
             os.chdir('..')
         filename = './models/params.json'
 
-        # Load existing data if the file already exists
-        try:
-            with open(filename, 'r') as file:
-                existing_data = json.loads(''.join(file.readlines()[:-1])) #take last line off
-        except (FileNotFoundError, json.decoder.JSONDecodeError):
-            print('Error reading params.json')
-            pass
+        with open(filename, 'r') as file:
+            existing_data = json.load(file)
 
+        existing_data.append(new_params)
         # Append the new data to the file
         with open(filename, 'w') as file:
             json.dump(existing_data, file, indent=4)
-            file.write(',\n')
-            json.dump(data, file, indent=4)
-            file.write('\n]\n')
 
 
     def __len__(self) -> int:
