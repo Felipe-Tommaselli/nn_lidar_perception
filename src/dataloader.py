@@ -107,15 +107,17 @@ class NnDataLoader(Dataset):
         # Load existing data if the file already exists
         try:
             with open(filename, 'r') as file:
-                existing_data = json.load(file)
+                existing_data = json.loads(''.join(file.readlines()[:-1])) #take last line off
         except (FileNotFoundError, json.decoder.JSONDecodeError):
+            print('Error reading params.json')
             pass
 
         # Append the new data to the file
-        with open(filename, 'a') as file:
+        with open(filename, 'w') as file:
+            json.dump(existing_data, file, indent=4)
+            file.write(',\n')
             json.dump(data, file, indent=4)
-            file.write('\n')
-
+            file.write('\n]\n')
 
 
     def __len__(self) -> int:
