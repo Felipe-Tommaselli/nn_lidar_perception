@@ -2,11 +2,19 @@
 # -*- coding: utf-8 -*-
 
 """
-Class that loads the dataset for the neural network. 
-- "class LidarDataset(Dataset)" loads the dataset from the csv file.
-    This class with the raw lidar data it is used in the nn_mlp.py file (multi-layer perceptron Network).
-- "class LidarDatasetCNN(Dataset)" loads the dataset from the images already processed from the lidar dataset.
-    This class with the images (instead of the raw data) it is used in the nn_cnn.py file (convolutional Network).
+The class that loads the dataset for the neural network. 
+This data loader loads all data from the "Images" folder and the specific labels from the ".csv" file.
+With that, two processes take place: Data normalization and Dataset creation. 
+1. Data normalization: The normalization with the best results is the "standard": (xi - mean(x)) / (std(x))
+    - the mean an std used for each label is stored in the params.json per "ruind" as an identifier
+    - this distribution guarantees mean = 0 and std = 1, with a balanced dataset 
+2. Dataset creation succeed through the __get_item__() called from the main.py
+    - it is worth noticing that there are two options: load each image at each __get_item__() call or 
+    load the entire image dataset. The second option consumes a lot of RAM memory but is faster during the training. 
+
+Difference from 'dataloader.py' and 'test_dataloader.py'
+dataloader.py: loads the entire image dataset once
+test_dataloader.py: load each image at each get_item call
 
 @author: Felipe-Tommaselli
 """ 
@@ -35,13 +43,9 @@ import copy
 sys.path.append('../')
 from pre_process import *
 
-global SLASH
-if platform == "linux" or platform == "linux2":
-    # linux
-    SLASH = "/"
-elif platform == "win32":
-    # Windows...
-    SLASH = "\\"
+# move from root (\src) to \assets\images
+if os.getcwd().split(SLASH)[-1] == 'src':
+    os.chdir('..') 
 
 class NnDataLoader(Dataset):
     ''' Dataset class for the lidar data with images. '''
@@ -50,44 +54,30 @@ class NnDataLoader(Dataset):
         ''' Constructor of the class. '''
         labels = pd.read_csv(csv_path)
         self.train_path = train_path
-
-        # move from root (\src) to \assets\images
-        if os.getcwd().split(SLASH)[-1] == 'src':
-            os.chdir('..') 
-
         self.images = list()
         self.labels_list = list()
 
         ############ LOAD DATASET ############
-
         for idx in range(len(labels)):
-
-            # get the step number by the index
-            step = labels.iloc[idx, 0]
-
-            # full_path = os.path.join(path, 'image'+str(i)+ '_' + str(j) +'.png')
+            step = labels.iloc[idx, 0] # step number by the index
             full_path = os.path.join(self.train_path, 'image'+ str(step) +'.png') 
 
-            # TODO: IMPORT IMAGE WITH PIL
-            # image treatment (only green channel)
+            ############ PROCESS IMAGE ############
             image = cv2.imread(full_path, -1)
             image = cv2.resize(image, (224, 224), interpolation=cv2.INTER_LINEAR)
             image = image[:, :, 1] # only green channel
             self.images.append(image)
 
-            #* PROCESS LABELs
+            ############ PROCESS LABEL ############
             wq_labels = NnDataLoader.process_label(labels.iloc[idx, 1:])
-
             self.labels_list.append(wq_labels) # take step out of labels
 
         ############ OBTAIN MEAN AND STD FOR NORMALIZATION ############
-        
-        # translate labels_list to numpy
         labels_numpy = np.asarray(self.labels_list)
         self.std = np.std(labels_numpy, axis=0)
         self.mean = np.mean(labels_numpy, axis=0)
         
-        ############ SAVE MEAN AND STD IN config.yaml ############
+        ############ SAVE MEAN AND STD IN "params.json" ############
         new_params = {
             'id': runid,  # You can set the appropriate id value
             'mean0': self.mean[0],
@@ -108,25 +98,21 @@ class NnDataLoader(Dataset):
             existing_data = json.load(file)
 
         existing_data.append(new_params)
-        # Append the new data to the file
         with open(filename, 'w') as file:
             json.dump(existing_data, file, indent=4)
 
 
     def __len__(self) -> int:
         ''' Returns the length of the dataset (based on the labels). '''
-        
         return len(self.labels_list)
 
     def __getitem__(self, idx: int) -> dict:
         ''' Returns the sample image of the dataset. '''
-
-        # PRE-PROCESSING
         image = copy.deepcopy(self.images[idx])
-        #image = PreProcess.contours_image(image)  #! visual 
-
         labels = copy.deepcopy(self.labels_list[idx])
+        
         labels = PreProcess.standard_extract_label(labels, self.mean, self.std)
+        #image = PreProcess.contours_image(image)  #! visual bad results 
 
         #? CHECKPOINT! Aqui as labels e a imagem estão corretas!!
 
@@ -145,24 +131,22 @@ class NnDataLoader(Dataset):
         #! suppose m1 = m2
         w1, w2, q1, q2 = labels
         labels = [w1, q1, q2] # removing w2
-
         return {"labels": labels, "image": image, "angle": 0}
 
     @staticmethod
     def process_label(labels):
         ''' Process the labels to be used in the network. Normalize azimuth and distance intersection.'''
-        DESIRED_SIZE = 224 #px
-        MAX_M = 224 
+        IMG_SIZE = 224 #px
 
         m1 = -labels[0]
         m2 = -labels[1]
-        b1 = MAX_M - labels[2]
-        b2 = MAX_M - labels[3]
+        b1 = IMG_SIZE - labels[2]
+        b2 = IMG_SIZE - labels[3]
 
-        #! NORMALIZATION WITH w1, w2, q1, q2
-        
+        # obs: IMG_SIZE change matplotlib and opencv start y to the origin 
+
+        # NORMALIZATION WITH w1, w2, q1, q2        
         w1, w2, q1, q2 = PreProcess.parametrization(m1, m2, b1, b2)
-
         return [w1, w2, q1, q2]
 
 
