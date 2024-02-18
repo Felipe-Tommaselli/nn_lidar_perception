@@ -61,7 +61,9 @@ def getData(csv_path, train_path, batch_size, runid, num_workers=0):
 
 
 def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader, num_epochs):
+    ''' Train model function: train (if) and validate (else)
 
+    '''
     train_losses = []
     val_losses = []
 
@@ -69,30 +71,22 @@ def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader
         model.train()
         running_loss = 0.0
         for i, data in enumerate(train_loader):
+            ############ START ############
             images, labels = data['image'], data['labels']
-            # convert to float32 and send it to the device
             # image dimension: (batch, channels, height, width)
             images = images.type(torch.float32).to(device)
             images = images.unsqueeze(1)
-            # convert labels to float32 and send it to the device
-            labels = [label.type(torch.float32).to(device) for label in labels]
-            # convert labels to tensor
-            labels = torch.stack(labels)
-            # convert to format: tensor([[value1, value2, value3, value4], [value1, value2, value3, value4], ...])
+            # convert to format: tensor([[value1, value2, value3, value4], ...])
             # this is: labels for each image, "batch" times -> shape: (batch, 4)
-            labels = labels.permute(1, 0)    
+            labels = [label.type(torch.float32).to(device) for label in labels]
+            labels = torch.stack(labels)
+            labels = labels.permute(1, 0) 
+
             outputs = model(images)
             loss = criterion(outputs, labels) 
-            # Loss_with_L2 = Loss_without_L2 + λ * ||w||^2
-            # Calculate L2 regularization loss
-            # l2_regularization_loss = 0
-            # for param in model.parameters():
-            #     l2_regularization_loss += torch.norm(param, 2)
-            # loss += weight_decay * l2_regularization_loss  # Add L2 regularization loss to the total loss
-            optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            #scheduler.step()
+            scheduler.step()
             running_loss += loss.item()
         else:
         # valing the model
