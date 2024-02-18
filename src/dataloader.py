@@ -40,11 +40,10 @@ import torchvision.models as models
 import json
 import copy
 
-sys.path.append('../')
 from pre_process import *
 
 # move from root (\src) to \assets\images
-if os.getcwd().split(SLASH)[-1] == 'src':
+if os.getcwd().split(r'/')[-1] == 'src':
     os.chdir('..') 
 
 class NnDataLoader(Dataset):

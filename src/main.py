@@ -23,7 +23,6 @@ from efficientnet_pytorch import EfficientNet
 torch.cuda.empty_cache()
 
 from dataloader import *
-sys.path.append('../')
 from pre_process import *
 
 
@@ -82,9 +81,10 @@ def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader
             ############ MODEL TRAINING ############
             outputs = model(images)
             loss = criterion(outputs, labels) 
+            optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            scheduler.step()
+            #scheduler.step()
             running_loss += loss.item()
         else:
         ############ VALIDATING ############
@@ -104,15 +104,11 @@ def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader
                     #TODO: calculate MSE
                 val_losses.append(val_loss/len(val_loader))
             pass
+        scheduler.step()
         train_losses.append(running_loss/len(train_loader))
         print(f'[{epoch+1}/{num_epochs}] .. Train Loss: {train_losses[-1]:.5f} .. val Loss: {val_losses[-1]:.5f}')
 
-
-    results = {
-        'train_losses': train_losses,
-        'val_losses': val_losses,
-    }
-    
+    results = {'train_losses': train_losses, 'val_losses': val_losses,}
     return results
 
 def plotResults(results, epochs, lr, runid):
@@ -142,15 +138,15 @@ if __name__ == '__main__':
 
     ############ PARAMETERS ############    
     epochs = 25
-    lr = float(0.0005) # TODO: test different learning rates
+    lr = float(0.005) # TODO: test different learning rates
     step_size = 5 # TODO: test different step sizes
-    gamma = 0.3
+    gamma = 0.5
     batch_size = 140 # 140 AWS
     weight_decay = 0 # L2 regularization
 
     ############ DATA ############
-    csv_path = "../data/artificial_data/tags/Artificial_Label_Data8.csv"
-    train_path = os.path.join(os.getcwd(), '..', 'data', 'artificial_data', 'train8')
+    csv_path = os.path.join(os.getcwd(), 'data', 'artificial_data', 'tags', 'Artificial_Label_Data8.csv')
+    train_path = os.path.join(os.getcwd(), 'data', 'artificial_data', 'train8')
     train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path, train_path=train_path, runid=runid)
 
     ############ MODEL ############
