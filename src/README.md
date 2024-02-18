@@ -21,11 +21,12 @@ On the other hand, the `nn_test.ipynb` and `test_dataloader.py` are used to test
 
 ### `/utils` scripts
 
-This folder contains different scripts for many applications united by their usefulness. In general, the `artificial_generator.py`, `create_dataset.py`, `lidar_tag.py` and `lidar2images.py` do not share much in common, but they are handy scripts that are used often (not every time). For that, they are classified as "utils".
+This folder contains different scripts for many applications united by their usefulness. In general, the `artificial_generator.py`, `artificial_test.ipynb`, `create_dataset.py`, `lidar_tag.py` and `lidar2images.py` do not share much in common, but they are handy scripts that are used often (not every time). For that, they are classified as "utils".
 
-* `artificial_generator.py`: Create the dataset based on some parameters in the script that generate a new raw_data dataset full of images and labels. 
-* `create_dataset.py`: Create a real-time dataset based on the `/terrasentia/scan` rostopic. 
-* `lidar_tag.py`: Generate the label in the .csv format by hand-made labelling of a specific image (from raw_data). Used in real-life dataset training.
+* `artificial_generator.py`: Create the dataset based on some parameters in the script that generate a new raw_data dataset full of images and labels;
+* `artificial_test.ipynb`: Test the points distributions before using the `artificial_generator.py`;
+* `create_dataset.py`: Create a real-time dataset based on the `/terrasentia/scan` rostopic;
+* `lidar_tag.py`: Generate the label in the .csv format by hand-made labelling of a specific image (from raw_data). Used in real-life dataset training;
 * `lidar2images.py`: Provide specific resources to the `lidar_tag.py` file. 
 
 It is worth noticing that both `lidar_tag.py` and `lidar2images.py` are deprecated and have not been used for a long time since there is no need to use hand-made labelling anymore.
