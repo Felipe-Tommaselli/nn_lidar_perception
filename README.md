@@ -66,11 +66,13 @@ pip install --upgrade setuptools
 ```
 
 ``` shell
-pip install customtkinter==5.1.2 matplotlib==3.7.1 numpy==1.24.2 pandas==2.0.0 Pillow==9.5.0 scikit_learn==1.2.2 scipy==1.10.1 torch==2.0.0 torchsummary==1.5.1 torchvision==0.15.1
+pip install customtkinter==5.1.2 matplotlib==3.7.1 numpy==1.24.2 pandas==2.0.0 Pillow==9.5.0 scikit_learn==1.2.2 scipy==1.10.1 torch==2.0.0 torchsummary==1.5.1 torchvision==0.15.1 colorful==0.5.5
 ```
 
+Old versions also require "opencv-contrib", try running without it first. 
+
 ``` shell
-pip install opencv-contrib-python>=4.7.0
+pip install opencv-contrib-python==4.7.0
 ```
 
 ### Full repo installation
