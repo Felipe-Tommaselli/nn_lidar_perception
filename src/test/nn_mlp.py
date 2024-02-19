@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+DEPRECATED!!!!!!!!!!!!!
+
+This implementation is a concept at the beginning of the project. The main idea here was to use the raw lidar data without the 
+image approach. However, the amount of NOISE in the reading took a lot of work with. Besides that, the image approach showed us a 
+good performance in real-time, culminating in this MLP project's discontinuation.
 
 @author: andres
 @author: Felipe-Tommaselli
