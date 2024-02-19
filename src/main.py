@@ -58,7 +58,7 @@ def train_model(model, criterion, optimizer, scheduler, train_loader, val_loader
     while validation assesses model performance on unseen data.
     - Feed forward pass: Input data is passed through the neural network to produce a prediction. 
     - Backward pass: Prediction errors are propagated back through the network to adjust the weights, optimizing the 
-      model's performance during training and validating.
+    model's performance during training and validating.
     '''
     train_losses = []
     val_losses = []
