@@ -1,3 +1,15 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+DEPRECATED!!!!!!!!!!!!!
+
+This implementation is based on using RANSAC algorithms to generate lines for labelling. But, with the success of 
+the current artificial dataset generation, there is no need. Besides that, for the performed tests, the performance of the
+RANSAC was below expected. 
+
+@author: Felipe-Tommaselli
+"""
+
 import numpy as np
 import cv2
 import random

@@ -1,3 +1,17 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+ACTIVE PROJECT!
+
+This class was used a lot for the data augmentation algorithms on real data. However, with the artificial dataset, there
+is no need to use this technique. Without the artificial dataset, this data augmentation with rotation adds a lot 
+of consistency to the dataset. However, the pattern created was a bit off compared to the real one. 
+With this, there is no need to use this algorithm in the current artificial implementation, but on real data, it is a good 
+way out of overfitting.
+
+@author: Felipe-Tommaselli
+"""
+
 import os
 import sys
 import torch
