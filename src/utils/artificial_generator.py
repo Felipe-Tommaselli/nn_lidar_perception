@@ -24,7 +24,7 @@ count_step = 0
 if  os.getcwd().split('/')[-1] != 'IC_NN_Lidar':
     os.chdir('../..') 
     
-FID = '10'
+FID = '11'
 
 PATH = os.getcwd() + '/' + str(''.join(['data', '/', 'artificial_data', '/', 'tags'])) + '/'
 NAME = 'Artificial_Label_Data' + FID + '.csv'

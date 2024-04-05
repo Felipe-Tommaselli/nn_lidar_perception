@@ -145,8 +145,8 @@ if __name__ == '__main__':
     weight_decay = 0 # L2 regularization
 
     ############ DATA ############
-    csv_path = os.path.join(os.getcwd(), 'data', 'artificial_data', 'tags', 'Artificial_Label_Data10.csv')
-    train_path = os.path.join(os.getcwd(), 'data', 'artificial_data', 'train10')
+    csv_path = os.path.join(os.getcwd(), 'data', 'artificial_data', 'tags', 'Artificial_Label_Data11.csv')
+    train_path = os.path.join(os.getcwd(), 'data', 'artificial_data', 'train11')
     train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path, train_path=train_path, runid=runid)
 
     ############ MODEL ############
