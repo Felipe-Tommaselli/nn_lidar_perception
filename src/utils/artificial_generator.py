@@ -38,35 +38,36 @@ if not os.path.exists(IMAGE_DIR):
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ############## DEFINITIONS ##############
 RANGE1, RANGE2, STEP = [-25, 26, 1]
-BOUND1, BOUND2 = [400, 500] # [1, 1]
-DIVIDER1_a, DIVIDER1_b = [40, 60] 
-DIVIDER2_a, DIVIDER2_b = [50, 80] 
+BOUND1, BOUND2 = [400, 600] #[200, 350]
+DIVIDER1_a, DIVIDER1_b = [30, 50] 
+DIVIDER2_a, DIVIDER2_b = [35, 60] 
 ############## DENTRO BAIXO (DB) ##############
 # linha principal de baixo até o meio
-DIVIDER_LIM, DB_D1_a, DB_D1_b, DB_D2_a, DB_D2_b = [100, 50, 80, 50, 70]
+DIVIDER_LIM, DB_D1_a, DB_D1_b, DB_D2_a, DB_D2_b = [100, 30, 70, 30, 70]
 DB_BOUND1, DB_BOUND2 = [5, 7]
 DB_RANGE1, DB_RANGE2 = [image_size//15, (6*image_size)//10]
 DB_COLOR = 'black'
 ############## DENTRO TOPO (DT) ############## 
 # linha rala na parte de cima
-DT_CLUST1, DT_CLUST2, DT_POINTS = [4, 22, 2]
+DT_CLUST1, DT_CLUST2, DT_POINTS = [4, 15, 2]
 DT_BOUND1, DT_BOUND2 = [2, 10]
 DT_RANGE1, DT_RANGE2 = [2*image_size//3, image_size]
 DT_COLOR = 'black'
 ############## FORA 1 ##############
 # acumulo de pontos na parte inferior
-F1_CLUST1, F1_CLUST2, F1_POINTS = [5, 18, 4]
+F1_CLUST1, F1_CLUST2, F1_POINTS = [3, 10, 3]
 F1_BOUND1, F1_BOUND2 = [8, 18]
-F1_RANGE1, F1_RANGE2 = [0, (image_size//5)]
+F1_RANGE1, F1_RANGE2 = [(image_size//8), (image_size//5)]
 F1_COLOR = 'black'
 ############## FORA 2 ##############
-F2_CLUST1, F2_CLUST2, F2_POINTS = [15, 20, 3]
+F2_CLUST1, F2_CLUST2, F2_POINTS = [8, 20, 3]
 F2_BOUND1_a, F2_BOUND1_b = [13, 14]
 F2_BOUND2_a, F2_BOUND2_b = [14, 15]
 F2_RANGE1, F2_RANGE2 = [0, (2*image_size//3)]
 F2_COLOR = 'black'
 ############## FORA CIMA ##############
-FC_LIM, FC_D1_a, FC_D1_b, FC_D2_a, FC_D2_b = [15, 20, 75, 15, 55]
+# linhas adjacentes
+FC_LIM, FC_D1_a, FC_D1_b, FC_D2_a, FC_D2_b = [20, 3, 50, 3, 40]
 FC_BOUND1, FC_BOUND2 = [30, 35]
 FC_RANGE1, FC_RANGE2 = [image_size//6, image_size]
 FC_COLOR = 'black'
@@ -76,7 +77,7 @@ FB_BOUND1, FB_BOUND2 = [50, 51]
 FB_CENTRAL1, FB_CENTRAL2 = [image_size//12, image_size//5]
 FB_COLOR = 'black'
 ############## RANDOM ##############
-RND_RANGE1, RND_RANGE2 = [0, 40]
+RND_RANGE1, RND_RANGE2 = [0, 30]
 RND_COLOR = 'black'
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
