@@ -24,7 +24,7 @@ count_step = 0
 if  os.getcwd().split('/')[-1] != 'IC_NN_Lidar':
     os.chdir('../..') 
     
-FID = '8'
+FID = '9'
 
 PATH = os.getcwd() + '/' + str(''.join(['data', '/', 'artificial_data', '/', 'tags'])) + '/'
 NAME = 'Artificial_Label_Data' + FID + '.csv'
@@ -36,48 +36,51 @@ if not os.path.exists(IMAGE_DIR):
     os.makedirs(IMAGE_DIR)
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 ############## DEFINITIONS ##############
-RANGE1, RANGE2, STEP = [-35, 36, 1]
-BOUND1, BOUND2 = [200, 350]
-DIVIDER1_a, DIVIDER1_b = [70, 90] 
-DIVIDER2_a, DIVIDER2_b = [70, 110] 
+RANGE1, RANGE2, STEP = [-25, 26, 5]
+BOUND1, BOUND2 = [1, 1]
+DIVIDER1_a, DIVIDER1_b = [40, 60] 
+DIVIDER2_a, DIVIDER2_b = [50, 80] 
 ############## DENTRO BAIXO (DB) ##############
-DIVIDER_LIM, DB_D1_a, DB_D1_b, DB_D2_a, DB_D2_b = [100, 60, 80, 60, 70]
+# linha principal de baixo até o meio
+DIVIDER_LIM, DB_D1_a, DB_D1_b, DB_D2_a, DB_D2_b = [100, 50, 80, 50, 70]
 DB_BOUND1, DB_BOUND2 = [5, 7]
-DB_RANGE1, DB_RANGE2 = [0, (9*image_size)//10]
+DB_RANGE1, DB_RANGE2 = [image_size//15, (6*image_size)//10]
 DB_COLOR = 'black'
-############## DENTRO TOPO (DT) ##############
-DT_CLUST1, DT_CLUST2, DT_POINTS = [4, 6, 2]
-DT_BOUND1, DT_BOUND2 = [28, 32]
+############## DENTRO TOPO (DT) ############## 
+# linha rala na parte de cima
+DT_CLUST1, DT_CLUST2, DT_POINTS = [4, 22, 2]
+DT_BOUND1, DT_BOUND2 = [2, 10]
 DT_RANGE1, DT_RANGE2 = [2*image_size//3, image_size]
 DT_COLOR = 'black'
 ############## FORA 1 ##############
-F1_CLUST1, F1_CLUST2, F1_POINTS = [5, 22, 3]
-F1_BOUND1, F1_BOUND2 = [8, 11]
-F1_RANGE1, F1_RANGE2 = [0, (2*image_size//3)]
+# acumulo de pontos na parte inferior
+F1_CLUST1, F1_CLUST2, F1_POINTS = [5, 18, 4]
+F1_BOUND1, F1_BOUND2 = [8, 18]
+F1_RANGE1, F1_RANGE2 = [0, (image_size//5)]
 F1_COLOR = 'black'
 ############## FORA 2 ##############
-F2_CLUST1, F2_CLUST2, F2_POINTS = [2, 6, 4]
-F2_BOUND1_a, F2_BOUND1_b = [13, 17]
-F2_BOUND2_a, F2_BOUND2_b = [27, 32]
+F2_CLUST1, F2_CLUST2, F2_POINTS = [15, 20, 3]
+F2_BOUND1_a, F2_BOUND1_b = [13, 14]
+F2_BOUND2_a, F2_BOUND2_b = [14, 15]
 F2_RANGE1, F2_RANGE2 = [0, (2*image_size//3)]
 F2_COLOR = 'black'
 ############## FORA CIMA ##############
-FC_LIM, FC_D1_a, FC_D1_b, FC_D2_a, FC_D2_b = [15, 3, 30, 0, 10]
-FC_BOUND1, FC_BOUND2 = [1, 15]
-FC_RANGE1, FC_RANGE2 = [image_size//2, image_size]
+FC_LIM, FC_D1_a, FC_D1_b, FC_D2_a, FC_D2_b = [15, 20, 75, 15, 55]
+FC_BOUND1, FC_BOUND2 = [30, 35]
+FC_RANGE1, FC_RANGE2 = [image_size//6, image_size]
 FC_COLOR = 'black'
 ############## FORA BAIXO ##############
-FB_CLUST1, FB_CLUST2, FB_POINTS = [2, 3, 3]
-FB_BOUND1, FB_BOUND2 = [13, 17]
-FB_CENTRAL1, FB_CENTRAL2 = [image_size//24, image_size//6]
+FB_CLUST1, FB_CLUST2, FB_POINTS = [1, 4, 5]
+FB_BOUND1, FB_BOUND2 = [50, 51]
+FB_CENTRAL1, FB_CENTRAL2 = [image_size//12, image_size//5]
 FB_COLOR = 'black'
 ############## RANDOM ##############
-RND_RANGE1, RND_RANGE2 = [0, 30]
+RND_RANGE1, RND_RANGE2 = [0, 40]
 RND_COLOR = 'black'
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 # rotacionar as retas
 for angle in range(RANGE1, RANGE2, STEP):
@@ -181,7 +184,7 @@ for angle in range(RANGE1, RANGE2, STEP):
             d = np.random.randint(DB_D1_a, DB_D1_b)
         else: 
             d = np.random.randint(DB_D2_a, DB_D2_b)
-        for _ in range(d):
+        for _ in range(d): # points
             boundary = np.random.randint(DB_BOUND1, DB_BOUND2)
             # escolher um y aleatorio entre 0 e 224
             y = np.random.randint(DB_RANGE1, DB_RANGE2)
@@ -261,7 +264,6 @@ for angle in range(RANGE1, RANGE2, STEP):
 
 
         # #################### Fora 2 ####################
-
         num_clusters = np.random.randint(2, 6) # Número de subconjuntos
         # Gerar pontos com aglomeração em subconjuntos
         for cluster in range(num_clusters):
@@ -290,7 +292,7 @@ for angle in range(RANGE1, RANGE2, STEP):
                 y = int(round(central_y + dy))
                 x_coords.append(x)
                 y_coords.append(y)
-        ax.scatter(x_coords, y_coords, s=90, c=F2_COLOR)
+        #!ax.scatter(x_coords, y_coords, s=90, c=F2_COLOR) #! não vou usar
         x_coords = []
         y_coords = []
 
@@ -306,8 +308,10 @@ for angle in range(RANGE1, RANGE2, STEP):
             boundary = np.random.randint(FC_BOUND1, FC_BOUND2)
             # escolher um y aleatorio entre 0 e 224
             y = np.random.randint(FC_RANGE1, FC_RANGE2)
+            x1_boundary = (y - b1r) / m1r
+            x2_boundary = (y - b2r) / m2r
             # fit do x1 e x2 com os boundarys
-            x = np.random.choice([np.random.randint(0, boundary), np.random.randint(image_size - boundary, image_size)])
+            x = np.random.choice([x1_boundary - boundary, x2_boundary + boundary])
             x_coords.append(x)
             y_coords.append(y)
         ax.scatter(x_coords, y_coords, s=90, c=FC_COLOR)
@@ -325,7 +329,7 @@ for angle in range(RANGE1, RANGE2, STEP):
             # achar o limiar da reta de boundary para aquele x e da reta normal
             x1_boundary = (central_y - b1r) / m1r
             x2_boundary = (central_y - b2r) / m2r
-            central_x = np.random.choice([np.random.randint(x1_boundary - boundary, x1_boundary), np.random.randint(x2_boundary, x2_boundary + boundary)])
+            central_x = np.random.choice([np.random.randint(x1_boundary - boundary, x1_boundary - 2*boundary//3), np.random.randint(x2_boundary + 2*boundary//3, x2_boundary + boundary)])
             # Gerar pontos no subconjunto
             for _ in range(points_per_cluster):
                 # Gerar deslocamentos usando uma distribuição normal (com baixa probabilidade de invadir o meio, se invadir é pouco)
@@ -363,10 +367,25 @@ for angle in range(RANGE1, RANGE2, STEP):
         ax.set_xlim(0, image_size)
         ax.set_ylim(0, image_size)
         
+        # Desenhar as retas rotacionadas (com pontos de início e fim)
+        #ax.plot(x_line, y1_line_rotated, 'r')
+        #ax.plot(x_line, y2_line_rotated, 'r')
+
+        # Linhas auxiliares
+        # yline = np.arange(0, image_size, 1)
+        # x1line = (yline - b1r) / m1r - 20
+        # x2line = (yline - b2r) / m2r + 20
+
+        # ax.plot(x1line, yline, 'c')
+        # ax.plot(x2line, yline, 'c')
+        
         # Remover as bordas e ticks dos eixos
         ax.set_xticks([])
         ax.set_yticks([])
         ax.axis('off')
+        
+        # Mostrar a imagem na tela
+        #plt.show()
         
         #* ################ SAVE LABELS ################
 
