@@ -137,10 +137,10 @@ if __name__ == '__main__':
     runid = str(day_time) # id of this particular run
 
     ############ PARAMETERS ############    
-    epochs = 25
+    epochs = 35
     lr = float(0.007) # TODO: test different learning rates
-    step_size = 6 # TODO: test different step sizes
-    gamma = 0.6
+    step_size = 7 # TODO: test different step sizes
+    gamma = 0.7
     batch_size = 140 # 140 AWS
     weight_decay = 0 # L2 regularization
 
