@@ -264,34 +264,34 @@ for angle in range(RANGE1, RANGE2, STEP):
 
 
         # #################### Fora 2 ####################
-        num_clusters = np.random.randint(2, 6) # Número de subconjuntos
-        # Gerar pontos com aglomeração em subconjuntos
-        for cluster in range(num_clusters):
-            points_per_cluster = 4  # Número de pontos por subconjunto
-            boundary1 = np.random.randint(F2_BOUND1_a, F2_BOUND1_b)
-            boundary2 = np.random.randint(F2_BOUND2_a, F2_BOUND2_b)
-            # escolher um y aleatorio entre 0 e 224
-            central_y = np.random.randint(F2_RANGE1, F2_RANGE2)
-            # achar o limiar da reta de boundary para aquele x e da reta normal
-            x1_boundary = (central_y - b1r) / m1r
-            x2_boundary = (central_y - b2r) / m2r
-            central_x = np.random.choice([np.random.randint(x1_boundary - boundary2, x1_boundary - boundary1), np.random.randint(x2_boundary + boundary1, x2_boundary + boundary2)])
-            # Gerar pontos no subconjunto
-            for _ in range(points_per_cluster):
-                # Gerar deslocamentos usando uma distribuição normal (sem invadir o meio)
-                if central_x >= x2_boundary:
-                    dx = abs(7*np.random.normal(0, 2))  # Deslocamento em x
-                if central_x <= x1_boundary:
-                    dx = - abs(7*np.random.normal(0, 2))  # Deslocamento em x
-                dy = np.random.normal(0, 1)  # Deslocamento em y
-                # round dx and dy with numpy
-                dx = np.round(dx, 0)
-                dy = np.round(dy, 0)
-                # Calcular as coordenadas do ponto com base no ponto central e nos deslocamentos
-                x = int(round(central_x + dx))
-                y = int(round(central_y + dy))
-                x_coords.append(x)
-                y_coords.append(y)
+        # num_clusters = np.random.randint(2, 6) # Número de subconjuntos
+        # # Gerar pontos com aglomeração em subconjuntos
+        # for cluster in range(num_clusters):
+        #     points_per_cluster = 4  # Número de pontos por subconjunto
+        #     boundary1 = np.random.randint(F2_BOUND1_a, F2_BOUND1_b)
+        #     boundary2 = np.random.randint(F2_BOUND2_a, F2_BOUND2_b)
+        #     # escolher um y aleatorio entre 0 e 224
+        #     central_y = np.random.randint(F2_RANGE1, F2_RANGE2)
+        #     # achar o limiar da reta de boundary para aquele x e da reta normal
+        #     x1_boundary = (central_y - b1r) / m1r
+        #     x2_boundary = (central_y - b2r) / m2r
+        #     central_x = np.random.choice([np.random.randint(x1_boundary - boundary2, x1_boundary - boundary1), np.random.randint(x2_boundary + boundary1, x2_boundary + boundary2)])
+        #     # Gerar pontos no subconjunto
+        #     for _ in range(points_per_cluster):
+        #         # Gerar deslocamentos usando uma distribuição normal (sem invadir o meio)
+        #         if central_x >= x2_boundary:
+        #             dx = abs(7*np.random.normal(0, 2))  # Deslocamento em x
+        #         if central_x <= x1_boundary:
+        #             dx = - abs(7*np.random.normal(0, 2))  # Deslocamento em x
+        #         dy = np.random.normal(0, 1)  # Deslocamento em y
+        #         # round dx and dy with numpy
+        #         dx = np.round(dx, 0)
+        #         dy = np.round(dy, 0)
+        #         # Calcular as coordenadas do ponto com base no ponto central e nos deslocamentos
+        #         x = int(round(central_x + dx))
+        #         y = int(round(central_y + dy))
+        #         x_coords.append(x)
+        #         y_coords.append(y)
         #!ax.scatter(x_coords, y_coords, s=90, c=F2_COLOR) #! não vou usar
         x_coords = []
         y_coords = []
