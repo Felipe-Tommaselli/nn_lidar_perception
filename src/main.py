@@ -137,7 +137,7 @@ if __name__ == '__main__':
     runid = str(day_time) # id of this particular run
 
     ############ PARAMETERS ############    
-    epochs = 15
+    epochs = 25
     lr = float(0.007) # TODO: test different learning rates
     step_size = 6 # TODO: test different step sizes
     gamma = 0.6
@@ -145,8 +145,8 @@ if __name__ == '__main__':
     weight_decay = 0 # L2 regularization
 
     ############ DATA ############
-    csv_path = os.path.join(os.getcwd(), 'data', 'artificial_data', 'tags', 'Artificial_Label_Data9.csv')
-    train_path = os.path.join(os.getcwd(), 'data', 'artificial_data', 'train9')
+    csv_path = os.path.join(os.getcwd(), 'data', 'artificial_data', 'tags', 'Artificial_Label_Data10.csv')
+    train_path = os.path.join(os.getcwd(), 'data', 'artificial_data', 'train10')
     train_data, val_data = getData(batch_size=batch_size, csv_path=csv_path, train_path=train_path, runid=runid)
 
     ############ MODEL ############
