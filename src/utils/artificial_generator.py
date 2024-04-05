@@ -37,8 +37,8 @@ if not os.path.exists(IMAGE_DIR):
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ############## DEFINITIONS ##############
-RANGE1, RANGE2, STEP = [-25, 26, 5]
-BOUND1, BOUND2 = [1, 1]
+RANGE1, RANGE2, STEP = [-25, 26, 1]
+BOUND1, BOUND2 = [300, 350] # [1, 1]
 DIVIDER1_a, DIVIDER1_b = [40, 60] 
 DIVIDER2_a, DIVIDER2_b = [50, 80] 
 ############## DENTRO BAIXO (DB) ##############
