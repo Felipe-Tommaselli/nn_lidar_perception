@@ -138,7 +138,7 @@ if __name__ == '__main__':
 
     ############ PARAMETERS ############    
     epochs = 35
-    lr = float(0.0075) # TODO: test different learning rates
+    lr = float(0.008) # TODO: test different learning rates
     step_size = 7 # TODO: test different step sizes
     gamma = 0.75
     batch_size = 140 # 140 AWS
@@ -166,7 +166,7 @@ if __name__ == '__main__':
     model = model.to(device)
     ############ NETWORK ############
     criterion = nn.L1Loss()
-    #optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+    #optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     # optimizer = torch.optim.SGD(model.parameters(), lr=lr, weight_decay=weight_decay, momentum=0.0)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=gamma)
