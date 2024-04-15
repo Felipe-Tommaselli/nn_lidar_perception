@@ -24,7 +24,7 @@ count_step = 0
 if  os.getcwd().split('/')[-1] != 'IC_NN_Lidar':
     os.chdir('../..') 
     
-FID = '11'
+FID = '12'
 
 PATH = os.getcwd() + '/' + str(''.join(['data', '/', 'artificial_data', '/', 'tags'])) + '/'
 NAME = 'Artificial_Label_Data' + FID + '.csv'
@@ -38,7 +38,7 @@ if not os.path.exists(IMAGE_DIR):
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ############## DEFINITIONS ##############
 RANGE1, RANGE2, STEP = [-25, 26, 1]
-BOUND1, BOUND2 = [400, 600] #[200, 350]
+BOUND1, BOUND2 = [1, 1] #[200, 350]
 DIVIDER1_a, DIVIDER1_b = [30, 50] 
 DIVIDER2_a, DIVIDER2_b = [35, 60] 
 ############## DENTRO BAIXO (DB) ##############
