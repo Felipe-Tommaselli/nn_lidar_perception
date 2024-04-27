@@ -111,9 +111,9 @@ class NnDataLoader(Dataset):
         labels = copy.deepcopy(self.labels_list[idx])
         
         labels = PreProcess.standard_extract_label(labels, self.mean, self.std)
-        #image = PreProcess.contours_image(image)  #! visual bad results 
+        #image = PreProcess.contours_image(image)  #! visual, bad results 
 
-        #? CHECKPOINT! Aqui as labels e a imagem estão corretas!!
+        #? CHECKPOINT!
 
         # labels_dep = PreProcess.standard_deprocess(image=image, label=labels, mean=self.mean, std=self.std)        
         # m1, m2, b1, b2 = labels_dep
