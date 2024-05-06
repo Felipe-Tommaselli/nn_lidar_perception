@@ -43,11 +43,11 @@ At the moment, the system is in the process of training the network, with the fo
 
 <img src="assets/images/results1.png" alt="TerraSentia" width=400>
 
-<img src="assets/losses_lr=9e-06_01-02-2024_01-46-13.png" alt="TerraSentia" width=400>
+<img src="assets/losses_06-04-2024_21-22-37.png" alt="TerraSentia" width=400>
 
 | Indicators | Results |
 |--------|-------|
-| Last epoch error | 0.037 |
+| Last epoch error | 0.017 |
 | Training time | 43min |
 | Inference time | 32.77 ms |
 
