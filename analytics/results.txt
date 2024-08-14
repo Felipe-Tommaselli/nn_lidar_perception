@@ -1,0 +1,48 @@
+Dataset id: 11
+len images?  21108
+[Error] Mean: 0.4990 | Standard deviation: 0.2786
+[Losses: Mean] [0.48863527 0.4875361  0.52087843] | Standard deviation: [0.30756226 0.32686102 0.3549958 ]
+[Full Loss] Mean: 0.4990 | Standard deviation: 0.2786
+Inferece: Perfect. 
+
+Dataset id: 10
+len images?  40080
+[Error] Mean: 0.4543 | Standard deviation: 0.2750
+[Losses: Mean] [0.44630373 0.46653047 0.45001107] | Standard deviation: [0.30483612 0.33721477 0.31235862]
+[Full Loss] Mean: 0.4543 | Standard deviation: 0.2750
+Inference: Bad, really bad. m and b inference were off.
+
+Dataset id: 9
+len images?  11440
+[Error] Mean: 0.5742 | Standard deviation: 0.2857
+[Losses: Mean] [0.5626106 0.5579143 0.602156 ] | Standard deviation: [0.3210605  0.36028883 0.37252137]
+[Full Loss] Mean: 0.5742 | Standard deviation: 0.2857
+Inference: Really good.
+
+Dataset id: 8
+len images?  15080
+[Error] Mean: 0.7181 | Standard deviation: 0.2828
+[Losses: Mean] [0.72400784 0.7056801  0.7246972 ] | Standard deviation: [0.30440742 0.34638134 0.3073362 ]
+[Full Loss] Mean: 0.7181 | Standard deviation: 0.2828
+Inference: Good in m, bad in b.
+
+Dataset id: 7
+len images?  106
+[Error] Mean: 0.6974 | Standard deviation: 0.2769
+[Losses: Mean] [0.6980802 0.6865334 0.7075425] | Standard deviation: [0.30374143 0.3590354  0.2981903 ]
+[Full Loss] Mean: 0.6974 | Standard deviation: 0.2769
+Inference: Bad. 
+
+Dataset id: 6
+len images?  9840
+[Error] Mean: 0.6860 | Standard deviation: 0.2912
+[Losses: Mean] [0.68786114 0.6828661  0.68732136] | Standard deviation: [0.316673   0.37780696 0.30817986]
+[Full Loss] Mean: 0.6860 | Standard deviation: 0.2912
+Inference: Good in m, bad in b.
+
+Dataset id: 5
+len images?  9840
+[Error] Mean: 0.5240 | Standard deviation: 0.3138
+[Losses: Mean] [0.5155887  0.54570866 0.5107802 ] | Standard deviation: [0.3475137  0.41180825 0.29529548]
+[Full Loss] Mean: 0.5240 | Standard deviation: 0.3138
+Inference: Terrible. Not that bad on b, but terrible on m.

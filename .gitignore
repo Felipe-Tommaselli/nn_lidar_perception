@@ -24,3 +24,4 @@ venv/
 myenv/
 
 models/model_005_09-01-2024_18-08-41.pth
+data/artificial_data/train11.zip
