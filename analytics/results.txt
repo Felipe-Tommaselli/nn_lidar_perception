@@ -14,9 +14,10 @@ Inference: Bad, really bad. m and b inference were off.
 
 Dataset id: 9
 len images?  11440
-[Error] Mean: 0.5742 | Standard deviation: 0.2857
-[Losses: Mean] [0.5626106 0.5579143 0.602156 ] | Standard deviation: [0.3210605  0.36028883 0.37252137]
-[Full Loss] Mean: 0.5742 | Standard deviation: 0.2857
+[Error] Mean: 0.5721 | Standard deviation: 0.2852
+[Errors Each] Mean: [0.5605786  0.55950534 0.59635264] | Standard deviation: [0.32054338 0.3591165  0.3725692 ]
+[Losses: Mean] [0.5605786  0.55950534 0.59635264] | Standard deviation: [0.32054338 0.3591165  0.3725692 ]
+[Full Loss] Mean: 0.5721 | Standard deviation: 0.2852
 Inference: Really good.
 
 Dataset id: 8
