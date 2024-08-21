@@ -24,7 +24,7 @@ Dataset id: 8
 len images?  15080
 [Error] Mean: 0.7181 | Standard deviation: 0.2828
 [Losses: Mean] [0.72400784 0.7056801  0.7246972 ] | Standard deviation: [0.30440742 0.34638134 0.3073362 ]
-[Full Loss] Mean: 0.7181 | Standard deviation: 0.2828
+[Full Loss] Mean: 0.7181 | Standard deviation: 0.2828e
 Inference: Good in m, bad in b.
 
 Dataset id: 7
